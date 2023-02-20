@@ -1,7 +1,7 @@
 import pytest
 from backend.torchlite import TorchLite
 from backend.dashboard import Dashboard
-from torchlitelib.extracted_features import Volume, WorkSet
+from htrc.torchlite.ef import Volume, WorkSet
 from backend.widgets import WidgetFactory
 
 

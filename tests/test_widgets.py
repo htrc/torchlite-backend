@@ -1,5 +1,5 @@
 import pytest
-from torchlitelib.extracted_features import WorkSet
+from htrc.torchlite.ef import WorkSet
 from backend.widgets import WidgetFactory
 import json
 

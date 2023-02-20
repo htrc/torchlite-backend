@@ -1,5 +1,5 @@
 import pytest
-from torchlitelib.extracted_features import WorkSet, Page
+from htrc.torchlite.ef import WorkSet, Page
 
 
 @pytest.fixture

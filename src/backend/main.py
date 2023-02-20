@@ -3,10 +3,10 @@ import json
 import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from api.extracted_features import WorkSet
-from api.dashboard import Dashboard
-from api.torchlite import TorchLite
-from api.widgets import WidgetFactory
+from htrc.torchlite.ef import WorkSet
+from backend.dashboard import Dashboard
+from backend.torchlite import TorchLite
+from backend.widgets import WidgetFactory
 
 app = TorchLite()
 

@@ -1,5 +1,5 @@
 import pytest
-from torchlitelib.extracted_features import Volume
+from htrc.torchlite.ef import Volume
 
 
 @pytest.fixture
