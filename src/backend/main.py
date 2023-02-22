@@ -1,9 +1,11 @@
 import uuid
 import json
 import logging
+import platform
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from htrc.torchlite.ef import WorkSet
+from backend import __version__
 from backend.dashboard import Dashboard
 from backend.torchlite import TorchLite
 from backend.widgets import WidgetFactory
@@ -47,6 +49,11 @@ tlapi.add_middleware(
 def read_root():
     return {"sample_worksets": [w.description for w in app.worksets.values()]}
 
+
+@tlapi.get("/info")
+def get_info():
+    return {"version": __version__,
+            "host": platform.node()}
 
 @tlapi.get("/dashboards")
 def get_root_dashboard():
