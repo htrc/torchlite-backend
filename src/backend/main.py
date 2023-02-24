@@ -4,7 +4,7 @@ import logging
 import platform
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from htrc.torchlite.ef import WorkSet
+from htrc.torchlite.ef.workset import WorkSet
 from backend import __version__
 from backend.dashboard import Dashboard
 from backend.torchlite import TorchLite
@@ -15,21 +15,7 @@ app = TorchLite()
 origins = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
 
 
-app.add_workset(
-    WorkSet(
-        url='https://worksets.htrc.illinois.edu/wsid/771d1500-7ac6-11eb-8593-e5f5ab8b1c01'
-    )
-)
-
-mini_workset = WorkSet()
-[
-    mini_workset.add_volume(v_id)
-    for v_id in ["uc1.32106011187561", "mdp.35112103187797", "uc1.$b684263"]
-]
-mini_workset.title = "minimal workset"
-mini_workset.description = "minimal workset for testing"
-app.add_workset(mini_workset)
-
+app.add_workset(WorkSet('63f7ae452500006404fc54c7'))
 
 app.add_dashboard(Dashboard("default"))
 
@@ -47,13 +33,13 @@ tlapi.add_middleware(
 
 @tlapi.get("/")
 def read_root():
-    return {"sample_worksets": [w.description for w in app.worksets.values()]}
+    return {"sample_worksets": [w.htid for w in app.worksets.values()]}
 
 
 @tlapi.get("/info")
 def get_info():
-    return {"version": __version__,
-            "host": platform.node()}
+    return {"version": __version__, "host": platform.node()}
+
 
 @tlapi.get("/dashboards")
 def get_root_dashboard():
@@ -97,7 +83,7 @@ def put_dashboard_workset(dashboard_id: str, workset_id: str):
     dashboard = app.get_dashboard(dashboard_id)
     workset = app.get_workset(workset_id)
     dashboard.workset = workset
-    return {"dashboard": dashboard.id, "workset": workset.id}
+    return {"dashboard": dashboard.id, "workset": workset.htid}
 
 
 @tlapi.get("/dashboards/{dashboard_id}/widgets")
@@ -121,7 +107,7 @@ def get_dashboard_widget(dashboard_id: str, widget_id: str):
     result = {"id": widget.id}
     ws = widget.workset
     if widget.workset:
-        result["workset"] = ws.id
+        result["workset"] = ws.htid
     return result
 
 
@@ -145,7 +131,7 @@ def get_widgets():
 ##########
 @tlapi.get("/worksets")
 def get_worksets():
-    return [ws.metadata for ws in app.worksets.values()]
+    return [ws.htid for ws in app.worksets.values()]
 
 
 @tlapi.get("/worksets/{workset_id}")
