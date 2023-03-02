@@ -1,5 +1,5 @@
 import pytest
-from htrc.torchlite.ef import Volume
+from htrc.torchlite.ef.volume import Volume
 
 
 @pytest.fixture

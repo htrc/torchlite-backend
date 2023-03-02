@@ -1,14 +1,14 @@
 import pytest
 from backend.dashboard import Dashboard
-from htrc.torchlite.ef import WorkSet, Volume
+from htrc.torchlite.ef.workset import WorkSet
+from htrc.torchlite.ef.volume import Volume
 from backend.widgets import WidgetFactory
 import uuid
 
 
 @pytest.fixture
 def workset():
-    ws = WorkSet()
-    ws.add_volume("loc.ark+=13960=t46q23w14")
+    ws = WorkSet('63f7ae452500006404fc54c7')
     return ws
 
 
