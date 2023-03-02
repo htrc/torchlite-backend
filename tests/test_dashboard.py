@@ -8,8 +8,7 @@ import uuid
 
 @pytest.fixture
 def workset():
-    ws = WorkSet()
-    ws.add_volume("loc.ark+=13960=t46q23w14")
+    ws = WorkSet('63f7ae452500006404fc54c7')
     return ws
 
 

@@ -1,27 +1,13 @@
 import pytest
 from backend.torchlite import TorchLite
 from backend.dashboard import Dashboard
-from htrc.torchlite.ef import Volume, WorkSet
+from htrc.torchlite.ef.workset import WorkSet
+from htrc.torchlite.ef.volume import Volume
 from backend.widgets import WidgetFactory
 
-
 @pytest.fixture
-def volume_1():
-    v = Volume("uc1.32106011187561")
-    return v
-
-
-@pytest.fixture
-def volume_2():
-    return Volume("loc.ark+=13960=t46q23w14")
-
-
-@pytest.fixture
-def workset_1(volume_1, volume_2):
-    ws = WorkSet()
-    ws.add_volume(Volume("uc1.32106011187561"))
-    ws.add_volume(Volume("loc.ark+=13960=t46q23w14"))
-    ws.description = "two volumes"
+def workset():
+    ws = WorkSet('63f7ae452500006404fc54c7')
     return ws
 
 
@@ -30,12 +16,12 @@ def widget_1():
     return WidgetFactory.make_widget('MetadataWidget')
 
 
-def test_worksets(workset_1):
+def test_worksets(workset):
     torchlite = TorchLite()
     assert torchlite.worksets == {}
-    torchlite.add_workset(workset_1)
-    key = workset_1.id
-    assert torchlite.get_workset(key) == workset_1
+    torchlite.add_workset(workset)
+    key = workset.htid
+    assert torchlite.get_workset(key) == workset
     assert len(torchlite.worksets) == 1
 
 
@@ -50,29 +36,29 @@ def test_dashboards():
     assert len(torchlite.dashboards) == 0
 
 
-def test_add_workset_to_torchlite(workset_1):
+def test_add_workset_to_torchlite(workset):
     torchlite = TorchLite()
-    torchlite.add_workset(workset_1)
+    torchlite.add_workset(workset)
     assert len(torchlite.worksets) == 1
 
 
-def test_get_workset_to_torchlite(workset_1):
+def test_get_workset_to_torchlite(workset):
     torchlite = TorchLite()
-    id = workset_1.id
-    torchlite.add_workset(workset_1)
-    assert torchlite.get_workset(id) == workset_1
+    id = workset.htid
+    torchlite.add_workset(workset)
+    assert torchlite.get_workset(id) == workset
 
 
-def test_add_workset_to_torchlite(workset_1):
+def test_add_workset_to_torchlite(workset):
     torchlite = TorchLite()
-    torchlite.add_workset(workset_1)
+    torchlite.add_workset(workset)
     assert len(torchlite.worksets) == 1
 
 
-def test_add_workset_to_dashboard(workset_1):
+def test_add_workset_to_dashboard(workset):
     d = Dashboard()
-    d.workset = workset_1
-    assert d.workset == workset_1
+    d.workset = workset
+    assert d.workset == workset
 
 
 def test_add_widget_to_dashboard(widget_1):
