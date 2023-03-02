@@ -1,6 +1,7 @@
 import pytest
 from backend.dashboard import Dashboard
-from htrc.torchlite.ef import WorkSet, Volume
+from htrc.torchlite.ef.workset import WorkSet
+from htrc.torchlite.ef.volume import Volume
 from backend.widgets import WidgetFactory
 import uuid
 

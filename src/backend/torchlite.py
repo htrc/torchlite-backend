@@ -48,7 +48,7 @@ class TorchLite:
         return self._worksets
 
     def add_workset(self, workset):
-        self.worksets[str(workset.id)] = workset
+        self.worksets[str(workset.htid)] = workset
         return self.worksets
 
     def get_workset(self, workset_id):

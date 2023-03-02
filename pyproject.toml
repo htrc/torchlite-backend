@@ -10,7 +10,7 @@ packages = [{include = "backend", from = "src"}]
 python = "^3.11"
 fastapi = "^0.90.1"
 requests = "^2.28.2"
-htrc-ef-lib = { git = "git@github.com:htrc/HTRC-EF-Lib.git", tag = "v0.2.0-alpha"}
+htrc-ef-lib = { git = "git@github.com:htrc/HTRC-EF-Lib.git" }
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.293"

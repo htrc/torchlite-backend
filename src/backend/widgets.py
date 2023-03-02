@@ -58,6 +58,9 @@ class MetadataWidget(Widget):
         self.type = "MetadataWidget"
 
         def return_values(ws):
+            return ws.metadata
+
+        def return_values_old(ws):
             result = []
             for k, v in ws.volumes.items():
                 if isinstance(v.publisher, list):
@@ -76,6 +79,7 @@ class MetadataWidget(Widget):
             return result
 
         self.add_step(lambda ws: return_values(ws))
+
 
 class TimelineWidget(Widget):
     '''publication timeline for workset'''
