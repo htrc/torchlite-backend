@@ -60,25 +60,8 @@ class MetadataWidget(Widget):
         def return_values(ws):
             return ws.metadata
 
-        def return_values_old(ws):
-            result = []
-            for k, v in ws.volumes.items():
-                if isinstance(v.publisher, list):
-                    publishers = [i['name'] for i in v.publisher]
-                else:
-                    publishers = [v.publisher['name']]
-
-                md = {}
-                md['id'] = k
-                md['title'] = v.title
-                md['pub_date'] = v.pub_date
-                md['publisher'] = publishers
-                md['pub_place'] = v.pub_place['name']
-                result.append(md)
-
-            return result
-
         self.add_step(lambda ws: return_values(ws))
+
 
 
 class TimelineWidget(Widget):
@@ -89,10 +72,9 @@ class TimelineWidget(Widget):
         self.type = "TimelineWidget"
 
         def return_values(ws):
-            result = []
-            for k, v in ws.volumes.items():
-                result.append(v.pub_date)
-            return result
+            return [{"title": v.title,
+                     "pub_date": v.pub_date}
+                    for v in ws.volumes]
 
         self.add_step(lambda ws: return_values(ws))
 
