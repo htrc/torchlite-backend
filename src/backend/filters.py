@@ -1,46 +1,31 @@
 import uuid
+import nltk
 from htrc.torchlite.ef.workset import WorkSet
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 from nltk.corpus import stopwords
+from functools import reduce
 
 
-def compose_n(*functions):
-    def compose2(f, g):
-        return lambda x: f(g(x))
-
-    return functools.reduce(compose2, functions, lambda x: x)
+def torchlite_stemmer(token_list):
+    stemmer = PorterStemmer()
+    return [stemmer.stem(tok) for tok in token_list]
 
 
-def compose_1(f, g):
-    return lambda x: f(g(x))
+def torchlite_lemmatizer(token_list):
+    lemmatizer = WordNetLemmatizer()
+    return [lemmatizer.lemmatize(tok) for tok in token_list]
 
 
-lem = WordNetLemmatizer()
-stem = PorterStemmer()
+def torchlite_stopword_filter(token_list):
+    return [tok for tok in token_list if tok not in stopwords.words('english')]
 
 
 class Filter(object):
-    '''The base torchlite filter class'''
-
-    def __init__(self, workset):
+    def __init__(self, *fns):
         self.id = uuid.uuid1()
-        self.filters = None
-        self._tokens = None
-        self._data = None
-        self.workset = workset
         self.type = "Generic"
 
-    @property
-    def tokens(self):
-        if not self._tokens:
-            self._tokens = self.workset.tokens.keys()
-        return self._tokens
-
-    @property
-    def data(self):
-        if self._data is None:
-            self.refresh()
-        return self._data
+        self.filters = reduce(lambda f, g: lambda x: g(f(x)), fns, lambda x: x)
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.id})"
@@ -50,41 +35,10 @@ class Filter(object):
             self.filters = fn
         else:
             self.filters = compose(fn, self.filters)
-        self.reset()
 
-    def reset(self):
-        self._data = None
-
-    def refresh(self):
-        self.reset()
-        self.apply_filters()
-
-    def apply_filters(self):
-        if self._data is None:
-            if self.filters is None:
-                self._data = self.tokens
-            else:
-                self._data = self.filters(self.tokens)
-
-    def stem_fn(self):
-        def fn(toks):
-            stemmer = PorterStemmer()
-            return [stemmer.stem(tok) for tok in toks]
-
-        return fn
-
-    def lem_fn(self):
-        def fn(toks):
-            lem = WordNetLemmatizer()
-            return [lem.lemmatize(tok) for tok in toks]
-
-        return fn
-
-    def stopword_fn(self):
-        def fn(toks):
-            return [tok for tok in toks if tok not in stopwords.words('english')]
-
-        return fn
+    def apply(self, token_list):
+        return self.filters(token_list)
 
 
-f = Filter(WorkSet('63f7ae452500006404fc54c7'))
+ws = WorkSet('63f7ae452500006404fc54c7')
+f = Filter()
