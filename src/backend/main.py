@@ -2,6 +2,7 @@ import uuid
 import json
 import logging
 import platform
+from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from htrc.torchlite.ef.workset import WorkSet
@@ -9,6 +10,7 @@ from backend import __version__
 from backend.dashboard import Dashboard
 from backend.torchlite import TorchLite
 from backend.widgets import WidgetFactory
+from backend.filters import *
 
 app = TorchLite()
 
@@ -18,6 +20,10 @@ origins = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
 app.add_workset(WorkSet('63f7ae452500006404fc54c7'))
 
 app.add_dashboard(Dashboard("default"))
+
+app.add_filter("stopwords", torchlite_stopword_filter)
+app.add_filter("stemmer", torchlite_stemmer)
+app.add_filter("lemmatizer", torchlite_lemmatizer)
 
 
 tlapi = FastAPI()
@@ -133,7 +139,31 @@ def get_widgets():
 def get_worksets():
     return [ws.htid for ws in app.worksets.values()]
 
+
 @tlapi.get("/worksets/{workset_id}")
 def get_workset_by_id(workset_id):
     ws = app.get_workset(workset_id)
     return ws
+
+
+#########
+# Filters
+#########
+
+
+@tlapi.get("/filters")
+def get_filters():
+    return list(app.filters.keys())
+
+
+@tlapi.get("/dashboards/{dashboard_id}/filters")
+def get_dashboard_filters(dashboard_id: str):
+    dashboard = app.get_dashboard(dashboard_id)
+    return dashboard.token_filters
+
+
+@tlapi.put("/dashboards/{dashboard_id}/filters/{filter_list}")
+def put_dashboard_filters(dashboard_id, filter_list):
+    dashboard = app.get_dashboard(dashboard_id)
+    dashboard.token_filters = filter_list.split(',')
+    return dashboard.token_filters

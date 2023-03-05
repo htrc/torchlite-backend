@@ -8,6 +8,7 @@ Users interact with Torchlite via a dashboard
 
 
 import uuid
+from backend.filters import FilterFactory
 
 
 class Dashboard:
@@ -20,7 +21,7 @@ class Dashboard:
         self._workset = None
         self._tokens = None
         self._token_data = None
-        self.token_filter = None
+        self.token_filters = None
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.id})"
@@ -53,10 +54,12 @@ class Dashboard:
         return self._token_data
 
     def filter(self, tokens):
-        if not self.token_filter:
+        if not self.token_filters:
             return tokens
         else:
-            return self.token_filter.apply(tokens)
+            factory = FilterFactory()
+            filter = factory.make_filter(*self.token_filters)
+            return filter.apply(tokens)
 
     def add_widget(self, widget):
         """Adds a widget to the dashboard."""

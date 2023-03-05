@@ -8,6 +8,7 @@ class TorchLite:
         self._dashboards = {}
         self._widgets = {}
         self._worksets = {}
+        self._filters = {}
 
         for cls in Widget.__subclasses__():
             self._widgets[cls.__name__] = cls.__doc__
@@ -57,3 +58,18 @@ class TorchLite:
     def delete_workset(self, workset_id):
         del self.worksets[workset_id]
         return self.worksets
+
+    # Filters
+
+    @property
+    def filters(self):
+        return self._filters
+
+    def add_filter(self, key, fn):
+        self._filters[key] = fn
+
+    def get_filter(self, key):
+        return self._filters[key]
+
+    def delete_filter(self, key):
+        del self._filters[key]
