@@ -53,9 +53,6 @@ class Filter(object):
 class FilterFactory(object):
     def __init__(self):
         self.registry = {}
-        self.register('stopwords', torchlite_stopword_filter)
-        self.register('lemmatize', torchlite_lemmatizer)
-        self.register('stem', torchlite_stemmer)
 
     def register(self, key, fn):
         self.registry[key] = fn
@@ -63,7 +60,3 @@ class FilterFactory(object):
     def make_filter(self, fnames):
         filter_fns = [self.registry[fname] for fname in fnames]
         return Filter(*filter_fns)
-
-
-ws = WorkSet('63f7ae452500006404fc54c7')
-f = Filter()

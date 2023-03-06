@@ -47,7 +47,7 @@ PUT http://localhost:8000/dashboards/default/filters?filter=stopwords
 #
 GET http://localhost:8000/dashboards/default/tokens
 #
-PUT http://localhost:8000/dashboards/default/filters?filter=stopwords&filter=stem
+PUT http://localhost:8000/dashboards/default/filters?filter=stopwords&filter=stemmer
 #
 
 POST http://localhost:8000/dashboards/default/widgets/MetadataWidget

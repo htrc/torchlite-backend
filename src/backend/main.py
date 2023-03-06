@@ -17,14 +17,14 @@ app = TorchLite()
 origins = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
 
 
-app.add_workset(WorkSet('63f7ae452500006404fc54c7'))
-
-app.add_dashboard(Dashboard("default"))
-
 app.register_filter("stopwords", torchlite_stopword_filter)
 app.register_filter("stemmer", torchlite_stemmer)
 app.register_filter("lemmatizer", torchlite_lemmatizer)
 
+
+app.add_workset(WorkSet('63f7ae452500006404fc54c7'))
+
+app.add_dashboard(Dashboard("default"))
 
 tlapi = FastAPI()
 

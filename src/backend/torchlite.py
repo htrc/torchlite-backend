@@ -20,6 +20,7 @@ class TorchLite:
         return [k for k in self._dashboards.keys()]
 
     def add_dashboard(self, dashboard):
+        dashboard.filter_factory = self.filter_factory
         self._dashboards[str(dashboard.id)] = dashboard
         return self.dashboards
 
