@@ -1,6 +1,7 @@
 from torchlitelib.extracted_features import WorkSet
 from backend.dashboard import Dashboard
 from backend.widgets import Widget
+from backend.filters import FilterFactory
 
 
 class TorchLite:
@@ -9,6 +10,7 @@ class TorchLite:
         self._widgets = {}
         self._worksets = {}
         self._filters = {}
+        self.filter_factory = FilterFactory()
 
         for cls in Widget.__subclasses__():
             self._widgets[cls.__name__] = cls.__doc__
@@ -69,13 +71,17 @@ class TorchLite:
 
     @property
     def filters(self):
-        return self._filters
+        # return self._filters
+        return self.filter_factory.registry
 
     def register_filter(self, key, fn):
-        self._filters[key] = fn
+        # self._filters[key] = fn
+        self.filter_factory.register(key, fn)
 
     def get_filter(self, key):
-        return self._filters[key]
+        # return self._filters[key]
+        return self.filter_factory.registry[key]
 
     def delete_filter(self, key):
-        del self._filters[key]
+        # del self._filters[key]
+        del self.filter_factory.registry[key]

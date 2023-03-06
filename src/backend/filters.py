@@ -15,22 +15,12 @@ def torchlite_stemmer(token_list: Counter):
     return new_list
 
 
-def torchlite_stemmer_old(token_list):
-    stemmer = PorterStemmer()
-    return [stemmer.stem(tok) for tok in token_list]
-
-
 def torchlite_lemmatizer(token_list: Counter):
     lemmatizer = WordNetLemmatizer()
     new_list = Counter()
     for token, token_count in token_list.items():
         new_list[lemmatizer.lemmatize(tok)] += token_count
     return new_list
-
-
-def torchlite_lemmatizer_old(token_list):
-    lemmatizer = WordNetLemmatizer()
-    return [lemmatizer.lemmatize(tok) for tok in token_list]
 
 
 def torchlite_stopword_filter(token_list: Counter):
@@ -41,11 +31,6 @@ def torchlite_stopword_filter(token_list: Counter):
         if token not in stoplist:
             new_list[token] += token_count
     return new_list
-
-
-def torchlite_stopword_filter_old(token_list):
-    '''Token_list is a list'''
-    return [tok for tok in token_list if tok not in stopwords.words('english')]
 
 
 class Filter(object):
