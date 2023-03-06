@@ -165,5 +165,5 @@ def get_dashboard_filters(dashboard_id: str):
 @tlapi.put("/dashboards/{dashboard_id}/filters/{filter_list}")
 def put_dashboard_filters(dashboard_id, filter_list):
     dashboard = app.get_dashboard(dashboard_id)
-    dashboard.token_filters = filter_list.split(',')
+    dashboard.token_filters = set(filter_list.split(','))
     return dashboard.token_filters

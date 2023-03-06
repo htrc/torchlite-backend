@@ -31,3 +31,17 @@ def test_dashboard(workset, widget):
     assert dashboard.widgets == {}
     dashboard.add_widget(widget)
     assert dashboard.widgets[str(widget.id)] == widget
+
+
+def test_filters():
+    dashboard = Dashboard()
+    assert dashboard._token_filters == set()
+    assert dashboard._token_data == None
+    test_data = ['alpha', 'beta']
+    dashboard._token_data = test_data
+    dashboard.token_filters = ['a', 'b']
+    assert dashboard._token_filters == set(['a', 'b'])
+    assert dashboard._token_data == None
+    dashboard._token_data = test_data
+    dashboard.token_filters = ['a', 'b']
+    assert dashboard._token_data == test_data
