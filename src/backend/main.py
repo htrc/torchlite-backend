@@ -3,7 +3,7 @@ import json
 import logging
 import platform
 from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from htrc.torchlite.ef.workset import WorkSet
 from backend import __version__
@@ -21,9 +21,9 @@ app.add_workset(WorkSet('63f7ae452500006404fc54c7'))
 
 app.add_dashboard(Dashboard("default"))
 
-app.add_filter("stopwords", torchlite_stopword_filter)
-app.add_filter("stemmer", torchlite_stemmer)
-app.add_filter("lemmatizer", torchlite_lemmatizer)
+app.register_filter("stopwords", torchlite_stopword_filter)
+app.register_filter("stemmer", torchlite_stemmer)
+app.register_filter("lemmatizer", torchlite_lemmatizer)
 
 
 tlapi = FastAPI()
@@ -162,8 +162,21 @@ def get_dashboard_filters(dashboard_id: str):
     return dashboard.token_filters
 
 
-@tlapi.put("/dashboards/{dashboard_id}/filters/{filter_list}")
-def put_dashboard_filters(dashboard_id, filter_list):
+@tlapi.put("/dashboards/{dashboard_id}/filters")
+def put_dashboard_filters(
+    dashboard_id: str, filter: list[str] | None = Query(default=None)
+):
     dashboard = app.get_dashboard(dashboard_id)
-    dashboard.token_filters = set(filter_list.split(','))
+    dashboard.token_filters = filter
     return dashboard.token_filters
+
+
+@tlapi.get("/dashboards/{dashboard_id}/tokens")
+def get_dashboard_tokens(dashboard_id):
+    '''
+    The token list can be very large. During development,
+    we cap the number of tokens returned at 100.
+    '''
+    dashboard = app.get_dashboard(dashboard_id)
+    tokens = dashboard.tokens
+    return tokens[0:100]

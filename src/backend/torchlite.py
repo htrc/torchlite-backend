@@ -60,12 +60,18 @@ class TorchLite:
         return self.worksets
 
     # Filters
+    '''
+    Filters are system-level entities; they are registered
+    when the torchlite app starts up.  Dashboards obtain the list of
+    available filters from the app, and should present to the user only
+    filters that have been registered.
+    '''
 
     @property
     def filters(self):
         return self._filters
 
-    def add_filter(self, key, fn):
+    def register_filter(self, key, fn):
         self._filters[key] = fn
 
     def get_filter(self, key):

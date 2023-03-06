@@ -28,6 +28,9 @@ class Dashboard:
     def reset_token_data(self):
         self._token_data = None
 
+    def reset_data(self):
+        self.reset_token_data()
+
     @property
     def id(self):
         return str(self._id)
@@ -62,15 +65,15 @@ class Dashboard:
     @property
     def tokens(self):
         if not self._token_data:
-            self._token_data = self.filter(self.workset.tokens)
+            self._token_data = self.filter(list(self.workset.tokens.keys()))
         return self._token_data
 
     def filter(self, tokens):
-        if not self._token_filters:
+        if self._token_filters == set():
             return tokens
         else:
             factory = FilterFactory()
-            filter = factory.make_filter(*self._token_filters)
+            filter = factory.make_filter(self._token_filters)
             return filter.apply(tokens)
 
     def add_widget(self, widget):

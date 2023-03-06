@@ -5,6 +5,8 @@ GET http://localhost:8000/dashboards
 #
 GET http://localhost:8000/worksets
 #
+GET http://localhost:8000/filters
+#
 GET http://localhost:8000/worksets/63f7ae452500006404fc54c7
 #
 POST http://localhost:8000/dashboards
@@ -23,10 +25,24 @@ GET http://localhost:8000/dashboards/:my-db/workset
 #
 PUT http://localhost:8000/dashboards/:my-db/workset/63f7ae452500006404fc54c7
 #
+GET http://localhost:8000/dashboards/:my-db/filters
+#
+PUT http://localhost:8000/dashboards/:my-db/filters/stopwords
+#
+GET http://localhost:8000/dashboards/:my-db/tokens
+#
 GET http://localhost:8000/dashboards/:my-db/widgets/:widget/data
 #
 GET http://localhost:8000/dashboards/default
 #
 PUT http://localhost:8000/dashboards/default/workset/63f7ae452500006404fc54c7
+#
+GET http://localhost:8000/dashboards/default/filters
+#
+GET http://localhost:8000/dashboards/default/tokens
+#
+PUT http://localhost:8000/dashboards/default/filters?filter=stopwords
+#
+GET http://localhost:8000/dashboards/default/tokens
 #
 POST http://localhost:8000/dashboards/default/widgets/MetadataWidget
