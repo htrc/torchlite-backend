@@ -65,6 +65,12 @@ class Dashboard:
     @property
     def tokens(self):
         if not self._token_data:
+            self._token_data = self.filter(self.workset.tokens)
+        return self._token_data
+
+    @property
+    def tokens_old(self):
+        if not self._token_data:
             self._token_data = self.filter(list(self.workset.tokens.keys()))
         return self._token_data
 

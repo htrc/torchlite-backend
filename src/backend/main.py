@@ -179,4 +179,4 @@ def get_dashboard_tokens(dashboard_id):
     '''
     dashboard = app.get_dashboard(dashboard_id)
     tokens = dashboard.tokens
-    return tokens[0:100]
+    return tokens.most_common(100)
