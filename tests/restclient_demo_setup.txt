@@ -2,6 +2,6 @@
 POST http://localhost:8000/dashboards/default/widgets/MetadataWidget
 -> run-hook (restclient-set-var ":widget" (cdr (assq 'widget (json-read))))
 #
-PUT http://localhost:8000/dashboards/default/workset/63f7ae452500006404fc54c7
+PUT http://localhost:8000/dashboards/default/workset/6416163a2d0000f9025c8284
 #
 GET http://localhost:8000/dashboards/default/widgets/:widget/data

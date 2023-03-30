@@ -7,7 +7,7 @@ GET http://localhost:8000/worksets
 #
 GET http://localhost:8000/filters
 #
-GET http://localhost:8000/worksets/63f7ae452500006404fc54c7
+GET http://localhost:8000/worksets/6416163a2d0000f9025c8284
 #
 POST http://localhost:8000/dashboards
 -> run-hook (restclient-set-var ":my-db" (cdr (assq 'dashboard (json-read))))
@@ -23,7 +23,7 @@ GET http://localhost:8000/dashboards/:my-db/widgets/:widget
 #
 GET http://localhost:8000/dashboards/:my-db/workset
 #
-PUT http://localhost:8000/dashboards/:my-db/workset/63f7ae452500006404fc54c7
+PUT http://localhost:8000/dashboards/:my-db/workset/6416163a2d0000f9025c8284
 #
 GET http://localhost:8000/dashboards/:my-db/filters
 #
@@ -35,7 +35,7 @@ GET http://localhost:8000/dashboards/:my-db/widgets/:widget/data
 #
 GET http://localhost:8000/dashboards/default
 #
-PUT http://localhost:8000/dashboards/default/workset/63f7ae452500006404fc54c7
+PUT http://localhost:8000/dashboards/default/workset/6416163a2d0000f9025c8284
 #
 GET http://localhost:8000/dashboards/default/filters
 #

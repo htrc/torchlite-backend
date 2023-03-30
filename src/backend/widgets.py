@@ -63,7 +63,6 @@ class MetadataWidget(Widget):
         self.add_step(lambda ws: return_values(ws))
 
 
-
 class TimelineWidget(Widget):
     '''publication timeline for workset'''
 
@@ -72,11 +71,10 @@ class TimelineWidget(Widget):
         self.type = "TimelineWidget"
 
         def return_values(ws):
-            return [{"title": v.title,
-                     "pub_date": v.pub_date}
-                    for v in ws.volumes]
+            return [{"title": v.title, "pub_date": v.pub_date} for v in ws.volumes]
 
         self.add_step(lambda ws: return_values(ws))
+
 
 class WidgetFactory:
     def __init__(self):

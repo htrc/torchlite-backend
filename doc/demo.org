@@ -1,0 +1,50 @@
+* Torchlite Backend Demonstration
+The most important part of Torchlite is its /dashboard:/ a React application that runs in a browser and enables users to select worksets, clean and filter workset data, and see data visualizations.  Torchlite's dashboard also gives users the ability to save data so that it may be displayed and explored in a Jupyter Notebook.
+
+Behind the scenes, Torchlite has a server application that performs vital functions for the dashboard: interacting with HTRC's Extracted Features database and performing sometimes elaborate computations that might lag if performed in the browser.  This /three-tiered architecture/ -- a presentation layer, a data layer, and a business layer -- is very common on the web.  It is favored by web developers because separating these concerns make applications faster to develop, more flexible to deploy, and easier to maintain.
+
+This demonstration shows Torchlite's back-end application in action.  The application is in active development, and not all of its functions have been implemented yet; it may also be slow and buggy.  And of course, this demonstration does not include the graphical dashboard!  But it does show how the graphical dashboard communicates with the backend to get data and execute user requests.
+
+We're going to show you how to install the Torchlite backend application on your own computer, start it up, and use your web browser to interact with it.
+
+** Getting Ready
+To install and run this demonstration, you need to have a computer that is connected to the Internet, and you must have permission to install software on it.  For now, we are going to assume you are running a recent version of MacOS on a Macintosh computer; if you have a Windows machine or a Linux machine, please contact us for help.
+
+If you have never installed software on your computer, you may want to get some help in installing the basic tools and using the command line.
+
+*** Install Homebrew
+#+begin_src shell
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#+end_src
+*** Install asdf
+#+begin_src shell
+  brew install asdf
+#+end_src
+
+*** Install a Recent Version of Python
+There are many tutorials and recipes on the Web showing how to install Python 3 on a Mac; if you have never installed software on your computer, you may want to get some help, as you are going to be using the command line to
+
+#+begin_src shell
+  asdf plugin-add python
+  asdf install python 3.11.0
+#+end_src
+*** Install Poetry
+#+begin_src shell
+  curl -sSL https://install.python-poetry.org | python3 -
+#+end_src
+
+*** Clone the Torchlite Backend GitHub Repository
+#+begin_src shell
+  git clone git@github.com:htrc/torchlite-backend.git
+#+end_src
+*** Install the Torchlite Backend Application
+#+begin_src shell
+  cd torchlite-backend
+  asdf local python 3.11.0
+  poetry install
+#+end_src
+*** Start the Torchlite Backend Application
+#+begin_src shell
+  cd src/backend
+  poetry run uvicorn main:tlapi
+#+end_src
