@@ -1,0 +1,110 @@
+from datetime import datetime
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from htrc.ef import WorksetEndPoint
+from htrc.ef.datamodels import Volume, Workset
+from htrc.torchlite import Torchlite
+from htrc.torchlite.dashboards import Dashboard
+from htrc.torchlite.widgets import WidgetFactory
+from htrc.torchlite.widgets.projectors import TimeLineProjector
+from htrc.torchlite.filters import *
+
+
+app = Torchlite()
+origins = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
+
+app.register_filter("stopwords", torchlite_stopword_filter)
+app.register_filter("stemmer", torchlite_stemmer)
+app.register_filter("lemmatizer", torchlite_lemmatizer)
+
+endpoint = WorksetEndPoint()
+
+startup_worksets = ['6418977d2d000079045c8287', '6416163a2d0000f9025c8284']
+
+defaults = {}
+defaults['workset'] = endpoint.get_workset('6416163a2d0000f9025c8284')
+
+for w in startup_worksets:
+    ws = endpoint.get_workset(w)
+    volcount = len(ws.htids)
+    app.add_workset(ws, description=f"Contains {volcount} volumes")
+
+default_dashboard = Dashboard(workset=defaults['workset'])
+app.add_dashboard(default_dashboard, timestamp=datetime.now())
+
+
+api = FastAPI()
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@api.get("/")
+async def read_root():
+    app_info = app.info()
+    return app_info | {"defaults": defaults}
+
+
+@api.get("/worksets")
+async def get_worksets():
+    return app.worksets
+
+
+@api.get("/worksets/{workset_id}")
+async def get_workset(workset_id):
+    obj = app.get_workset(workset_id)
+    ep = WorksetEndPoint()
+    metadata = ep.get_metadata(workset_id)
+    return {'id': obj['workset'].id, 'metadata': metadata}
+
+
+def dashboard_info(dashboard: Dashboard):
+    return {
+        'id': dashboard.id,
+        'workset': dashboard.workset,
+        'widgets': dashboard.widgets,
+    }
+
+
+@api.get("/dashboards")
+async def get_dashboards():
+    dashboards = []
+    for d in app.dashboards:
+        info = dashboard_info(d['dashboard'])
+        info['timestamp'] = d['timestamp']
+        dashboards.append(info)
+    return dashboards
+
+
+@api.post("/dashboards")
+def create_dashboard():
+    d = Dashboard(workset=defaults['workset'])
+    app.add_dashboard(d, timestamp=str(datetime.now()))
+    return app.get_dashboard(d.id)
+
+
+@api.get("/dashboards/{dashboard_id}")
+async def get_dashboard(dashboard_id):
+    return app.get_dashboard(dashboard_id)
+
+
+@api.put("/dashboards/{dashboard_id}/workset/{workset_id}")
+def put_dashboard_workset(dashboard_id: str, workset_id: str):
+    dashboard_obj = app.get_dashboard(dashboard_id)
+    dashboard = dashboard_obj['dashboard']
+    workset = app.get_workset(workset_id)
+    dashboard.workset = workset
+    return dashboard_info(dashboard)
+
+
+@api.post("/dashboards/{dashboard_id}/widgets/{widget_type}")
+def post_dashboard_widget(dashboard_id: str, widget_type: str):
+    dashboard_obj = app.get_dashboard(dashboard_id)
+    dashboard = dashboard_obj['dashboard']
+    widget = WidgetFactory.make_widget(widget_type)
+    dashboard.add_widget(widget)
+    return {"widget": widget.id}
