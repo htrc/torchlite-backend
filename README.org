@@ -14,13 +14,9 @@ This is the back-end API service for Torchlite.
 #+end_src
 * Running the Backend in Development
 #+begin_src shell
-  cd src/backend
-  poetry run uvicorn main:tlapi --reload
+  cd src
+  poetry run uvicorn app:api --reload
 #+end_src
   
 * A Quick Demonstration
-#+begin_src shell
-  curl -X PUT http://localhost:8000/dashboards/default/workset/63f7ae452500006404fc54c7
-#+end_src
-
 Point your browser at <http://localhost:8000/docs,> and use the UI to select a workset and add MetadataWidget to the default dashboard

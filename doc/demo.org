@@ -45,6 +45,6 @@ There are many tutorials and recipes on the Web showing how to install Python 3 
 #+end_src
 *** Start the Torchlite Backend Application
 #+begin_src shell
-  cd src/backend
-  poetry run uvicorn main:tlapi
+  cd src
+  poetry run uvicorn app:api
 #+end_src
