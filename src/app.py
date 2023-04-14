@@ -5,13 +5,23 @@ from htrc.ef import WorksetEndPoint
 from htrc.ef.datamodels import Volume, Workset
 from htrc.torchlite import Torchlite
 from htrc.torchlite.dashboards import Dashboard
-from htrc.torchlite.widgets import WidgetFactory
+from htrc.torchlite.widgets import TimeLineWidget
 from htrc.torchlite.widgets.projectors import TimeLineProjector
 from htrc.torchlite.filters import *
 
 
 app = Torchlite()
 origins = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
+
+api = FastAPI()
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 app.register_filter("stopwords", torchlite_stopword_filter)
 app.register_filter("stemmer", torchlite_stemmer)
@@ -30,17 +40,8 @@ for w in startup_worksets:
     app.add_workset(ws, description=f"Contains {volcount} volumes")
 
 default_dashboard = Dashboard(workset=defaults['workset'])
+default_dashboard.id = "default"
 app.add_dashboard(default_dashboard, timestamp=datetime.now())
-
-
-api = FastAPI()
-api.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 
 @api.get("/")
@@ -89,7 +90,10 @@ def create_dashboard():
 
 @api.get("/dashboards/{dashboard_id}")
 async def get_dashboard(dashboard_id):
-    return app.get_dashboard(dashboard_id)
+    if dashboard_id:
+        return app.get_dashboard(dashboard_id)
+    else:
+        return None
 
 
 @api.put("/dashboards/{dashboard_id}/workset/{workset_id}")
@@ -105,6 +109,14 @@ def put_dashboard_workset(dashboard_id: str, workset_id: str):
 def post_dashboard_widget(dashboard_id: str, widget_type: str):
     dashboard_obj = app.get_dashboard(dashboard_id)
     dashboard = dashboard_obj['dashboard']
-    widget = WidgetFactory.make_widget(widget_type)
-    dashboard.add_widget(widget)
-    return {"widget": widget.id}
+    widget_class = app.widgets[widget_type]
+    dashboard.add_widget(widget_class)
+    return dashboard_info(dashboard)
+
+
+@api.get("/dashboards/{dashboard_id}/widget/{widget_id}/data")
+async def get_widget_data(dashboard_id: str, widget_id: str):
+    dashboard_obj = app.get_dashboard(dashboard_id)
+    dashboard = dashboard_obj['dashboard']
+    widget = dashboard.get_widget(widget_id)
+    return widget.data

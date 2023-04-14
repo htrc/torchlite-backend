@@ -9,14 +9,11 @@ from htrc.ef.datamodels import Workset
 class Torchlite:
     def __init__(self) -> None:
         self._dashboards = []
-        self._widgets = {}
+        self._widgets = {w.__name__: w for w in Widget.__subclasses__()}
         self._worksets = []
         self._filters = {}
         self.filter_factory = FilterFactory()
         self.workset_endpoint = WorksetEndPoint()
-
-        for cls in Widget.__subclasses__():
-            self._widgets[cls.__name__] = cls.__doc__
 
     def info(self):
         info = {}
@@ -80,9 +77,9 @@ class Torchlite:
         '''The list of registered widgets'''
         return self._widgets
 
-    def add_widget(self, widget):
-        self.widgets[str(widget.id)] = widget
-        return self.widgets
+    # def add_widget(self, widget):
+    #     self.widgets[str(widget.id)] = widget
+    #     return self.widgets
 
     def get_widget(self, widget_id):
         return self.widgets[widget_id]

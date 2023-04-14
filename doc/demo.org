@@ -48,3 +48,43 @@ There are many tutorials and recipes on the Web showing how to install Python 3 
   cd src
   poetry run uvicorn app:api
 #+end_src
+
+*** Interact with the Server
+Now you can interact with the server.  One way is to use the OpenAPI endpoint at [[http://127.0.0.1:8000/docs][http://127.0.0.1:8000/docs]]: you can use form fields, links, and buttons to make requests and see responses.
+
+Another way is to use a commandline tool like curl.  Here's how you would add a timeline widget to the default dashboard:
+
+#+begin_src shell
+  curl -X 'POST' \
+    'http://127.0.0.1:8000/dashboards/default/widgets/TimeLineWidget' \
+    -H 'accept: application/json' \
+    -d ''
+#+end_src
+
+Now you can ask the new widget for data (your widget id will be different):
+#+begin_src shell
+  curl -X 'GET' \
+    'http://127.0.0.1:8000/dashboards/default/widget/c9d0f15c-d548-11ed-bc15-acde48001122/data' \
+    -H 'accept: application/json'
+#+end_src
+
+#+begin_src json
+  [
+    {
+      "htid": "mdp.35112103187797",
+      "pubDate": 1947
+    },
+    {
+      "htid": "mdp.39015058744122",
+      "pubDate": 2001
+    },
+    {
+      "htid": "uc1.$b684263",
+      "pubDate": 1889
+    },
+    {
+      "htid": "uc1.32106011187561",
+      "pubDate": 2001
+    }
+  ]
+#+end_src

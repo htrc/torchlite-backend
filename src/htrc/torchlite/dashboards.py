@@ -41,9 +41,8 @@ class Dashboard:
     def widgets(self) -> List[Widget]:
         return self._widgets
 
-    def add_widget(self, widget: Widget):
-        if self.workset:
-            widget.workset = self.workset
+    def add_widget(self, widget_class):
+        widget = widget_class(self.workset)
         self.widgets.append(widget)
 
     def get_widget(self, widget_id: UUID1):
