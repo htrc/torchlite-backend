@@ -26,6 +26,20 @@ class Api:
         uri = f"{self.worksets_uri}/{wsid}"
         return ef.Workset(**self.get(uri))
 
+    def get_workset_metadata(
+        self, wsid: str, fields: Union[List[str], None] = None
+    ) -> List[ef.Volume]:
+        uri = f"{self.worksets_uri}/{wsid}/metadata"
+        queries = {}
+        if fields:
+            queries['fields'] = ','.join(fields)
+
+        if queries:
+            uri = f"{uri}?{urllib.parse.urlencode(queries)}"
+
+        data = self.get(uri)
+        return [ef.Volume(**item) for item in data]
+
     def get_workset_volumes(self, wsid: str, *fields) -> List[ef.Volume]:
         uri = f"{self.worksets_uri}/{wsid}/volumes"
         if fields:
@@ -38,7 +52,7 @@ class Api:
         htid: str,
         pos: Union[bool, None] = None,
         fields: Union[List[str], None] = None,
-    ) -> dict:
+    ) -> List[ef.Volume]:
         uri = f"{self.volumes_uri}/{cleanId(htid)}"
         queries = {}
         if pos is not None:
@@ -48,11 +62,11 @@ class Api:
 
         if queries:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"
-        return self.get(uri)
+        return [ef.Volume(**item) for item in self.get(uri)]
 
     def get_volume_metadata(
         self, htid: str, fields: Union[List[str], None] = None
-    ) -> dict:
+    ) -> List[ef.Volume]:
         uri = f"{self.volumes_uri}/{cleanId(htid)}/metadata"
         queries = {}
         if fields:
@@ -60,7 +74,7 @@ class Api:
 
         if queries:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"
-        return self.get(uri)
+        return [ef.Volume(**item) for item in self.get(uri)]
 
     def get_pages(
         self,
@@ -68,7 +82,7 @@ class Api:
         seq: Union[List[str], None] = None,
         pos: Union[bool, None] = None,
         fields: Union[List[str], None] = None,
-    ) -> dict:
+    ) -> List[ef.Volume]:
         uri = f"{self.volumes_uri}/{cleanId(htid)}/pages"
         queries = {}
         if seq is not None:
@@ -81,4 +95,4 @@ class Api:
         if queries:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"
 
-        return self.get(uri)
+        return [ef.Volume(**item) for item in self.get(uri)]

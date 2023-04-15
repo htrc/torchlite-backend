@@ -97,7 +97,7 @@ async def get_dashboard(dashboard_id):
 def put_dashboard_workset(dashboard_id: str, workset_id: str):
     dashboard_obj = app.get_dashboard(dashboard_id)
     dashboard = dashboard_obj['dashboard']
-    workset = app.get_workset(workset_id)
+    workset = app.get_workset(workset_id)  # fix to use torchlite workset
     dashboard.workset = workset
     return dashboard_info(dashboard)
 
