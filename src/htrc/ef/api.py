@@ -45,9 +45,8 @@ class Api:
         htid: str,
         pos: Union[bool, None] = None,
         fields: Union[List[str], None] = None,
-    ):
-        clean_htid = cleanId(htid)
-        uri = f"{self.volumes_uri}/{clean_htid}"
+    ) -> dict:
+        uri = f"{self.volumes_uri}/{cleanId(htid)}"
         queries = {}
         if pos is not None:
             queries['pos'] = f"{str(pos).lower()}"
@@ -58,8 +57,17 @@ class Api:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"
         return self.get(uri)
 
-    def get_volume_metadata(self, htid: str, fields: List[str]):
-        pass
+    def get_volume_metadata(
+        self, htid: str, fields: Union[List[str], None] = None
+    ) -> dict:
+        uri = f"{self.volumes_uri}/{cleanId(htid)}/metadata"
+        queries = {}
+        if fields:
+            queries['fields'] = ','.join(fields)
+
+        if queries:
+            uri = f"{uri}?{urllib.parse.urlencode(queries)}"
+        return self.get(uri)
 
     def get_pages(self, htid: str, seq: List[int], pos: bool, **fields):
         pass
