@@ -1,16 +1,9 @@
 import urllib.parse
 from typing import List, Union
 from pydantic import NoneStr
+from pydantic.utils import sequence_like
 import requests
 import htrc.ef.datamodels as ef
-
-# function cleanId(id) {
-#   const i = id.indexOf('.');
-#   if (i == -1) throw `Invalid clean htid: ${id}`;
-#   const lib = id.substring(0, i);
-#   const libId = id.substring(i+1);
-#   return `${lib}.${libId.replaceAll(':', '+').replaceAll('/', '=').replaceAll('.', ',')}`;
-# }
 
 
 def cleanId(id):
@@ -24,7 +17,7 @@ class Api:
     worksets_uri: str = f"{base_uri}/worksets"
     volumes_uri: str = f"{base_uri}/volumes"
 
-    def get(self, uri):
+    def get(self, uri: str) -> dict:
         r = requests.get(uri)
         r.raise_for_status()
         return r.json()['data']
@@ -69,5 +62,23 @@ class Api:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"
         return self.get(uri)
 
-    def get_pages(self, htid: str, seq: List[int], pos: bool, **fields):
-        pass
+    def get_pages(
+        self,
+        htid: str,
+        seq: Union[List[str], None] = None,
+        pos: Union[bool, None] = None,
+        fields: Union[List[str], None] = None,
+    ) -> dict:
+        uri = f"{self.volumes_uri}/{cleanId(htid)}/pages"
+        queries = {}
+        if seq is not None:
+            queries['seq'] = ','.join(seq)
+        if pos is not None:
+            queries['pos'] = f"{str(pos).lower()}"
+        if fields:
+            queries['fields'] = ','.join(fields)
+
+        if queries:
+            uri = f"{uri}?{urllib.parse.urlencode(queries)}"
+
+        return self.get(uri)
