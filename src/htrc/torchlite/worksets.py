@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import List, Union
 import htrc.ef.datamodels as ef
+from htrc.ef.api import Api
 from htrc.ef import WorksetEndPoint
 
 
@@ -13,10 +14,10 @@ class Workset:
 
     """
 
-    def __init__(self, wsid: str) -> None:
-        self._ws_endpoint: WorksetEndPoint = WorksetEndPoint()
+    def __init__(self, wsid: str, ef_api: Api) -> None:
+        self._ef_api: Api = ef_api
         self.id: str = wsid
-        self._ef_workset: ef.Workset = self._ws_endpoint.get_workset(wsid)
+        self._ef_workset: ef.Workset = self._ef_api.get_workset(wsid)
         self._volumes: Union[List[Volume], None] = None
 
     def __repr__(self) -> str:
@@ -25,7 +26,9 @@ class Workset:
     @property
     def volumes(self):
         if self._volumes is None:
-            self._volumes = [Volume(v) for v in self._ws_endpoint.get_volumes(self.id)]
+            self._volumes = [
+                Volume(v) for v in self._ef_api.get_workset_volumes(self.id)
+            ]
         return self._volumes
 
     @property

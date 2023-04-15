@@ -2,7 +2,6 @@
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.widgets import Widget
 from htrc.torchlite.filters import FilterFactory
-from htrc.ef import WorksetEndPoint
 from htrc.ef.datamodels import Workset
 
 
@@ -13,7 +12,6 @@ class Torchlite:
         self._worksets = []
         self._filters = {}
         self.filter_factory = FilterFactory()
-        self.workset_endpoint = WorksetEndPoint()
 
     def info(self):
         info = {}
