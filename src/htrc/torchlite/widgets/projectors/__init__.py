@@ -1,24 +1,20 @@
-from htrc.ef.datamodels import Workset
-from htrc.ef import WorksetEndPoint
-from htrc.torchlite import widgets
+from htrc.torchlite.worksets import Workset
 
 
 class Projector:
-    def __init__(self, workset: Workset) -> None:
-        self.workset = workset
+    def __init__(self) -> None:
         self.projection = None
 
-    def project(self, workset, **kwargs):
+    def project(self, workset: Workset):
         pass
 
 
 class TimeLineProjector(Projector):
-    def __init__(self, workset: Workset) -> None:
-        super().__init__(workset)
+    def __init__(self) -> None:
+        super().__init__()
 
-    def project(self, **kwargs):
-        endpoint = WorksetEndPoint()
-        data = endpoint.get_metadata(self.workset.id, 'htid', 'metadata.pubDate')
+    def project(self, workset: Workset):
+        data = workset.metadata(['htid', 'metadata.pubDate'])
         self.projection = [
             {'htid': d.htid, 'pubDate': d.metadata.pubDate} for d in data
         ]

@@ -2,7 +2,6 @@ from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from htrc.ef.api import Api
-from htrc.ef.datamodels import Volume, Workset
 from htrc.torchlite import Torchlite
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.widgets import TimeLineWidget
@@ -30,6 +29,7 @@ app.register_filter("lemmatizer", torchlite_lemmatizer)
 startup_workset_ids = ['6418977d2d000079045c8287', '6416163a2d0000f9025c8284']
 
 defaults = {}
+# defaults['workset'] = Api().get_workset('6416163a2d0000f9025c8284')
 defaults['workset'] = Api().get_workset('6416163a2d0000f9025c8284')
 
 for w in startup_workset_ids:

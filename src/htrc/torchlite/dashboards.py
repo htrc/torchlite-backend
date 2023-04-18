@@ -3,7 +3,7 @@ import uuid
 from typing import Union, List
 from pydantic import UUID1
 from htrc.torchlite.widgets import Widget
-from htrc.ef.datamodels import Workset
+from htrc.torchlite.worksets import Workset
 
 
 class Dashboard:
@@ -33,16 +33,14 @@ class Dashboard:
     def workset(self, workset: Workset):
         self._workset = workset
         self.reset_data()
-        if self._widgets:
-            for widget in self._widgets:
-                widget.workset = workset
 
     @property
     def widgets(self) -> List[Widget]:
         return self._widgets
 
     def add_widget(self, widget_class):
-        widget = widget_class(self.workset)
+        widget = widget_class()
+        widget.dashboard = self
         self.widgets.append(widget)
 
     def get_widget(self, widget_id: UUID1):

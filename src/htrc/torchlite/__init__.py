@@ -2,7 +2,7 @@
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.widgets import Widget
 from htrc.torchlite.filters import FilterFactory
-from htrc.ef.datamodels import Workset
+import htrc.ef.datamodels as ef
 
 
 class Torchlite:
@@ -39,7 +39,7 @@ class Torchlite:
     def worksets(self):
         return self._worksets
 
-    def add_workset(self, workset: Workset, **kwargs):
+    def add_workset(self, workset: ef.Workset, **kwargs):
         entry = {"workset": workset, **kwargs}
         self._worksets.append(entry)
 

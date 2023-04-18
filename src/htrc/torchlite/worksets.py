@@ -2,7 +2,6 @@
 from typing import List, Union
 import htrc.ef.datamodels as ef
 from htrc.ef.api import Api
-from htrc.ef import WorksetEndPoint
 
 
 class Workset:
@@ -30,6 +29,9 @@ class Workset:
                 Volume(v) for v in self._ef_api.get_workset_volumes(self.id)
             ]
         return self._volumes
+
+    def metadata(self, fields: Union[List[str], None] = None) -> List[ef.Volume]:
+        return self._ef_api.get_workset_metadata(self.id, fields)
 
     @property
     def htids(self):
