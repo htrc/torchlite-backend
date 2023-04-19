@@ -6,7 +6,7 @@ authors = ["cwulfman <cwulfman@princeton.edu>"]
 readme = "README.org"
 packages = [
   {include = "htrc/torchlite", from = "src"},
-  {include = "htrc/ef/datamodels", from = "src"},
+  {include = "htrc/ef/", from = "src"},
 ]
 
 [tool.poetry.dependencies]
