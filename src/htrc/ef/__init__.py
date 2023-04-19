@@ -16,7 +16,7 @@ class WorksetEndPoint(EndPoint):
         super().__init__()
         self.base_uri = f"{self.base_uri}/worksets"
 
-    def get_workset(self, wsid):
+    def get_workset(self, wsid: str) -> Workset:
         uri = f"{self.base_uri}/{wsid}"
         return Workset(**self.get(uri))
 

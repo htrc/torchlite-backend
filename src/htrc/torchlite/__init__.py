@@ -2,91 +2,50 @@
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.widgets import Widget
 from htrc.torchlite.filters import FilterFactory
-from htrc.ef import WorksetEndPoint
-from htrc.ef.datamodels import Workset
+from htrc.torchlite.worksets import Workset
+import htrc.ef.datamodels as ef
+from htrc.ef.api import Api
 
 
 class Torchlite:
-    def __init__(self) -> None:
-        self._dashboards = []
-        self._widgets = {w.__name__: w for w in Widget.__subclasses__()}
-        self._worksets = []
+    def __init__(self, ef_api: Api) -> None:
+        self.ef_api = ef_api
+        self._dashboards = {}
+        self.widgets = {w.__name__: w for w in Widget.__subclasses__()}
+        self._worksets = {}
         self._filters = {}
         self.filter_factory = FilterFactory()
-        self.workset_endpoint = WorksetEndPoint()
 
     def info(self):
-        info = {}
-        info["worksets"] = [
-            {"id": ws['workset'].id, "description": ws['description']}
-            for ws in self._worksets
-        ]
-        info['dashboards'] = []
-        for d in self._dashboards:
-            db = d['dashboard']
-            # timestamp = d['timestamp']
-            info['dashboards'].append(
-                {
-                    'id': db.id,
-                    # 'timestamp': timestamp,
-                    'workset': db.workset.id,
-                    'widgets': db.widgets,
-                }
-            )
-        info['registered_widgets'] = self.widgets
-
-        return info
+        return {"dashboards": self._dashboards, "widgets": self.widgets}
 
     @property
     def worksets(self):
         return self._worksets
 
-    def add_workset(self, workset: Workset, **kwargs):
-        entry = {"workset": workset, **kwargs}
-        self._worksets.append(entry)
+    def add_workset(self, workset: Workset):
+        self._worksets[workset.id] = workset
+        return workset
 
     def get_workset(self, workset_id: str):
-        return next(filter(lambda x: x['workset'].id == workset_id, self._worksets))
+        return self._worksets[workset_id]
 
     def delete_workset(self, workset_id: str) -> None:
-        ws = self.get_workset(workset_id)
-        if ws:
-            self._worksets.remove(ws)
+        del self._worksets[workset_id]
 
     @property
     def dashboards(self):
         return self._dashboards
 
-    def add_dashboard(self, dashboard: Dashboard, **kwargs):
-        # dashboard.filter_factory = self.filter_factory
-        entry = {"dashboard": dashboard, **kwargs}
-        self._dashboards.append(entry)
+    def add_dashboard(self, dashboard: Dashboard):
+        self._dashboards[dashboard.id] = dashboard
+        return dashboard
 
     def get_dashboard(self, dashboard_id):
-        return next(
-            filter(lambda x: x['dashboard'].id == dashboard_id, self.dashboards)
-        )
+        return self._dashboards[dashboard_id]
 
     def delete_dashboard(self, dashboard_id):
-        dashboard = self.get_dashboard(dashboard_id)
-        if dashboard:
-            self._dashboards.remove(dashboard)
-
-    @property
-    def widgets(self):
-        '''The list of registered widgets'''
-        return self._widgets
-
-    # def add_widget(self, widget):
-    #     self.widgets[str(widget.id)] = widget
-    #     return self.widgets
-
-    def get_widget(self, widget_id):
-        return self.widgets[widget_id]
-
-    def delete_widget(self, widget_id):
-        del self.widgets[widget_id]
-        return self.widgets
+        del self._dashboards[dashboard_id]
 
     # Filters
     '''

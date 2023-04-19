@@ -1,6 +1,7 @@
 from typing import Any, List, Union
 from pydantic import BaseModel, ValidationError, DateTimeError
 
+
 class Workset(BaseModel):
     id: str
     htids: List[str]
@@ -69,4 +70,4 @@ class Volume(BaseModel):
     metadata: VolumeMetadata
 
     def __repr__(self):
-        return f"Volume({self.htid})"
+        return f"htrc.ef.datamodels.Volume({self.htid})"
