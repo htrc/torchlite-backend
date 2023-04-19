@@ -7,17 +7,25 @@ from htrc.torchlite.worksets import Workset
 
 
 class Dashboard:
-    def __init__(self, **kwargs):
+    def __init__(self) -> None:
         self.id = str(uuid.uuid1())
-        self._widgets: List[Widget] = []
+        self.widgets = {}
         self._workset: Union[Workset, None] = None
-        if 'workset' in kwargs:
-            self._workset = kwargs['workset']
         self.token_data = None
         self.token_filters = set()
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.id})"
+
+    @property
+    def info(self):
+        props = {}
+        props['id'] = self.id
+        if self._workset:
+            props['workset'] = self._workset.id
+        if self.widgets:
+            props['widgets'] = self.widgets
+        return props
 
     def reset_token_data(self):
         self.token_data = None
@@ -34,18 +42,11 @@ class Dashboard:
         self._workset = workset
         self.reset_data()
 
-    @property
-    def widgets(self) -> List[Widget]:
-        return self._widgets
-
-    def add_widget(self, widget_class):
-        widget = widget_class()
-        widget.dashboard = self
-        self.widgets.append(widget)
+    def add_widget(self, widget: Widget):
+        self.widgets[widget.id] = widget
 
     def get_widget(self, widget_id: UUID1):
-        return next(filter(lambda w: w.id == widget_id, self._widgets))
+        return self.widgets[widget_id]
 
     def delete_widget(self, widget_id: UUID1):
-        widget = self.get_widget(widget_id)
-        self._widgets.remove(widget)
+        del self.widgets[widget_id]

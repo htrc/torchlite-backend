@@ -9,7 +9,6 @@ from htrc.torchlite.widgets.projectors import Projector, TimeLineProjector
 class Widget:
     def __init__(self) -> None:
         self.id = str(uuid.uuid1())
-        self.dashboard: "Dashboard"
         self.projector: Projector
         self._cache = None
 
@@ -19,14 +18,9 @@ class Widget:
     def reset(self) -> None:
         self._cache = None
 
-    @property
-    def workset(self) -> Workset:
-        return self.dashboard.workset
-
-    @property
-    def data(self):
+    def get_data(self, workset):
         if self._cache is None:
-            self.projector.project(self.workset)
+            self.projector.project(workset)
             self._cache = self.projector.projection
         return self._cache
 

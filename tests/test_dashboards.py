@@ -1,4 +1,5 @@
 import pytest
+
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.widgets import TimeLineWidget
 from htrc.torchlite.worksets import Workset
@@ -13,7 +14,9 @@ def workset():
 
 @pytest.fixture
 def dashboard(workset):
-    return Dashboard(workset=workset)
+    d = Dashboard()
+    d.workset = workset
+    return d
 
 
 def test_dashboard(dashboard, workset):
