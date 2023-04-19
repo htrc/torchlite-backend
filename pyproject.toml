@@ -5,8 +5,7 @@ description = ""
 authors = ["cwulfman <cwulfman@princeton.edu>"]
 readme = "README.org"
 packages = [
-  {include = "htrc/torchlite/widgets/projectors", from = "src"},
-  {include = "htrc/torchlite/widgets/transformers", from = "src"},
+  {include = "htrc/torchlite", from = "src"},
   {include = "htrc/ef/datamodels", from = "src"},
 ]
 
