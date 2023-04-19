@@ -21,6 +21,7 @@ def dashboard(workset):
 
 def test_dashboard(dashboard, workset):
     assert dashboard.workset == workset
-    assert dashboard.widgets == []
-    dashboard.add_widget(TimeLineWidget)
+    assert dashboard.widgets == {}
+    widget = TimeLineWidget()
+    dashboard.add_widget(widget)
     assert len(dashboard.widgets) == 1
