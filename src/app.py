@@ -10,8 +10,40 @@ from htrc.torchlite.widgets import TimeLineWidget
 from htrc.torchlite.widgets.projectors import TimeLineProjector
 from htrc.torchlite.filters import *
 
-ef_api = Api()
-app = Torchlite(ef_api)
+
+def setup_demo(app, ef_api):
+    # startup_workset_ids = [
+    #     '6418977d2d000079045c8287',
+    #     '6416163a2d0000f9025c8284',
+    #     '64407dbd3300005208a5dca4',
+    # ]
+
+    app.add_workset(id='64407dbd3300005208a5dca4', description='DocSouth', volumes=82)
+
+    app.add_workset(
+        id='644070973300002108a5dca2', description='Freud Standard Edition', volumes=160
+    )
+
+    app.add_workset(
+        id='644076b83300003608a5dca3', description='Seven Dada Manifests', volumes=419
+    )
+
+    app.add_workset(id='6418977d2d000079045c8287', description="New Jersey", volumes=10)
+
+    demo_workset = tl_Workset('64407dbd3300005208a5dca4', ef_api)
+    demo_dashboard = Dashboard()
+    demo_dashboard.workset = demo_workset
+    demo_dashboard.id = 'demo'
+    widget = TimeLineWidget()
+    widget.id = 'TimeLineWidget'
+    demo_dashboard.add_widget(widget)
+
+    app.add_dashboard(demo_dashboard)
+    app.register_filter("stopwords", torchlite_stopword_filter)
+    app.register_filter("stemmer", torchlite_stemmer)
+    app.register_filter("lemmatizer", torchlite_lemmatizer)
+
+
 origins = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
 
 api = FastAPI()
@@ -24,31 +56,15 @@ api.add_middleware(
 )
 
 
-app.register_filter("stopwords", torchlite_stopword_filter)
-app.register_filter("stemmer", torchlite_stemmer)
-app.register_filter("lemmatizer", torchlite_lemmatizer)
-
-startup_workset_ids = ['6418977d2d000079045c8287', '6416163a2d0000f9025c8284']
-
-for id in startup_workset_ids:
-    ws = tl_Workset(id, ef_api)
-    app.add_workset(ws)
-
-
-defaults = {}
-defaults['workset'] = tl_Workset('6416163a2d0000f9025c8284', ef_api)
-
-
-default_dashboard = Dashboard()
-default_dashboard.workset = defaults["workset"]
-default_dashboard.id = "default"
-app.add_dashboard(default_dashboard)
+ef_api = Api()
+app = Torchlite(ef_api)
+setup_demo(app, ef_api)
 
 
 @api.get("/")
 async def read_root():
     app_info = app.info()
-    return app_info | {"defaults": defaults}
+    return app_info
 
 
 @api.get("/worksets")
@@ -58,14 +74,9 @@ async def get_worksets():
 
 @api.get("/worksets/{workset_id}")
 async def get_workset(workset_id):
-    obj = app.get_workset(workset_id)
-    metadata = Api().get_volume_metadata(workset_id)
-    return {'id': obj['workset'].id, 'metadata': metadata}
-
-
-# @api.get("/dashboards")
-# async def get_dashboards():
-#     return [d.info for d in app.dashboards]
+    metadata = app.ef_api.get_workset_metadata(workset_id, ['metadata.title'])
+    titles = [v.metadata.title for v in metadata]
+    return {'id': workset_id, 'metadata': titles}
 
 
 @api.get("/dashboards")
@@ -74,14 +85,14 @@ async def get_dashboards():
 
 
 @api.post("/dashboards")
-def create_dashboard():
+async def create_dashboard():
     d = Dashboard()
     app.add_dashboard(d)
     return app.get_dashboard(d.id)
 
 
 @api.get("/dashboards/{dashboard_id}")
-def get_dashboard(dashboard_id):
+async def get_dashboard(dashboard_id):
     if dashboard_id:
         return app.get_dashboard(dashboard_id)
     else:
@@ -89,15 +100,14 @@ def get_dashboard(dashboard_id):
 
 
 @api.put("/dashboards/{dashboard_id}/workset/{workset_id}")
-def put_dashboard_workset(dashboard_id: str, workset_id: str):
+async def put_dashboard_workset(dashboard_id: str, workset_id: str):
     dashboard = app.get_dashboard(dashboard_id)
-    workset = app.get_workset(workset_id)  # fix to use torchlite workset
-    dashboard.workset = workset
+    dashboard.workset = tl_Workset(workset_id, ef_api)
     return dashboard.info
 
 
 @api.post("/dashboards/{dashboard_id}/widgets/{widget_type}")
-def post_dashboard_widget(dashboard_id: str, widget_type: str):
+async def post_dashboard_widget(dashboard_id: str, widget_type: str):
     dashboard = app.get_dashboard(dashboard_id)
     widget_class = app.widgets[widget_type]
     widget = widget_class()

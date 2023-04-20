@@ -12,26 +12,15 @@ class Torchlite:
         self.ef_api = ef_api
         self._dashboards = {}
         self.widgets = {w.__name__: w for w in Widget.__subclasses__()}
-        self._worksets = {}
+        self.worksets = []
         self._filters = {}
         self.filter_factory = FilterFactory()
 
     def info(self):
         return {"dashboards": self._dashboards, "widgets": self.widgets}
 
-    @property
-    def worksets(self):
-        return self._worksets
-
-    def add_workset(self, workset: Workset):
-        self._worksets[workset.id] = workset
-        return workset
-
-    def get_workset(self, workset_id: str):
-        return self._worksets[workset_id]
-
-    def delete_workset(self, workset_id: str) -> None:
-        del self._worksets[workset_id]
+    def add_workset(self, **kwargs):
+        self.worksets.append(kwargs)
 
     @property
     def dashboards(self):
