@@ -25,10 +25,12 @@ def setup_demo(app, ef_api):
     )
 
     app.add_workset(
-        id='644076b83300003608a5dca3', description='Seven Dada Manifests', volumes=419
+        id='644076b83300003608a5dca3', description='Seven Dada Manifests', volumes=10
     )
 
-    app.add_workset(id='6418977d2d000079045c8287', description="New Jersey", volumes=10)
+    app.add_workset(
+        id='6418977d2d000079045c8287', description="New Jersey", volumes=419
+    )
 
     demo_workset = tl_Workset('64407dbd3300005208a5dca4', ef_api)
     demo_dashboard = Dashboard()

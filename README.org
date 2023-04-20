@@ -19,4 +19,8 @@ This is the back-end API service for Torchlite.
 #+end_src
   
 * A Quick Demonstration
-Point your browser at <http://localhost:8000/docs,> and use the UI to select a workset and add MetadataWidget to the default dashboard
+Point your browser at <http://localhost:8000/docs,> and play with the endpoints. Use the demo dashboard and the TimeLineWidget to get a quick result:
+
+#+begin_src shell
+  curl http://127.0.0.1:8000/dashboards/demo/widget/TimeLineWidget/data
+#+end_src
