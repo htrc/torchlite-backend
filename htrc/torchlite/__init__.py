@@ -4,6 +4,8 @@ from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.filters import FilterFactory
 from htrc.torchlite.widgets import Widget
 
+__version__ = "0.0.0"
+
 
 class Torchlite:
     def __init__(self, ef_api: Api) -> None:

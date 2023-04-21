@@ -4,10 +4,14 @@ version = "0.0.0"
 description = "Torchlite backend service"
 authors = ["cwulfman <cwulfman@princeton.edu>"]
 readme = "README.org"
-packages = [
-  {include = "htrc", from = "."},
-]
+packages = [{include = "htrc"}]
 repository = "https://github.com/htrc/torchlite-backend"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "pep440"
+dirty = true
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -132,5 +136,5 @@ line-length = 120
 target-version = 'py311'
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
