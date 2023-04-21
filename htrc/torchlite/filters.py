@@ -1,10 +1,9 @@
 import uuid
-import nltk
-from htrc.ef.datamodels import Workset
-from nltk.stem import PorterStemmer, WordNetLemmatizer
-from nltk.corpus import stopwords
-from functools import reduce
 from collections import Counter
+from functools import reduce
+
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer, WordNetLemmatizer
 
 
 def torchlite_stemmer(token_list: Counter):

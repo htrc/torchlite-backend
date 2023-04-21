@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from htrc.torchlite.dashboards import Dashboard
-from htrc.torchlite.widgets import Widget
-from htrc.torchlite.filters import FilterFactory
-from htrc.torchlite.worksets import Workset
-import htrc.ef.datamodels as ef
 from htrc.ef.api import Api
+from htrc.torchlite.dashboards import Dashboard
+from htrc.torchlite.filters import FilterFactory
+from htrc.torchlite.widgets import Widget
+from htrc.torchlite.worksets import Workset
 
 
 class Torchlite:

@@ -1,14 +1,12 @@
-from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from htrc.ef.api import Api
-import htrc.ef.datamodels as ef
 from htrc.torchlite import Torchlite
-from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.dashboards import Dashboard
-from htrc.torchlite.widgets import TimeLineWidget
-from htrc.torchlite.widgets.projectors import TimeLineProjector
 from htrc.torchlite.filters import *
+from htrc.torchlite.widgets import TimeLineWidget
+from htrc.torchlite.worksets import Workset as tl_Workset
 
 
 def setup_demo(app, ef_api):
@@ -56,7 +54,6 @@ api.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 ef_api = Api()
 app = Torchlite(ef_api)
