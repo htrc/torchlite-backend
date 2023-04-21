@@ -23,7 +23,7 @@ class Widget:
 
 
 class TimeLineWidget(Widget):
-    '''publication timeline for workset'''
+    """publication timeline for workset"""
 
     def __init__(self) -> None:
         super().__init__()

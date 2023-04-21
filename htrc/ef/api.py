@@ -7,7 +7,7 @@ import htrc.ef.datamodels as ef
 
 
 def cleanId(id):
-    lib, libId = id.split('.')
+    lib, libId = id.split(".")
     cleaned = libId.translate(str.maketrans(":/.", "+=,"))
     return f"{lib}.{cleaned}"
 
@@ -20,19 +20,17 @@ class Api:
     def get(self, uri: str) -> dict:
         r = requests.get(uri)
         r.raise_for_status()
-        return r.json()['data']
+        return r.json()["data"]
 
     def get_workset(self, wsid: str) -> ef.Workset:
         uri = f"{self.worksets_uri}/{wsid}"
         return ef.Workset(**self.get(uri))
 
-    def get_workset_metadata(
-            self, wsid: str, fields: Union[List[str], None] = None
-    ) -> List[ef.Volume]:
+    def get_workset_metadata(self, wsid: str, fields: Union[List[str], None] = None) -> List[ef.Volume]:
         uri = f"{self.worksets_uri}/{wsid}/metadata"
         queries = {}
         if fields:
-            queries['fields'] = ','.join(fields)
+            queries["fields"] = ",".join(fields)
 
         if queries:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"
@@ -48,49 +46,47 @@ class Api:
         return [ef.Volume(**item) for item in data]
 
     def get_volume_data(
-            self,
-            htid: str,
-            pos: Union[bool, None] = None,
-            fields: Union[List[str], None] = None,
+        self,
+        htid: str,
+        pos: Union[bool, None] = None,
+        fields: Union[List[str], None] = None,
     ) -> List[ef.Volume]:
         uri = f"{self.volumes_uri}/{cleanId(htid)}"
         queries = {}
         if pos is not None:
-            queries['pos'] = f"{str(pos).lower()}"
+            queries["pos"] = f"{str(pos).lower()}"
         if fields:
-            queries['fields'] = ','.join(fields)
+            queries["fields"] = ",".join(fields)
 
         if queries:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"
         return [ef.Volume(**item) for item in self.get(uri)]
 
-    def get_volume_metadata(
-            self, htid: str, fields: Union[List[str], None] = None
-    ) -> List[ef.Volume]:
+    def get_volume_metadata(self, htid: str, fields: Union[List[str], None] = None) -> List[ef.Volume]:
         uri = f"{self.volumes_uri}/{cleanId(htid)}/metadata"
         queries = {}
         if fields:
-            queries['fields'] = ','.join(fields)
+            queries["fields"] = ",".join(fields)
 
         if queries:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"
         return [ef.Volume(**item) for item in self.get(uri)]
 
     def get_pages(
-            self,
-            htid: str,
-            seq: Union[List[str], None] = None,
-            pos: Union[bool, None] = None,
-            fields: Union[List[str], None] = None,
+        self,
+        htid: str,
+        seq: Union[List[str], None] = None,
+        pos: Union[bool, None] = None,
+        fields: Union[List[str], None] = None,
     ) -> List[ef.Volume]:
         uri = f"{self.volumes_uri}/{cleanId(htid)}/pages"
         queries = {}
         if seq is not None:
-            queries['seq'] = ','.join(seq)
+            queries["seq"] = ",".join(seq)
         if pos is not None:
-            queries['pos'] = f"{str(pos).lower()}"
+            queries["pos"] = f"{str(pos).lower()}"
         if fields:
-            queries['fields'] = ','.join(fields)
+            queries["fields"] = ",".join(fields)
 
         if queries:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"

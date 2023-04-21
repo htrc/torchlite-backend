@@ -8,7 +8,7 @@ from htrc.torchlite.worksets import Workset
 
 @pytest.fixture
 def workset():
-    ws = Workset('6416163a2d0000f9025c8284', Api())
+    ws = Workset("6416163a2d0000f9025c8284", Api())
     return ws
 
 
