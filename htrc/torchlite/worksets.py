@@ -26,9 +26,7 @@ class Workset:
     @property
     def volumes(self):
         if self._volumes is None:
-            self._volumes = [
-                Volume(v) for v in self._ef_api.get_workset_volumes(self.id)
-            ]
+            self._volumes = [Volume(v) for v in self._ef_api.get_workset_volumes(self.id)]
         return self._volumes
 
     def metadata(self, fields: Union[List[str], None] = None) -> List[ef.Volume]:

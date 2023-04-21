@@ -18,14 +18,14 @@ def torchlite_lemmatizer(token_list: Counter):
     lemmatizer = WordNetLemmatizer()
     new_list = Counter()
     for token, token_count in token_list.items():
-        new_list[lemmatizer.lemmatize(tok)] += token_count
+        new_list[lemmatizer.lemmatize(token)] += token_count
     return new_list
 
 
 def torchlite_stopword_filter(token_list: Counter):
-    '''Token_list is a Counter'''
+    """Token_list is a Counter"""
     new_list = Counter()
-    stoplist = stopwords.words('english')
+    stoplist = stopwords.words("english")
     for token, token_count in token_list.items():
         if token not in stoplist:
             new_list[token] += token_count

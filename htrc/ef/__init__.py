@@ -1,6 +1,6 @@
 import requests
 
-from htrc.ef.datamodels import Workset, Volume, PublicationPlace
+from htrc.ef.datamodels import Workset, Volume
 
 
 class EndPoint:
@@ -9,7 +9,7 @@ class EndPoint:
     def get(self, uri):
         r = requests.get(uri)
         r.raise_for_status()
-        return r.json()['data']
+        return r.json()["data"]
 
 
 class WorksetEndPoint(EndPoint):
@@ -30,7 +30,7 @@ class WorksetEndPoint(EndPoint):
         if fields:
             uri = f"{uri}?fields={','.join(fields)}"
 
-        data = self.get(uri)
+        self.get(uri)
         # return data
         return [Volume(**item) for item in self.get(uri)]
 
@@ -39,10 +39,8 @@ class WorksetEndPoint(EndPoint):
         return r
 
     def create_workset(self, volume_ids):
-        data = ' '.join(volume_ids)
-        result = requests.post(
-            self.base_uri, data=data, headers={'Content-Type': 'text/plain'}
-        )
+        data = " ".join(volume_ids)
+        requests.post(self.base_uri, data=data, headers={"Content-Type": "text/plain"})
         return data
 
 

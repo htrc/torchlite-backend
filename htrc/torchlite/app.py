@@ -4,9 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from htrc.ef.api import Api
 from htrc.torchlite import Torchlite
 from htrc.torchlite.dashboards import Dashboard
-from htrc.torchlite.filters import *
 from htrc.torchlite.widgets import TimeLineWidget
 from htrc.torchlite.worksets import Workset as tl_Workset
+from torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 
 
 def setup_demo(app, ef_api):
@@ -16,26 +16,20 @@ def setup_demo(app, ef_api):
     #     '64407dbd3300005208a5dca4',
     # ]
 
-    app.add_workset(id='64407dbd3300005208a5dca4', description='DocSouth', volumes=82)
+    app.add_workset(id="64407dbd3300005208a5dca4", description="DocSouth", volumes=82)
 
-    app.add_workset(
-        id='644070973300002108a5dca2', description='Freud Standard Edition', volumes=160
-    )
+    app.add_workset(id="644070973300002108a5dca2", description="Freud Standard Edition", volumes=160)
 
-    app.add_workset(
-        id='644076b83300003608a5dca3', description='Seven Dada Manifests', volumes=10
-    )
+    app.add_workset(id="644076b83300003608a5dca3", description="Seven Dada Manifests", volumes=10)
 
-    app.add_workset(
-        id='6418977d2d000079045c8287', description="New Jersey", volumes=419
-    )
+    app.add_workset(id="6418977d2d000079045c8287", description="New Jersey", volumes=419)
 
-    demo_workset = tl_Workset('64407dbd3300005208a5dca4', ef_api)
+    demo_workset = tl_Workset("64407dbd3300005208a5dca4", ef_api)
     demo_dashboard = Dashboard()
     demo_dashboard.workset = demo_workset
-    demo_dashboard.id = 'demo'
+    demo_dashboard.id = "demo"
     widget = TimeLineWidget()
-    widget.id = 'TimeLineWidget'
+    widget.id = "TimeLineWidget"
     demo_dashboard.add_widget(widget)
 
     app.add_dashboard(demo_dashboard)
@@ -73,9 +67,9 @@ async def get_worksets():
 
 @api.get("/worksets/{workset_id}")
 async def get_workset(workset_id):
-    metadata = app.ef_api.get_workset_metadata(workset_id, ['metadata.title'])
+    metadata = app.ef_api.get_workset_metadata(workset_id, ["metadata.title"])
     titles = [v.metadata.title for v in metadata]
-    return {'id': workset_id, 'metadata': titles}
+    return {"id": workset_id, "metadata": titles}
 
 
 @api.get("/dashboards")

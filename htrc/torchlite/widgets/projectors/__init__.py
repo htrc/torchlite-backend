@@ -14,8 +14,6 @@ class TimeLineProjector(Projector):
         super().__init__()
 
     def project(self, workset: Workset):
-        data = workset.metadata(['htid', 'metadata.pubDate'])
-        self.projection = [
-            {'htid': d.htid, 'pubDate': d.metadata.pubDate} for d in data
-        ]
+        data = workset.metadata(["htid", "metadata.pubDate"])
+        self.projection = [{"htid": d.htid, "pubDate": d.metadata.pubDate} for d in data]
         return self.projection

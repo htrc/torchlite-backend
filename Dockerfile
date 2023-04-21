@@ -30,7 +30,7 @@ COPY poetry.lock pyproject.toml README.org ./
 COPY htrc ./htrc
 
 RUN poetry config virtualenvs.in-project true && \
-    poetry install --no-interaction --no-root --only=main && \
+    poetry install --no-interaction --no-ansi --no-root --only=main --sync && \
     poetry build --format=wheel
 
 FROM base as final

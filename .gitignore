@@ -133,3 +133,6 @@ dmypy.json
 # IDEs
 /.idea/
 *.iml
+
+# coverage
+test-results/

@@ -22,11 +22,11 @@ class Dashboard:
     @property
     def info(self):
         props = {}
-        props['id'] = self.id
+        props["id"] = self.id
         if self._workset:
-            props['workset'] = self._workset.id
+            props["workset"] = self._workset.id
         if self.widgets:
-            props['widgets'] = self.widgets
+            props["widgets"] = self.widgets
         return props
 
     def reset_token_data(self):
