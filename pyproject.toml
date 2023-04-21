@@ -108,7 +108,6 @@ allowlist_externals =
     poetry
 commands_pre = poetry install --no-ansi --sync
 commands =
-    poetry run black htrc tests
     poetry run ruff htrc tests
     mkdir -p test-results
     poetry run pytest {posargs} --junit-xml test-results/{envname}/junit.xml --cov-report html:test-results/{envname}/coverage/cov_html --cov-report xml:test-results/{envname}/coverage/cov.xml --html=test-results/{envname}/report.html
