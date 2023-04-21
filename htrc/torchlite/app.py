@@ -6,7 +6,7 @@ from htrc.torchlite import Torchlite
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.widgets import TimeLineWidget
 from htrc.torchlite.worksets import Workset as tl_Workset
-from torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
+from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 
 
 def setup_demo(app, ef_api):
