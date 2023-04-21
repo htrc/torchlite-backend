@@ -1,42 +1,34 @@
-from typing import List, Union
-
 from pydantic import BaseModel
-
+from typing import List, Union
 
 class Workset(BaseModel):
     id: str
     htids: List[str]
     created: str
 
-
 class Contributor(BaseModel):
     id: str
     type: str
     name: str
-
 
 class Publisher(BaseModel):
     id: str
     type: str
     name: str
 
-
 class PublicationPlace(BaseModel):
     id: Union[str, None]
     type: Union[str, None]
     name: Union[str, None]
 
-
 class SourceInstitution(BaseModel):
     type: str
     name: str
-
 
 class Journal(BaseModel):
     id: str
     type: str
     journalTitle: str
-
 
 class VolumeMetadata(BaseModel):
     schemaVersion: Union[str, None]
@@ -65,10 +57,6 @@ class VolumeMetadata(BaseModel):
     lastRightsUpateDate: Union[int, None]
     isPartOf: Union[Journal, None]
 
-
 class Volume(BaseModel):
     htid: str
     metadata: VolumeMetadata
-
-    def __repr__(self) -> str:
-        return f"htrc.ef.datamodels.Volume({self.htid})"
