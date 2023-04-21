@@ -1,9 +1,9 @@
 import pytest
 
+from htrc.ef.api import Api
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.widgets import TimeLineWidget
 from htrc.torchlite.worksets import Workset
-from htrc.ef.api import Api
 
 
 @pytest.fixture

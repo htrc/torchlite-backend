@@ -1,6 +1,5 @@
-import pytest
-from htrc.torchlite.worksets import Workset
 from htrc.ef.api import Api
+from htrc.torchlite.worksets import Workset
 
 
 def test_workset():

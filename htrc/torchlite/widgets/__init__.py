@@ -1,8 +1,5 @@
-from typing import Protocol, Union
 import uuid
-from pydantic import NoneStr
-from htrc.torchlite.worksets import Workset
-import htrc.ef.datamodels as ef
+
 from htrc.torchlite.widgets.projectors import Projector, TimeLineProjector
 
 

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import uuid
-from typing import Union, List
+from typing import Union
+
 from pydantic import UUID1
+
 from htrc.torchlite.widgets import Widget
 from htrc.torchlite.worksets import Workset
 

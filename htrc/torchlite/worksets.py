@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import List, Union
+
 import htrc.ef.datamodels as ef
 from htrc.ef.api import Api
 

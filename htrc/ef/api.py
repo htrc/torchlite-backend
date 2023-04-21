@@ -1,8 +1,8 @@
 import urllib.parse
 from typing import List, Union
-from pydantic import NoneStr
-from pydantic.utils import sequence_like
+
 import requests
+
 import htrc.ef.datamodels as ef
 
 
@@ -27,7 +27,7 @@ class Api:
         return ef.Workset(**self.get(uri))
 
     def get_workset_metadata(
-        self, wsid: str, fields: Union[List[str], None] = None
+            self, wsid: str, fields: Union[List[str], None] = None
     ) -> List[ef.Volume]:
         uri = f"{self.worksets_uri}/{wsid}/metadata"
         queries = {}
@@ -48,10 +48,10 @@ class Api:
         return [ef.Volume(**item) for item in data]
 
     def get_volume_data(
-        self,
-        htid: str,
-        pos: Union[bool, None] = None,
-        fields: Union[List[str], None] = None,
+            self,
+            htid: str,
+            pos: Union[bool, None] = None,
+            fields: Union[List[str], None] = None,
     ) -> List[ef.Volume]:
         uri = f"{self.volumes_uri}/{cleanId(htid)}"
         queries = {}
@@ -65,7 +65,7 @@ class Api:
         return [ef.Volume(**item) for item in self.get(uri)]
 
     def get_volume_metadata(
-        self, htid: str, fields: Union[List[str], None] = None
+            self, htid: str, fields: Union[List[str], None] = None
     ) -> List[ef.Volume]:
         uri = f"{self.volumes_uri}/{cleanId(htid)}/metadata"
         queries = {}
@@ -77,11 +77,11 @@ class Api:
         return [ef.Volume(**item) for item in self.get(uri)]
 
     def get_pages(
-        self,
-        htid: str,
-        seq: Union[List[str], None] = None,
-        pos: Union[bool, None] = None,
-        fields: Union[List[str], None] = None,
+            self,
+            htid: str,
+            seq: Union[List[str], None] = None,
+            pos: Union[bool, None] = None,
+            fields: Union[List[str], None] = None,
     ) -> List[ef.Volume]:
         uri = f"{self.volumes_uri}/{cleanId(htid)}/pages"
         queries = {}

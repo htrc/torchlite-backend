@@ -1,7 +1,6 @@
-import pytest
 from htrc.ef.api import Api
-from htrc.torchlite.worksets import Workset
 from htrc.torchlite.widgets.projectors import TimeLineProjector
+from htrc.torchlite.worksets import Workset
 
 wsid = "6416163a2d0000f9025c8284"
 
