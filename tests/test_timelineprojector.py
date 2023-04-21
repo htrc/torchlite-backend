@@ -11,5 +11,5 @@ def test_tlp():
     projector.project(ws)
     projection = projector.projection
     assert len(projection) == 4
-    assert projection[0]['htid'] == 'mdp.35112103187797'
-    assert projector.projection[0]['pubDate'] == 1947
+    assert projection[0]["htid"] == "mdp.35112103187797"
+    assert projector.projection[0]["pubDate"] == 1947

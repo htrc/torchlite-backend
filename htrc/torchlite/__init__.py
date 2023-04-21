@@ -3,7 +3,6 @@ from htrc.ef.api import Api
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.filters import FilterFactory
 from htrc.torchlite.widgets import Widget
-from htrc.torchlite.worksets import Workset
 
 
 class Torchlite:
@@ -36,12 +35,12 @@ class Torchlite:
         del self._dashboards[dashboard_id]
 
     # Filters
-    '''
+    """
     Filters are system-level entities; they are registered
     when the torchlite app starts up.  Dashboards obtain the list of
     available filters from the app, and should present to the user only
     filters that have been registered.
-    '''
+    """
 
     @property
     def filters(self):
