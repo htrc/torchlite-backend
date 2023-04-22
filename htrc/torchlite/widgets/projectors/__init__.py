@@ -1,19 +1,20 @@
+from typing import Any, List
 from htrc.torchlite.worksets import Workset
 
 
 class Projector:
     def __init__(self) -> None:
-        self.projection = None
+        self.projection: List = []
 
-    def project(self, workset: Workset):
-        pass
+    def project(self, workset: Workset) -> List:
+        return []
 
 
 class TimeLineProjector(Projector):
     def __init__(self) -> None:
         super().__init__()
 
-    def project(self, workset: Workset):
+    def project(self, workset: Workset) -> List[Any]:
         data = workset.metadata(["htid", "metadata.pubDate"])
         self.projection = [{"htid": d.htid, "pubDate": d.metadata.pubDate} for d in data]
         return self.projection

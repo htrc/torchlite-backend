@@ -945,6 +945,57 @@ slack = ["slack-sdk"]
 telegram = ["requests"]
 
 [[package]]
+name = "types-requests"
+version = "2.28.11.17"
+description = "Typing stubs for requests"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-requests-2.28.11.17.tar.gz", hash = "sha256:0d580652ce903f643f8c3b494dd01d29367ea57cea0c7ad7f65cf3169092edb0"},
+    {file = "types_requests-2.28.11.17-py3-none-any.whl", hash = "sha256:cc1aba862575019306b2ed134eb1ea994cab1c887a22e18d3383e6dd42e9789b"},
+]
+
+[package.dependencies]
+types-urllib3 = "<1.27"
+
+[[package]]
+name = "types-setuptools"
+version = "67.6.0.8"
+description = "Typing stubs for setuptools"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-setuptools-67.6.0.8.tar.gz", hash = "sha256:df3e084c3b5af782cb81bd516f40213b572d932fa2f1272aef307d15643736f8"},
+    {file = "types_setuptools-67.6.0.8-py3-none-any.whl", hash = "sha256:0b178cab1d5a7487cd410d1b5448d1a85d9da1bf44aa7be7c0d4f33d65041e5a"},
+]
+
+[[package]]
+name = "types-ujson"
+version = "5.7.0.3"
+description = "Typing stubs for ujson"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-ujson-5.7.0.3.tar.gz", hash = "sha256:416cd9e6414ce9c2a113361f2b333345011968592cf56a15b0abd95b673859c5"},
+    {file = "types_ujson-5.7.0.3-py3-none-any.whl", hash = "sha256:68b55eb26d7687519062739c2ccc13d85d29bcc194cb6c8162daeebae3b77702"},
+]
+
+[[package]]
+name = "types-urllib3"
+version = "1.26.25.10"
+description = "Typing stubs for urllib3"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-urllib3-1.26.25.10.tar.gz", hash = "sha256:c44881cde9fc8256d05ad6b21f50c4681eb20092552351570ab0a8a0653286d6"},
+    {file = "types_urllib3-1.26.25.10-py3-none-any.whl", hash = "sha256:12c744609d588340a07e45d333bf870069fc8793bcf96bae7a96d4712a42591d"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.5.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -1016,4 +1067,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.3)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b40ea95309fd5e4c2ee67526c7bd4cc769713c09249816a8b517bf15ccecb40e"
+content-hash = "46ed5b738fe52a4ed97ca9054345484f556bc738d72edc85fde730f103fc9c9a"

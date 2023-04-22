@@ -1,21 +1,17 @@
+from typing import List, Union, Any
 from fastapi import FastAPI
+import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 
 from htrc.ef.api import Api
 from htrc.torchlite import Torchlite
 from htrc.torchlite.dashboards import Dashboard
-from htrc.torchlite.widgets import TimeLineWidget
+from htrc.torchlite.widgets import TimeLineWidget, Widget
 from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 
 
-def setup_demo(app, ef_api):
-    # startup_workset_ids = [
-    #     '6418977d2d000079045c8287',
-    #     '6416163a2d0000f9025c8284',
-    #     '64407dbd3300005208a5dca4',
-    # ]
-
+def setup_demo(app: Torchlite, ef_api: Api) -> None:
     app.add_workset(id="64407dbd3300005208a5dca4", description="DocSouth", volumes=82)
 
     app.add_workset(id="644070973300002108a5dca2", description="Freud Standard Edition", volumes=160)
@@ -40,7 +36,7 @@ def setup_demo(app, ef_api):
 
 origins = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
 
-api = FastAPI()
+api: fastapi.FastAPI = FastAPI()
 api.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -49,43 +45,42 @@ api.add_middleware(
     allow_headers=["*"],
 )
 
-ef_api = Api()
-app = Torchlite(ef_api)
+ef_api: Api = Api()
+app: Torchlite = Torchlite(ef_api)
 setup_demo(app, ef_api)
 
 
 @api.get("/")
-async def read_root():
-    app_info = app.info()
-    return app_info
+async def read_root() -> dict:
+    return app.info()
 
 
 @api.get("/worksets")
-async def get_worksets():
+async def get_worksets() -> List:
     return app.worksets
 
 
 @api.get("/worksets/{workset_id}")
-async def get_workset(workset_id):
+async def get_workset(workset_id: str) -> dict:
     metadata = app.ef_api.get_workset_metadata(workset_id, ["metadata.title"])
     titles = [v.metadata.title for v in metadata]
     return {"id": workset_id, "metadata": titles}
 
 
 @api.get("/dashboards")
-async def get_dashboards():
+async def get_dashboards() -> dict[str, Dashboard]:
     return app.dashboards
 
 
 @api.post("/dashboards")
-async def create_dashboard():
+async def create_dashboard() -> Dashboard:
     d = Dashboard()
     app.add_dashboard(d)
     return app.get_dashboard(d.id)
 
 
 @api.get("/dashboards/{dashboard_id}")
-async def get_dashboard(dashboard_id):
+async def get_dashboard(dashboard_id: str) -> Union[Dashboard, None]:
     if dashboard_id:
         return app.get_dashboard(dashboard_id)
     else:
@@ -93,14 +88,14 @@ async def get_dashboard(dashboard_id):
 
 
 @api.put("/dashboards/{dashboard_id}/workset/{workset_id}")
-async def put_dashboard_workset(dashboard_id: str, workset_id: str):
-    dashboard = app.get_dashboard(dashboard_id)
+async def put_dashboard_workset(dashboard_id: str, workset_id: str) -> dict:
+    dashboard: Dashboard = app.get_dashboard(dashboard_id)
     dashboard.workset = tl_Workset(workset_id, ef_api)
     return dashboard.info
 
 
 @api.post("/dashboards/{dashboard_id}/widgets/{widget_type}")
-async def post_dashboard_widget(dashboard_id: str, widget_type: str):
+async def post_dashboard_widget(dashboard_id: str, widget_type: str) -> Dashboard:
     dashboard = app.get_dashboard(dashboard_id)
     widget_class = app.widgets[widget_type]
     widget = widget_class()
@@ -109,7 +104,7 @@ async def post_dashboard_widget(dashboard_id: str, widget_type: str):
 
 
 @api.get("/dashboards/{dashboard_id}/widget/{widget_id}/data")
-async def get_widget_data(dashboard_id: str, widget_id: str):
-    dashboard = app.get_dashboard(dashboard_id)
-    widget = dashboard.get_widget(widget_id)
+async def get_widget_data(dashboard_id: str, widget_id: str) -> Union[List[Any], None]:
+    dashboard: Dashboard = app.get_dashboard(dashboard_id)
+    widget: Widget = dashboard.get_widget(widget_id)
     return widget.get_data(dashboard.workset)
