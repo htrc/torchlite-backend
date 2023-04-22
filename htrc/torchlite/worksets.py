@@ -5,7 +5,6 @@ import htrc.ef.datamodels as ef
 from htrc.ef.api import Api
 
 
-
 class Volume:
     def __init__(self, data: ef.Volume) -> None:
         self.data: ef.Volume = data
@@ -13,6 +12,7 @@ class Volume:
 
     def __repr__(self) -> str:
         return f"Torchlite_Volume({self.htid})"
+
 
 class Workset:
     """Torchlite Workset

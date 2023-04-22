@@ -11,7 +11,7 @@ from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 
 
-def setup_demo(app: Torchlite, ef_api: Api)-> None:
+def setup_demo(app: Torchlite, ef_api: Api) -> None:
     app.add_workset(id="64407dbd3300005208a5dca4", description="DocSouth", volumes=82)
 
     app.add_workset(id="644070973300002108a5dca2", description="Freud Standard Edition", volumes=160)

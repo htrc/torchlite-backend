@@ -3,6 +3,7 @@ from typing import Any, List, Optional, Union
 from htrc.torchlite.widgets.projectors import Projector, TimeLineProjector
 from htrc.torchlite.worksets import Workset
 
+
 class Widget:
     def __init__(self) -> None:
         self.id: str = str(uuid.uuid1())
