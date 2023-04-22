@@ -55,7 +55,7 @@ async def read_root() -> dict:
     return app.info()
 
 
-@api.get("/worksets")
+@api.get("/worksets", response_model=None)
 async def get_worksets() -> List:
     return app.worksets
 
@@ -67,19 +67,19 @@ async def get_workset(workset_id: str) -> dict:
     return {"id": workset_id, "metadata": titles}
 
 
-@api.get("/dashboards")
-async def get_dashboards() -> dict[str, Dashboard]:
+@api.get("/dashboards", response_model=None)
+async def get_dashboards() -> dict:
     return app.dashboards
 
 
-@api.post("/dashboards")
+@api.post("/dashboards", response_model=None)
 async def create_dashboard() -> Dashboard:
     d = Dashboard()
     app.add_dashboard(d)
     return app.get_dashboard(d.id)
 
 
-@api.get("/dashboards/{dashboard_id}")
+@api.get("/dashboards/{dashboard_id}", response_model=None)
 async def get_dashboard(dashboard_id: str) -> Union[Dashboard, None]:
     if dashboard_id:
         return app.get_dashboard(dashboard_id)
@@ -94,7 +94,7 @@ async def put_dashboard_workset(dashboard_id: str, workset_id: str) -> dict:
     return dashboard.info
 
 
-@api.post("/dashboards/{dashboard_id}/widgets/{widget_type}")
+@api.post("/dashboards/{dashboard_id}/widgets/{widget_type}", response_model=None)
 async def post_dashboard_widget(dashboard_id: str, widget_type: str) -> Dashboard:
     dashboard = app.get_dashboard(dashboard_id)
     widget_class = app.widgets[widget_type]
