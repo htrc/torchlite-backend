@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from fastapi import FastAPI
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
@@ -68,19 +68,19 @@ async def get_workset(workset_id: str) -> dict:
 
 
 @api.get("/dashboards")
-async def get_dashboards() -> dict:
+async def get_dashboards() -> dict[str, Dashboard]:
     return app.dashboards
 
 
 @api.post("/dashboards")
-async def create_dashboard():
+async def create_dashboard() -> Dashboard:
     d = Dashboard()
     app.add_dashboard(d)
     return app.get_dashboard(d.id)
 
 
 @api.get("/dashboards/{dashboard_id}")
-async def get_dashboard(dashboard_id):
+async def get_dashboard(dashboard_id: str) -> Union[Dashboard, None]:
     if dashboard_id:
         return app.get_dashboard(dashboard_id)
     else:
@@ -88,14 +88,14 @@ async def get_dashboard(dashboard_id):
 
 
 @api.put("/dashboards/{dashboard_id}/workset/{workset_id}")
-async def put_dashboard_workset(dashboard_id: str, workset_id: str):
-    dashboard = app.get_dashboard(dashboard_id)
+async def put_dashboard_workset(dashboard_id: str, workset_id: str) -> dict:
+    dashboard: Dashboard = app.get_dashboard(dashboard_id)
     dashboard.workset = tl_Workset(workset_id, ef_api)
     return dashboard.info
 
 
 @api.post("/dashboards/{dashboard_id}/widgets/{widget_type}")
-async def post_dashboard_widget(dashboard_id: str, widget_type: str):
+async def post_dashboard_widget(dashboard_id: str, widget_type: str) -> Dashboard:
     dashboard = app.get_dashboard(dashboard_id)
     widget_class = app.widgets[widget_type]
     widget = widget_class()
@@ -104,7 +104,7 @@ async def post_dashboard_widget(dashboard_id: str, widget_type: str):
 
 
 @api.get("/dashboards/{dashboard_id}/widget/{widget_id}/data")
-async def get_widget_data(dashboard_id: str, widget_id: str):
+async def get_widget_data(dashboard_id: str, widget_id: str) -> Union[List, None]:
     dashboard = app.get_dashboard(dashboard_id)
     widget = dashboard.get_widget(widget_id)
     return widget.get_data(dashboard.workset)

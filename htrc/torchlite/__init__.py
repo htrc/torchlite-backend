@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import List
+from typing import Callable, List, Union, Unpack
 from htrc.ef.api import Api
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.filters import FilterFactory
@@ -20,7 +20,7 @@ class Torchlite:
     def info(self) -> dict:
         return {"dashboards": self._dashboards, "widgets": self.widgets}
 
-    def add_workset(self, **kwargs) -> None:
+    def add_workset(self, **kwargs: Union[str, int]) -> None:
         self.worksets.append(kwargs)
 
     @property
@@ -31,10 +31,10 @@ class Torchlite:
         self._dashboards[dashboard.id] = dashboard
         return dashboard
 
-    def get_dashboard(self, dashboard_id) -> Dashboard:
+    def get_dashboard(self, dashboard_id: str) -> Dashboard:
         return self._dashboards[dashboard_id]
 
-    def delete_dashboard(self, dashboard_id) -> None:
+    def delete_dashboard(self, dashboard_id: str) -> None:
         del self._dashboards[dashboard_id]
 
     # Filters
@@ -46,14 +46,14 @@ class Torchlite:
     """
 
     @property
-    def filters(self):
+    def filters(self) -> dict[str, Callable]:
         return self.filter_factory.registry
 
-    def register_filter(self, key, fn):
+    def register_filter(self, key: str, fn: Callable) -> None:
         self.filter_factory.register(key, fn)
 
-    def get_filter(self, key):
+    def get_filter(self, key: str) -> Callable:
         return self.filter_factory.registry[key]
 
-    def delete_filter(self, key):
+    def delete_filter(self, key: str) -> None:
         del self.filter_factory.registry[key]

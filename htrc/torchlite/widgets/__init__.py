@@ -5,7 +5,7 @@ from htrc.torchlite.widgets.projectors import Projector, TimeLineProjector
 
 class Widget:
     def __init__(self) -> None:
-        self.id = str(uuid.uuid1())
+        self.id: str = str(uuid.uuid1())
         self.projector: Projector
         self._cache = None
 
