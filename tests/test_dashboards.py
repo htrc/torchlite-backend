@@ -7,19 +7,19 @@ from htrc.torchlite.worksets import Workset
 
 
 @pytest.fixture
-def workset():
+def workset() -> Workset:
     ws = Workset("6416163a2d0000f9025c8284", Api())
     return ws
 
 
 @pytest.fixture
-def dashboard(workset):
+def dashboard(workset: Workset) -> Dashboard:
     d = Dashboard()
     d.workset = workset
     return d
 
 
-def test_dashboard(dashboard, workset):
+def test_dashboard(dashboard: Dashboard, workset: Workset) -> None:
     assert dashboard.workset == workset
     assert dashboard.widgets == {}
     widget = TimeLineWidget()

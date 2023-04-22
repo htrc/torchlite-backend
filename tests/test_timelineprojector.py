@@ -2,11 +2,12 @@ from htrc.ef.api import Api
 from htrc.torchlite.widgets.projectors import TimeLineProjector
 from htrc.torchlite.worksets import Workset
 
-wsid = "6416163a2d0000f9025c8284"
+wsid: str = "6416163a2d0000f9025c8284"
 
 
-def test_tlp():
-    ws = Workset(wsid, Api())
+def test_tlp() -> None:
+    ef_api: Api = Api()
+    ws: Workset = Workset(wsid, ef_api)
     projector = TimeLineProjector()
     projector.project(ws)
     projection = projector.projection

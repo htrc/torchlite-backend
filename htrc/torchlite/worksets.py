@@ -24,7 +24,7 @@ class Workset:
         return f"Torchlite_Workset({self.id})"
 
     @property
-    def volumes(self):
+    def volumes(self) -> Union[List[Volume], None]:
         if self._volumes is None:
             self._volumes = [Volume(v) for v in self._ef_api.get_workset_volumes(self.id)]
         return self._volumes
@@ -33,7 +33,7 @@ class Workset:
         return self._ef_api.get_workset_metadata(self.id, fields)
 
     @property
-    def htids(self):
+    def htids(self) -> List[str]:
         return self._ef_workset.htids
 
 

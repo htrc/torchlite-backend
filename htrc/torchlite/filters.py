@@ -3,8 +3,8 @@ import uuid
 from collections import Counter
 from functools import reduce
 
-from nltk.corpus import stopwords #type: ignore
-from nltk.stem import PorterStemmer, WordNetLemmatizer #type: ignore
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer, WordNetLemmatizer
 
 
 def torchlite_stemmer(token_list: Counter) -> Counter:

@@ -4,7 +4,7 @@ from htrc.torchlite.worksets import Workset
 
 class Projector:
     def __init__(self) -> None:
-        self.projection: Union[List, None] = None
+        self.projection: List = []
 
     def project(self, workset: Workset) -> List:
         return []

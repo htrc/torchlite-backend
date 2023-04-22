@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Any
 from fastapi import FastAPI
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from htrc.ef.api import Api
 from htrc.torchlite import Torchlite
 from htrc.torchlite.dashboards import Dashboard
-from htrc.torchlite.widgets import TimeLineWidget
+from htrc.torchlite.widgets import TimeLineWidget, Widget
 from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 
@@ -104,7 +104,7 @@ async def post_dashboard_widget(dashboard_id: str, widget_type: str) -> Dashboar
 
 
 @api.get("/dashboards/{dashboard_id}/widget/{widget_id}/data")
-async def get_widget_data(dashboard_id: str, widget_id: str) -> Union[List, None]:
-    dashboard = app.get_dashboard(dashboard_id)
-    widget = dashboard.get_widget(widget_id)
+async def get_widget_data(dashboard_id: str, widget_id: str) -> Union[List[Any], None]:
+    dashboard: Dashboard = app.get_dashboard(dashboard_id)
+    widget: Widget = dashboard.get_widget(widget_id)
     return widget.get_data(dashboard.workset)
