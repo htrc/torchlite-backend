@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from typing import List
 from htrc.ef.api import Api
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.filters import FilterFactory
@@ -9,31 +10,31 @@ __version__ = "0.0.0"
 
 class Torchlite:
     def __init__(self, ef_api: Api) -> None:
-        self.ef_api = ef_api
-        self._dashboards = {}
-        self.widgets = {w.__name__: w for w in Widget.__subclasses__()}
-        self.worksets = []
-        self._filters = {}
-        self.filter_factory = FilterFactory()
+        self.ef_api: Api = ef_api
+        self._dashboards: dict = {}
+        self.widgets: dict = {w.__name__: w for w in Widget.__subclasses__()}
+        self.worksets: List = []
+        self._filters: dict = {}
+        self.filter_factory: FilterFactory = FilterFactory()
 
-    def info(self):
+    def info(self) -> dict:
         return {"dashboards": self._dashboards, "widgets": self.widgets}
 
-    def add_workset(self, **kwargs):
+    def add_workset(self, **kwargs) -> None:
         self.worksets.append(kwargs)
 
     @property
-    def dashboards(self):
+    def dashboards(self) -> dict:
         return self._dashboards
 
-    def add_dashboard(self, dashboard: Dashboard):
+    def add_dashboard(self, dashboard: Dashboard) -> Dashboard:
         self._dashboards[dashboard.id] = dashboard
         return dashboard
 
-    def get_dashboard(self, dashboard_id):
+    def get_dashboard(self, dashboard_id) -> Dashboard:
         return self._dashboards[dashboard_id]
 
-    def delete_dashboard(self, dashboard_id):
+    def delete_dashboard(self, dashboard_id) -> None:
         del self._dashboards[dashboard_id]
 
     # Filters
