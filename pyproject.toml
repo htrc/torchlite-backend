@@ -39,7 +39,6 @@ black = "^23.3.0"
 pre-commit = "^3.2.2"
 
 [tool.mypy]
-mypy_path = "$MYPY_CONFIG_FILE_DIR/stubs"
 exclude = ['^tests/conftest.py$']
 no_implicit_optional = true
 show_error_codes = true
