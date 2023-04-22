@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import Callable, List, Union, Unpack
+from typing import Callable, List, Union
 from htrc.ef.api import Api
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.filters import FilterFactory

@@ -2,7 +2,6 @@
 import uuid
 from typing import Counter, Union
 
-from pydantic import UUID1
 
 from htrc.torchlite.widgets import Widget
 from htrc.torchlite.worksets import Workset
