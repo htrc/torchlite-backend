@@ -1,5 +1,5 @@
 import urllib.parse
-from typing import Iterable, List, Optional, Union
+from typing import List, Optional, Union
 
 import requests
 
@@ -38,15 +38,15 @@ class Api:
         data: dict = self.get(uri)
         return [ef.Volume(**item) for item in data]
 
-    def get_workset_volumes(self, wsid: str, fields: Optional[List[str]] ) -> List[ef.Volume]:
+    def get_workset_volumes(self, wsid: str, fields: Optional[List[str]] = None) -> List[ef.Volume]:
         uri: str = f"{self.worksets_uri}/{wsid}/volumes"
         if fields:
             uri = f"{uri}?fields={','.join(fields)}"
         data: dict = self.get(uri)
         return [ef.Volume(**item) for item in data]
 
-    def get_volume_data(self, htid: str, pos: Union[bool, None] = None,
-        fields: Optional[List[str]] = None
+    def get_volume_data(
+        self, htid: str, pos: Union[bool, None] = None, fields: Optional[List[str]] = None
     ) -> List[ef.Volume]:
         uri: str = f"{self.volumes_uri}/{cleanId(htid)}"
         queries: dict = {}
