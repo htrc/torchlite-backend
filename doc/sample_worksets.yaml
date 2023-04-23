@@ -9,7 +9,7 @@ author: SCWAReD
 - name: Comparative Literature Workset
   id: 6408a63a30000067055ce2e9
   volumes: 927
-  description: >
+  description:
              A list of works authored by non-Native Americans
              in HathiTrust on the similar subjects as the
              Native-authored workset during similar time
@@ -19,7 +19,7 @@ author: SCWAReD
 - name: The Black Fantastic Workset
   id: 642720e53300008d02a5dc9c
   volumes: 90
-  description: >
+  description:
              90 volumes, including duplicates, of Black Fantastic
              fiction, identified by Dr. Seretha Williams and
              Dr. Clarissa West-White, as part of HTRC's SCWAReD
@@ -29,7 +29,7 @@ author: SCWAReD
 - name: History of Black Writers Workset
   id: 6407a1ec300000a4045ce2e7
   volumes: 2166
-  description: >
+  description:
              Volumes found in HathiTrust written by African-American
              authors, as identified by the University of Kansas's
              Project on the History of Black Writing, released as part
@@ -39,7 +39,7 @@ author: SCWAReD
 - name: History of Black Writers Workset Sample
   id: 640ba4bf300000440a5ce31a
   volumes: 25
-  description: >
+  description:
              25 volume sample of volumes found in HathiTrust written
              by African-American authors, as identified by the
              University of Kansas's Project on the History of Black
