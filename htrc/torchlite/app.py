@@ -9,6 +9,7 @@ from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.widgets import TimeLineWidget, Widget
 from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
+from htrc.torchlite.middleware import TorchliteVersionHeaderMiddleware
 
 
 def setup_demo(app: Torchlite, ef_api: Api) -> None:
@@ -43,6 +44,9 @@ api.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+api.add_middleware(
+    TorchliteVersionHeaderMiddleware,
 )
 
 ef_api: Api = Api()

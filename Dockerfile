@@ -1,10 +1,12 @@
 FROM python:3.11-slim as base
 
 ARG ENV
+ARG TORCHLITE_VERSION
 
 # One of "prod" or "dev"
 ENV ENV ${ENV}
 ENV TORCHLITE_PORT 8000
+ENV TORCHLITE_VERSION ${TORCHLITE_VERSION:-0.0.0}
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -31,6 +33,7 @@ COPY htrc ./htrc
 
 RUN poetry config virtualenvs.in-project true && \
     poetry install --no-interaction --no-ansi --no-root --only=main --sync && \
+    poetry version $TORCHLITE_VERSION \
     poetry build --format=wheel
 
 FROM base as final
