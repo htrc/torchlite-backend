@@ -16,12 +16,12 @@ dirty = true
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.95.1"
-uvicorn = "^0.21.1"
+uvicorn = {extras = ["standard"], version = "^0.21.1"}
 requests = "^2.28.2"
 pydantic = "^1.10.6"
 nltk = "^3.8.1"
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
 pytest-asyncio = "^0.18.3"
 pytest-cov = "^3.0.0"
@@ -30,6 +30,8 @@ pytest-lazy-fixture = "^0.6.3"
 coverage = { version = "^7.0.5", extras = ["toml"]}
 Faker = "^13.11.0"
 tox = "^4.0.0"
+
+[tool.poetry.group.lint.dependencies]
 ruff = "^0.0.262"
 black = "^23.3.0"
 mypy = "^0.950"
@@ -105,7 +107,7 @@ exclude_lines = [
 legacy_tox_ini = """
 [tox]
 min_version = 4.0
-envlist = py{311}
+envlist = py{311}, ruff, mypy
 skipsdist = true
 requires = poetry==1.4.2
 
@@ -114,12 +116,14 @@ description = run the tests with {basepython}
 allowlist_externals =
     mkdir
     poetry
-commands_pre = poetry install --no-ansi --sync
+commands_pre = poetry install --no-interaction --sync
 commands =
-    poetry run ruff htrc tests
-    poetry run mypy .
     mkdir -p test-results
     poetry run pytest {posargs} --junit-xml test-results/{envname}/junit.xml --cov-report html:test-results/{envname}/coverage/cov_html --cov-report xml:test-results/{envname}/coverage/cov.xml --html=test-results/{envname}/report.html
+
+[testenv:ruff]
+description = perform style checking
+commands = poetry run ruff htrc tests
 
 [testenv:mypy]
 description = perform type checking
