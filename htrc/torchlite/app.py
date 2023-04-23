@@ -1,9 +1,4 @@
-from yaml import load
-
-try:
-    from yaml import CLoader as Loader
-except ImportError:
-    from yaml import Loader
+from yaml import load, Loader
 import requests
 from fastapi import FastAPI
 import fastapi
