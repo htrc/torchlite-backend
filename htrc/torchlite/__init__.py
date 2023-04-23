@@ -5,7 +5,12 @@ from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.filters import FilterFactory
 from htrc.torchlite.widgets import Widget
 
-__version__ = "0.0.0"
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("torchlite")
+except PackageNotFoundError:
+    __version__ = "UNKNOWN"
 
 
 class Torchlite:
