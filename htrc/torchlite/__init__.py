@@ -10,13 +10,13 @@ from htrc.torchlite.widgets import Widget
 __version__ = "0.0.0"
 
 
-class StatusEnum(str, Enum):
+class Status(str, Enum):
     success = "success"
     error = "error"
 
 
 class Response(BaseModel):
-    status: StatusEnum
+    status: Status
     data: Optional[List] = None
     messages: Optional[List[str]] = None
 

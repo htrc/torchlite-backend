@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 from htrc.ef.api import Api
-from htrc.torchlite import Torchlite, Response, StatusEnum
+from htrc.torchlite import Torchlite, Response, Status
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.widgets import TimeLineWidget, Widget
 from htrc.torchlite.worksets import Workset as tl_Workset
@@ -52,18 +52,18 @@ setup_demo(app, ef_api)
 async def read_root() -> Response:
     info: dict = app.info()
     if info:
-        return Response(status=StatusEnum.success, data=list(info))
+        return Response(status=Status.success, data=list(info))
     else:
-        return Response(status=StatusEnum.error, messages=list("could not get app info"))
+        return Response(status=Status.error, messages=list("could not get app info"))
 
 
 @api.get("/worksets")
 async def get_worksets() -> Response:
     worksets: list = app.worksets
     if worksets:
-        return Response(status=StatusEnum.success, data=worksets)
+        return Response(status=Status.success, data=worksets)
     else:
-        return Response(status=StatusEnum.error, messages=list("could not get worksets"))
+        return Response(status=Status.error, messages=list("could not get worksets"))
 
 
 @api.get("/worksets/{workset_id}")
@@ -72,7 +72,7 @@ async def get_workset(workset_id: str) -> Response:
     titles: list = []
     if metadata:
         titles = [v.metadata.title for v in metadata]
-    return Response(status=StatusEnum.success, data=list({"id": workset_id, "metadata": titles}))
+    return Response(status=Status.success, data=list({"id": workset_id, "metadata": titles}))
 
 
 @api.get("/dashboards")
@@ -81,13 +81,13 @@ async def get_dashboards() -> Response:
     info_list: list = []
     if dashboards:
         info_list = [d.info for d in dashboards.values()]
-    return Response(status=StatusEnum.success, data=info_list)
+    return Response(status=Status.success, data=info_list)
 
 
 @api.post("/dashboards")
 async def create_dashboard() -> Response:
     d = app.add_dashboard(Dashboard())
-    return Response(status=StatusEnum.success, data=list(d.id))
+    return Response(status=Status.success, data=list(d.id))
 
 
 @api.get("/dashboards/{dashboard_id}")
@@ -96,9 +96,9 @@ async def get_dashboard(dashboard_id: str) -> Response:
     data = []
     if db:
         data.append(db.info)
-        return Response(status=StatusEnum.success, data=data)
+        return Response(status=Status.success, data=data)
     else:
-        return Response(status=StatusEnum.error, messages=[f"could not find dashboard {dashboard_id}"])
+        return Response(status=Status.error, messages=[f"could not find dashboard {dashboard_id}"])
 
 
 @api.put("/dashboards/{dashboard_id}/workset/{workset_id}")
@@ -106,36 +106,36 @@ async def put_dashboard_workset(dashboard_id: str, workset_id: str) -> Response:
     dashboard: Dashboard = app.get_dashboard(dashboard_id)
     if dashboard:
         dashboard.workset = tl_Workset(workset_id, ef_api)
-        return Response(status=StatusEnum.success, data=list(dashboard.info))
+        return Response(status=Status.success, data=list(dashboard.info))
     else:
-        return Response(status=StatusEnum.error, messages=[f"could not find dashboard {dashboard_id}"])
+        return Response(status=Status.error, messages=[f"could not find dashboard {dashboard_id}"])
 
 
 @api.post("/dashboards/{dashboard_id}/widgets/{widget_type}")
 async def post_dashboard_widget(dashboard_id: str, widget_type: str) -> Response:
     dashboard = app.get_dashboard(dashboard_id)
     if not dashboard:
-        return Response(status=StatusEnum.error, messages=[f"could not find dashboard {dashboard_id}"])
+        return Response(status=Status.error, messages=[f"could not find dashboard {dashboard_id}"])
     widget_class = app.widgets[widget_type]
     if not widget_class:
-        return Response(status=StatusEnum.error, messages=[f"could not find widget type {widget_type}"])
+        return Response(status=Status.error, messages=[f"could not find widget type {widget_type}"])
     widget = widget_class()
     dashboard.add_widget(widget)
-    return Response(status=StatusEnum.success, data=list({"widget_id": widget.id}))
+    return Response(status=Status.success, data=list({"widget_id": widget.id}))
 
 
 @api.get("/dashboards/{dashboard_id}/widget/{widget_id}/data")
 async def get_widget_data(dashboard_id: str, widget_id: str) -> Response:
     dashboard: Dashboard = app.get_dashboard(dashboard_id)
     if not dashboard:
-        return Response(status=StatusEnum.error, messages=[f"could not find dashboard {dashboard_id}"])
+        return Response(status=Status.error, messages=[f"could not find dashboard {dashboard_id}"])
 
     workset = dashboard.workset
     if not workset:
-        return Response(status=StatusEnum.error, messages=["dashboard has no workset"])
+        return Response(status=Status.error, messages=["dashboard has no workset"])
 
     widget: Widget = dashboard.get_widget(widget_id)
     if not widget:
-        return Response(status=StatusEnum.error, messages=[f"could not find widget {widget_id}"])
+        return Response(status=Status.error, messages=[f"could not find widget {widget_id}"])
 
-    return Response(status=StatusEnum.success, data=widget.get_data(workset))
+    return Response(status=Status.success, data=widget.get_data(workset))
