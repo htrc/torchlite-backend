@@ -1,3 +1,10 @@
+from yaml import load
+
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
+import requests
 from fastapi import FastAPI
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,8 +16,16 @@ from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 from htrc.torchlite.middleware import TorchliteVersionHeaderMiddleware
 
+sample_worksets_uri = "https://raw.githubusercontent.com/htrc/torchlite-backend/develop/doc/sample_worksets.yaml"
+
 
 def setup_demo(app: Torchlite, ef_api: Api) -> None:
+    r = requests.get(sample_worksets_uri)
+    sample_workset_data = load(r.text, Loader=Loader)
+
+    for data in sample_workset_data:
+        app.add_workset(**data)
+
     app.add_workset(id="64407dbd3300005208a5dca4", description="DocSouth", volumes=82)
 
     app.add_workset(id="644070973300002108a5dca2", description="Freud Standard Edition", volumes=160)
