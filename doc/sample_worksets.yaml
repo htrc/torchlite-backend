@@ -1,7 +1,7 @@
 - name: Native-authored Workset
   id: 6408a5e930000067055ce2e8
   volumes: 919
-  description: >
+  description:
              A list of works authored
              by Native Americans in HathiTrust
   author: SCWAReD
