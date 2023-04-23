@@ -17,16 +17,24 @@ class Api:
     worksets_uri: str = f"{base_uri}/worksets"
     volumes_uri: str = f"{base_uri}/volumes"
 
-    def get(self, uri: str) -> dict:
+    def get(self, uri: str) -> dict | None:
         r: requests.models.Response = requests.get(uri)
         r.raise_for_status()
-        return r.json()["data"]
+        r.json()
+        try:
+            return r.json()["data"]
+        except KeyError:
+            return None
 
-    def get_workset(self, wsid: str) -> ef.Workset:
+    def get_workset(self, wsid: str) -> ef.Workset | None:
         uri: str = f"{self.worksets_uri}/{wsid}"
-        return ef.Workset(**self.get(uri))
+        response = self.get(uri)
+        if response:
+            return ef.Workset(**response)
+        else:
+            return None
 
-    def get_workset_metadata(self, wsid: str, fields: Optional[List[str]]) -> List[ef.Volume]:
+    def get_workset_metadata(self, wsid: str, fields: Optional[List[str]]) -> List[ef.Volume] | None:
         uri = f"{self.worksets_uri}/{wsid}/metadata"
         queries: dict = {}
         if fields:
@@ -35,8 +43,11 @@ class Api:
         if queries:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"
 
-        data: dict = self.get(uri)
-        return [ef.Volume(**item) for item in data]
+        data: dict | None = self.get(uri)
+        if data:
+            return [ef.Volume(**item) for item in data]
+        else:
+            return None
 
     def get_workset_volumes(self, wsid: str, fields: Optional[List[str]] = None) -> List[ef.Volume]:
         uri: str = f"{self.worksets_uri}/{wsid}/volumes"

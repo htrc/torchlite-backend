@@ -25,7 +25,7 @@ class Dashboard:
         if self._workset:
             props["workset"] = self._workset.id
         if self.widgets:
-            props["widgets"] = self.widgets
+            props["widgets"] = [w.__repr__() for w in self.widgets]
         return props
 
     def reset_token_data(self) -> None:

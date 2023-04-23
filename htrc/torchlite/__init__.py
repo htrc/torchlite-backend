@@ -1,11 +1,24 @@
 # -*- coding: utf-8 -*-
-from typing import Callable, List, Union
+from enum import Enum
+from typing import Callable, List, Union, Optional
+from pydantic import BaseModel
 from htrc.ef.api import Api
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.filters import FilterFactory
 from htrc.torchlite.widgets import Widget
 
 __version__ = "0.0.0"
+
+
+class StatusEnum(str, Enum):
+    success = "success"
+    error = "error"
+
+
+class Response(BaseModel):
+    status: StatusEnum
+    data: Optional[List] = None
+    messages: Optional[List[str]] = None
 
 
 class Torchlite:
