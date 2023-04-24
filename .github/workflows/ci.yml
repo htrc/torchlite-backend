@@ -71,7 +71,6 @@ jobs:
           images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}
           tags: |
             type=sha,prefix={{branch}}-,priority=750,enable=${{ startsWith(github.ref, 'refs/heads/') }}
-            type=edge
             type=ref,event=branch
             type=ref,event=pr
             type=pep440,pattern={{version}}
