@@ -1,12 +1,7 @@
-FROM python:3.11-slim as base
-
-ARG TORCHLITE_VERSION
+FROM python:3.11-slim
 
 ENV TORCHLITE_PORT 8000
-ENV TORCHLITE_VERSION "${TORCHLITE_VERSION:-0.0.0}"
 
-# Keeps Python from generating .pyc files in the container
-ENV PYTHONDONTWRITEBYTECODE 1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONFAULTHANDLER 1
@@ -16,33 +11,11 @@ ENV PIP_NO_CACHE_DIR 1
 RUN useradd -ms /bin/bash torchlite
 WORKDIR /home/torchlite
 
-FROM base as builder
+COPY dist/*.whl log_conf.yaml docker-entrypoint.sh ./
 
-ENV PIP_DEFAULT_TIMEOUT 100
-ENV PIP_DISABLE_PIP_VERSION_CHECK 1
-ENV PIPX_BIN_DIR /usr/local/bin
-ENV POETRY_VERSION 1.4.2
-ENV POETRY_VIRTUALENVS_IN_PROJECT true
-ENV POETRY_DYNAMIC_VERSIONING_BYPASS true
-
-RUN pip install --upgrade pip pipx && pipx install "poetry==$POETRY_VERSION"
-
-COPY poetry.lock pyproject.toml README.* ./
-COPY htrc ./htrc
-
-RUN poetry install --no-interaction --no-ansi --no-root --only=main --sync && \
-    poetry version "$TORCHLITE_VERSION" && \
-    poetry build --format=wheel
-
-FROM base as final
-
-COPY --chown=torchlite:torchlite --from=builder /home/torchlite/.venv ./.venv
-COPY --chown=torchlite:torchlite --from=builder /home/torchlite/dist .
-COPY --chown=torchlite:torchlite docker-entrypoint.sh .
+RUN pip install -U pip *.whl && rm -f *.whl
 
 USER torchlite
-
-RUN ./.venv/bin/pip install *.whl
 
 EXPOSE $TORCHLITE_PORT
 
