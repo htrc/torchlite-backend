@@ -110,7 +110,7 @@ exclude_lines = [
 legacy_tox_ini = """
 [tox]
 min_version = 4.0
-envlist = py{311}, ruff, mypy
+envlist = py{311}, ruff, mypy, pyflakes
 skipsdist = true
 requires = poetry==1.4.2
 
@@ -131,6 +131,10 @@ commands = poetry run ruff htrc tests
 [testenv:mypy]
 description = perform type checking
 commands = poetry run mypy .
+
+[testenv:pyflakes]
+description = perform error checking
+commands = poetry run pyflakes htrc tests
 
 [testenv:docs]
 description = invoke sphinx-build to build the HTML docs
