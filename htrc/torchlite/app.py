@@ -4,7 +4,7 @@ from fastapi import FastAPI
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 from htrc.ef.api import Api
-from htrc.torchlite import Torchlite, Response, Status
+from htrc.torchlite import Torchlite, Response, Status, __version__
 from htrc.torchlite.dashboards import Dashboard
 from htrc.torchlite.widgets import TimeLineWidget, Widget
 from htrc.torchlite.worksets import Workset as tl_Workset
@@ -44,6 +44,8 @@ def setup_demo(app: Torchlite, ef_api: Api) -> None:
 
 
 origins = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
+
+print(f"Starting Torchlite Backend v{__version__}")
 
 api: fastapi.FastAPI = FastAPI()
 api.add_middleware(

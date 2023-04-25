@@ -15,12 +15,12 @@ class Volume:
 
 
 class Workset:
-    """Torchlite Workset
+    """
+    Torchlite Workset
 
     This class encapsulates data about a workset.  It includes raw
     data retrieved from the HTRC ef-api, as well as user
     customizations and modifications.
-
     """
 
     def __init__(self, wsid: str, ef_api: Api) -> None:
