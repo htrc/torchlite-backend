@@ -16,5 +16,8 @@ class TimeLineProjector(Projector):
 
     def project(self, workset: Workset) -> List[Any]:
         data = workset.metadata(["htid", "metadata.pubDate"])
-        self.projection = [{"htid": d.htid, "pubDate": d.metadata.pubDate} for d in data]
+        if data:
+            self.projection = [{"htid": d.htid, "pubDate": d.metadata.pubDate} for d in data]
+        else:
+            self.projection = []
         return self.projection
