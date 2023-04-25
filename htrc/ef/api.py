@@ -67,7 +67,7 @@ class Api:
 
     def get_volume_data(
         self, htid: str, pos: Optional[bool] = None, fields: Optional[List[str]] = None
-    ) -> List[ef.Volume]:
+    ) -> List[ef.Volume] | None:
         uri: str = f"{self.volumes_uri}/{clean_id(htid)}"
         queries: dict = {}
         if pos is not None:
@@ -82,7 +82,7 @@ class Api:
         else:
             return None
 
-    def get_volume_metadata(self, htid: str, fields: Optional[List[str]]) -> List[ef.Volume]:
+    def get_volume_metadata(self, htid: str, fields: Optional[List[str]]) -> List[ef.Volume] | None:
         uri: str = f"{self.volumes_uri}/{clean_id(htid)}/metadata"
         queries: dict = {}
         if fields:
