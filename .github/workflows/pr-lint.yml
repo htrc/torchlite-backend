@@ -13,7 +13,6 @@ jobs:
           reporter: github-pr-review
 
   mypy:
-    name: runner / mypy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
