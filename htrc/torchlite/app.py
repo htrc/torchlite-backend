@@ -21,14 +21,6 @@ def setup_demo(app: Torchlite, ef_api: Api) -> None:
     for data in sample_workset_data:
         app.add_workset(**data)
 
-    app.add_workset(id="64407dbd3300005208a5dca4", description="DocSouth", volumes=82)
-
-    app.add_workset(id="644070973300002108a5dca2", description="Freud Standard Edition", volumes=160)
-
-    app.add_workset(id="644076b83300003608a5dca3", description="Seven Dada Manifests", volumes=10)
-
-    app.add_workset(id="6418977d2d000079045c8287", description="New Jersey", volumes=419)
-
     demo_workset = tl_Workset("64407dbd3300005208a5dca4", ef_api)
     demo_dashboard = Dashboard()
     demo_dashboard.workset = demo_workset

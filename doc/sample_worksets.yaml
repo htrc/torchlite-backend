@@ -45,3 +45,10 @@
              University of Kansas's Project on the History of Black
              Writing, released as part of the SCWAReD project
   author: SCWAReD
+
+- name: DocSouth
+  id: 64407dbd3300005208a5dca4
+  volumes: 82
+  description:
+        The HTRC DocSouth thematic collection.
+  author: cwulfman
