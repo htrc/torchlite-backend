@@ -5,4 +5,4 @@
 environment: development
 # One of test, development, production
 
-featured_workset_url: http://raw.githubusercontent.com/htrc/torchlite-backend/sample_worksets/doc/sample_worksets.yaml
+featured_worksets_url: https://raw.githubusercontent.com/htrc/torchlite-backend/develop/doc/sample_worksets.yaml
