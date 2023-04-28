@@ -25,7 +25,7 @@ class Widget:
 
 
 class TimeLineWidget(Widget):
-    """publication timeline for workset"""
+    """Displays the publication dates of the volumes in a workset on a timeline."""
 
     def __init__(self) -> None:
         super().__init__()
