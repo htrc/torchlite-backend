@@ -1,4 +1,4 @@
-from yaml import load, Loader
+from yaml import load, Loader, safe_load
 import requests
 from fastapi import FastAPI
 import fastapi
@@ -11,15 +11,19 @@ from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 from htrc.torchlite.middleware import TorchliteVersionHeaderMiddleware
 
-sample_worksets_uri = "https://raw.githubusercontent.com/htrc/torchlite-backend/develop/doc/sample_worksets.yaml"
+with open("config.yaml", mode="r", encoding="utf-8") as f:
+    config = safe_load(f)
 
 
 def setup_demo(app: Torchlite, ef_api: Api) -> None:
-    r = requests.get(sample_worksets_uri)
-    sample_workset_data = load(r.text, Loader=Loader)
-
-    for data in sample_workset_data:
-        app.add_workset(**data)
+    if "featured_worksets_url" in config:
+        url = config["featured_worksets_url"]
+        if url:
+            r = requests.get(url)
+            if r.status_code == 200:
+                sample_workset_data = load(r.text, Loader=Loader)
+                for data in sample_workset_data:
+                    app.add_workset(**data)
 
     demo_workset = tl_Workset("64407dbd3300005208a5dca4", ef_api)
     demo_dashboard = Dashboard()
