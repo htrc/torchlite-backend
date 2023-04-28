@@ -1,0 +1,64 @@
+* Torchlite Backend API
+** Introduction
+In the following documention, /Torchlite/ will refer to the backend service.
+
+This document gives a high-level overview of the API; for technical information about each endpoint, consult the OpenApi documentation at https://torchlite-dev-api.192.17.61.53.nip.io/docs.
+
+All endpoints return a JSON object with 2 fields:
+
+- /status/, which for now returns either "success" or "error";
+- /data/, if the status is "success"; data will always contain a JSON list whose actual contents will vary depending on the request;
+- /messages/, if the status is "error"; its value is a list of strings containing error messages.
+
+** Endpoints
+*** GET /
+The top-level endpoint to the API.  Right now, it just returns some stub information, but it will eventually return some status information about the backend.
+
+*** GET /docs
+Openapi documentation of the api.
+
+*** GET /worksets
+Returns a list of worksets that have been registered with Torchlite. At startup, Torchlite reads in a list of featured worksets maintained by HTRC staff.
+
+*** GET /dashboards
+Returns a list of already-created dashboards available to the current user.
+
+*** GET widgets (not yet implemented)
+Returns a list of widget_types that have been registered with Torchlite.
+
+*** POST/dashboards POST (https://torchlite-dev-api.192.17.61.53.nip.io/dashboards)
+Torchlite creates a new dashboard; returns the new dashboard's id
+
+*** GET /dashboards/{dashboard_id}
+returns data about the dashboard, including its current workset and its current widgets.
+
+*** PUT /dashboards/{dashboard_id}/workset/{workset_id}
+Sets the dashboard's current workset to be workset_id and recalculates state
+
+*** POST dashboads/{dashboard_id}/widgets/{widget_type}
+Adds a new widget of /widget_type/ to the dashboard. Returns the new widget's id.
+
+*** DELETE /dashboards/{dashboard_id}/widgets/{widget_id} (not yet implemented)
+Removes widget widget_id from the dashboard
+
+*** GET /dashboards/{dashboard_id}/widgets/{widget_id}/data
+Returns the widget data, to be displayed in the interface, saved, etc.
+
+** Sample Flows
+- >> POST to /dashboards to get a new dashboard
+- << MY_DBD
+
+- >> GET /worksets
+- << list of workset ids + metadata
+
+- >> PUT to /dashboards/MY_DBD/workset/htid123 to set the dashboard's workset to workset htid123
+- << success or failure
+
+- >> GET /widgets
+- << list of widget types + metadata
+
+- >> POST to /dashboards/MY_DBD/widgets/TimeLineWidget to add a timeline widget to the dashboard
+- << widget_id widget_456
+
+- >> GET from /dashboards/MY_DBD/widget/widget_456/data to get widget data
+- << the widget data
