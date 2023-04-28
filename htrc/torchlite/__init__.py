@@ -36,7 +36,13 @@ class Torchlite:
         self.filter_factory: FilterFactory = FilterFactory()
 
     def info(self) -> dict:
-        return {"dashboards": self._dashboards, "widgets": self.widgets}
+        filters = self.filters
+        return {
+            "worksets": [w["name"] for w in self.worksets],
+            "dashboards": list(self._dashboards.keys()),
+            "widgets": [{k: v.__doc__} for k, v in self.widgets.items()],
+            "filters": list(filters.keys()),
+        }
 
     def add_workset(self, **kwargs: Union[str, int]) -> None:
         self.worksets.append(kwargs)

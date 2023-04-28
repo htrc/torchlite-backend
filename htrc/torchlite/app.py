@@ -15,7 +15,7 @@ with open("config.yaml", mode="r", encoding="utf-8") as f:
     config = safe_load(f)
 
 
-def setup_demo(app: Torchlite, ef_api: Api) -> None:
+def set_defaults(app: Torchlite, ef_api: Api) -> None:
     if "featured_worksets_url" in config:
         url = config["featured_worksets_url"]
         if url:
@@ -25,15 +25,15 @@ def setup_demo(app: Torchlite, ef_api: Api) -> None:
                 for data in sample_workset_data:
                     app.add_workset(**data)
 
-    demo_workset = tl_Workset("64407dbd3300005208a5dca4", ef_api)
-    demo_dashboard = Dashboard()
-    demo_dashboard.workset = demo_workset
-    demo_dashboard.id = "demo"
+    default_workset = tl_Workset("64407dbd3300005208a5dca4", ef_api)
+    default_dashboard = Dashboard()
+    default_dashboard.workset = default_workset
+    default_dashboard.id = "default_dashboard"
     widget = TimeLineWidget()
-    widget.id = "demo_widget"
-    demo_dashboard.add_widget(widget)
+    widget.id = "default_widget"
+    default_dashboard.add_widget(widget)
 
-    app.add_dashboard(demo_dashboard)
+    app.add_dashboard(default_dashboard)
     app.register_filter("stopwords", torchlite_stopword_filter)
     app.register_filter("stemmer", torchlite_stemmer)
     app.register_filter("lemmatizer", torchlite_lemmatizer)
@@ -57,14 +57,14 @@ api.add_middleware(
 
 ef_api: Api = Api()
 app: Torchlite = Torchlite(ef_api)
-setup_demo(app, ef_api)
+set_defaults(app, ef_api)
 
 
 @api.get("/")
 async def read_root() -> Response:
     info: dict = app.info()
     if info:
-        return Response(status=Status.success, data=list(info))
+        return Response(status=Status.success, data=[info])
     else:
         return Response(status=Status.error, messages=list("could not get app info"))
 
@@ -79,12 +79,14 @@ async def get_worksets() -> Response:
 
 
 @api.get("/worksets/{workset_id}")
-async def get_workset(workset_id: str) -> Response:
-    metadata = app.ef_api.get_workset_metadata(workset_id, ["metadata.title"])
+async def get_workset_by_id(workset_id: str) -> Response:
+    metadata = app.ef_api.get_workset_metadata(workset_id, ["htid,metadata.title"])
     titles: list = []
     if metadata:
-        titles = [v.metadata.title for v in metadata]
-    return Response(status=Status.success, data=list({"id": workset_id, "metadata": titles}))
+        titles = [{"htid": v.htid, "title": v.metadata.title} for v in metadata]
+        return Response(status=Status.success, data=titles)
+    else:
+        return Response(status=Status.error, messages=["got no titles"])
 
 
 @api.get("/dashboards")
@@ -99,7 +101,7 @@ async def get_dashboards() -> Response:
 @api.post("/dashboards")
 async def create_dashboard() -> Response:
     d = app.add_dashboard(Dashboard())
-    return Response(status=Status.success, data=list(d.id))
+    return Response(status=Status.success, data=[d.id])
 
 
 @api.get("/dashboards/{dashboard_id}")
@@ -118,7 +120,7 @@ async def put_dashboard_workset(dashboard_id: str, workset_id: str) -> Response:
     dashboard: Dashboard = app.get_dashboard(dashboard_id)
     if dashboard:
         dashboard.workset = tl_Workset(workset_id, ef_api)
-        return Response(status=Status.success, data=list(dashboard.info))
+        return Response(status=Status.success, data=[dashboard.info])
     else:
         return Response(status=Status.error, messages=[f"could not find dashboard {dashboard_id}"])
 
@@ -133,7 +135,7 @@ async def post_dashboard_widget(dashboard_id: str, widget_type: str) -> Response
         return Response(status=Status.error, messages=[f"could not find widget type {widget_type}"])
     widget = widget_class()
     dashboard.add_widget(widget)
-    return Response(status=Status.success, data=list({"widget_id": widget.id}))
+    return Response(status=Status.success, data=[{"widget_id": widget.id}])
 
 
 @api.get("/dashboards/{dashboard_id}/widget/{widget_id}/data")
