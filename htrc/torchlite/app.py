@@ -1,4 +1,7 @@
-from yaml import load, Loader, safe_load
+import os
+from typing import Optional
+from pathlib import Path
+from yaml import safe_load
 import requests
 from fastapi import FastAPI
 import fastapi
@@ -11,19 +14,35 @@ from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 from htrc.torchlite.middleware import TorchliteVersionHeaderMiddleware
 
-with open("config.yaml", mode="r", encoding="utf-8") as f:
-    config = safe_load(f)
+
+class TorchliteError(Exception):
+    "Torchlite error of some kind"
+    pass
 
 
-def set_defaults(app: Torchlite, ef_api: Api) -> None:
-    if "featured_worksets_url" in config:
-        url = config["featured_worksets_url"]
-        if url:
-            r = requests.get(url)
-            if r.status_code == 200:
-                sample_workset_data = load(r.text, Loader=Loader)
-                for data in sample_workset_data:
-                    app.add_workset(**data)
+config_file: Optional[str] = os.getenv("TORCHLITE_CONFIG")
+
+if config_file is None:
+    raise TorchliteError("Torchlite Configuration not found")
+
+if config_file.startswith("http"):
+    resp: requests.Response = requests.get(config_file)
+    if resp.status_code == 200:
+        config = safe_load(resp.text)
+    else:
+        raise TorchliteError(f"{config_file} not found")
+else:
+    p: Path = Path(config_file)
+    if p.exists():
+        with open(p, mode="r", encoding="utf-8-sig") as f:
+            config = safe_load(f)
+    else:
+        raise TorchliteError(f"config file {p} does not exist")
+
+
+def set_defaults(app: Torchlite, ef_api: Api, config: dict) -> None:
+    for data in config["featured_worksets"]:
+        app.add_workset(**data)
 
     default_workset = tl_Workset("64407dbd3300005208a5dca4", ef_api)
     default_dashboard = Dashboard()
@@ -57,7 +76,7 @@ api.add_middleware(
 
 ef_api: Api = Api()
 app: Torchlite = Torchlite(ef_api)
-set_defaults(app, ef_api)
+set_defaults(app, ef_api, config)
 
 
 @api.get("/")
