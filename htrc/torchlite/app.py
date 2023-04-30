@@ -14,24 +14,30 @@ from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 from htrc.torchlite.middleware import TorchliteVersionHeaderMiddleware
 
+
+class TorchliteError(Exception):
+    "Torchlite error of some kind"
+    pass
+
+
 config_file: Optional[str] = os.getenv("TORCHLITE_CONFIG")
 
 if config_file is None:
-    raise OSError("Torchlite Configuration not found")
+    raise TorchliteError("Torchlite Configuration not found")
 
 if config_file.startswith("http"):
     resp: requests.Response = requests.get(config_file)
     if resp.status_code == 200:
         config = safe_load(resp.text)
     else:
-        raise OSError(f"{config_file} not found")
+        raise TorchliteError(f"{config_file} not found")
 else:
     p: Path = Path(config_file)
     if p.exists():
         with open(p, mode="r", encoding="utf-8-sig") as f:
             config = safe_load(f)
     else:
-        raise OSError(f"config file {p} does not exist")
+        raise TorchliteError(f"config file {p} does not exist")
 
 
 def set_defaults(app: Torchlite, ef_api: Api, config: dict) -> None:
