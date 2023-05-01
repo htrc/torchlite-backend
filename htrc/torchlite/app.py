@@ -33,10 +33,10 @@ if config_file.startswith("http"):
         raise TorchliteError(f"{config_file} not found")
 else:
     p: Path = Path(config_file)
-    if p.exists():
+    try:
         with open(p, mode="r", encoding="utf-8-sig") as f:
             config = safe_load(f)
-    else:
+    except TorchliteError:
         raise TorchliteError(f"config file {p} does not exist")
 
 

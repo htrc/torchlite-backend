@@ -1,8 +1,0 @@
-# This file should be cloned from config-test.yaml, config-dev.yaml or config-prod.yaml
-# and customized as necessary.  It should not be checked into version
-# control.
-
-environment: development
-# One of test, development, production
-
-featured_worksets_url: https://raw.githubusercontent.com/htrc/torchlite-backend/develop/doc/sample_worksets.yaml
