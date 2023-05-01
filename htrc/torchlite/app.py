@@ -33,7 +33,7 @@ if parse_result.scheme.startswith("http"):
     if resp.status_code == 200:
         config = safe_load(resp.text)
     else:
-        raise TorchliteError(f"{config_file_name} not found")
+        raise TorchliteError(f"Could not load config {config_file_name} - HTTP error {resp.status_code}")
 else:
     if parse_result.path is None:
         raise TorchliteError("must supply a config file")
