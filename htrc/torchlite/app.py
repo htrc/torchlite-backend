@@ -13,6 +13,7 @@ from htrc.torchlite.widgets import TimeLineWidget, Widget
 from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 from htrc.torchlite.middleware import TorchliteVersionHeaderMiddleware
+from urllib.parse import urlparse, ParseResult
 
 
 class TorchliteError(Exception):
@@ -20,24 +21,27 @@ class TorchliteError(Exception):
     pass
 
 
-config_file: Optional[str] = os.getenv("TORCHLITE_CONFIG")
+config_file_name: Optional[str] = os.getenv("TORCHLITE_CONFIG")
 
-if config_file is None:
-    raise TorchliteError("Torchlite Configuration not found")
+if not config_file_name:
+    raise TorchliteError("TORCHLITE_CONFIG value is invalid or not set")
 
-if config_file.startswith("http"):
-    resp: requests.Response = requests.get(config_file)
+parse_result: ParseResult = urlparse(config_file_name)
+
+if parse_result.scheme.startswith("http"):
+    resp: requests.Response = requests.get(config_file_name)
     if resp.status_code == 200:
         config = safe_load(resp.text)
     else:
-        raise TorchliteError(f"{config_file} not found")
+        raise TorchliteError(f"Could not load config {config_file_name} - HTTP error {resp.status_code}")
 else:
-    p: Path = Path(config_file)
+
+    p: Path = Path(parse_result.path)
     try:
         with open(p, mode="r", encoding="utf-8-sig") as f:
             config = safe_load(f)
-    except TorchliteError:
-        raise TorchliteError(f"config file {p} does not exist")
+    except IOError as e:
+        raise TorchliteError(f"could not load config file {config_file_name}") from e
 
 
 def set_defaults(app: Torchlite, ef_api: Api, config: dict) -> None:
