@@ -17,15 +17,19 @@ from urllib.parse import urlparse, ParseResult
 
 
 class TorchliteError(Exception):
-    "Torchlite error of some kind"
+    """Torchlite error of some kind"""
+
     pass
 
 
-config_file_name: Optional[str] = os.getenv("TORCHLITE_CONFIG")
+env = os.getenv("ENV", "dev")
+print(f"Starting Torchlite Backend v{__version__} ({env})")
 
+config_file_name: Optional[str] = os.getenv("TORCHLITE_CONFIG")
 if not config_file_name:
     raise TorchliteError("TORCHLITE_CONFIG value is invalid or not set")
 
+print(f"Loading configuration from {config_file_name}...")
 parse_result: ParseResult = urlparse(config_file_name)
 
 if parse_result.scheme.startswith("http"):
@@ -35,7 +39,6 @@ if parse_result.scheme.startswith("http"):
     else:
         raise TorchliteError(f"Could not load config {config_file_name} - HTTP error {resp.status_code}")
 else:
-
     p: Path = Path(parse_result.path)
     try:
         with open(p, mode="r", encoding="utf-8-sig") as f:
@@ -63,8 +66,6 @@ def set_defaults(app: Torchlite, ef_api: Api, config: dict) -> None:
 
 
 origins = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
-
-print(f"Starting Torchlite Backend v{__version__}")
 
 api: fastapi.FastAPI = FastAPI()
 api.add_middleware(
