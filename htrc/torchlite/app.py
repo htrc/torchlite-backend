@@ -35,8 +35,6 @@ if parse_result.scheme.startswith("http"):
     else:
         raise TorchliteError(f"Could not load config {config_file_name} - HTTP error {resp.status_code}")
 else:
-    if parse_result.path is None:
-        raise TorchliteError("must supply a config file")
 
     p: Path = Path(parse_result.path)
     try:
