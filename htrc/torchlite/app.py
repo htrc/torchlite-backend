@@ -28,7 +28,7 @@ if config_file_name is None:
 
 parse_result: ParseResult = urlparse(config_file_name)
 
-if parse_result.scheme == "http":
+if parse_result.scheme.startswith("http"):
     resp: requests.Response = requests.get(config_file_name)
     if resp.status_code == 200:
         config = safe_load(resp.text)
