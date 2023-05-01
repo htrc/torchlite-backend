@@ -23,7 +23,7 @@ class TorchliteError(Exception):
 
 config_file_name: Optional[str] = os.getenv("TORCHLITE_CONFIG")
 
-if config_file_name is None:
+if not config_file_name:
     raise TorchliteError("Torchlite Configuration not found")
 
 parse_result: ParseResult = urlparse(config_file_name)
