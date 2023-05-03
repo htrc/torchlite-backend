@@ -33,6 +33,8 @@ class Dashboard:
 
     def reset_data(self) -> None:
         self.reset_token_data()
+        if self.widgets:
+            [widget.reset() for widget in self.widgets.values()]
 
     @property
     def workset(self) -> Union[Workset, None]:
