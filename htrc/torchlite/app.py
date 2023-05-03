@@ -1,11 +1,12 @@
 import os
 from typing import Optional
 from pathlib import Path
+
+from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
 from yaml import safe_load
 import requests
 from fastapi import FastAPI
 import fastapi
-from fastapi.middleware.cors import CORSMiddleware
 from htrc.ef.api import Api
 from htrc.torchlite import Torchlite, Response, Status, __version__
 from htrc.torchlite.dashboards import Dashboard
@@ -65,18 +66,22 @@ def set_defaults(app: Torchlite, ef_api: Api, config: dict) -> None:
     app.register_filter("lemmatizer", torchlite_lemmatizer)
 
 
-origins = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
-
 api: fastapi.FastAPI = FastAPI()
 api.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-api.add_middleware(
     TorchliteVersionHeaderMiddleware,
+)
+api.include_router(
+    HealthcheckRouter(
+        Probe(
+            name="readiness",
+            checks=[],  # TBD
+        ),
+        Probe(
+            name="liveness",
+            checks=[],
+        ),
+    ),
+    prefix="/health",
 )
 
 ef_api: Api = Api()

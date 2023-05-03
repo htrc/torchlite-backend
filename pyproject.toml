@@ -16,11 +16,12 @@ dirty = true
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.95.1"
-uvicorn = {extras = ["standard"], version = "^0.21.1"}
+uvicorn = {extras = ["standard"], version = "^0.22.0"}
 requests = "^2.28.2"
 pydantic = "^1.10.6"
 nltk = "^3.8.1"
 pyyaml = "^6.0"
+fastapi-healthchecks = "^1.0.7"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
@@ -51,6 +52,7 @@ disallow_untyped_defs = true
 [[tool.mypy.overrides]]
 module = [
   "nltk.*",
+  "fastapi_healthchecks.api.router.*",
 ]
 ignore_missing_imports = true
 
