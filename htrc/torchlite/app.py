@@ -10,7 +10,7 @@ import fastapi
 from htrc.ef.api import Api
 from htrc.torchlite import Torchlite, Response, Status, __version__
 from htrc.torchlite.dashboards import Dashboard
-from htrc.torchlite.widgets import TimeLineWidget, Widget
+from htrc.torchlite.widgets import Widget
 from htrc.torchlite.worksets import Workset as tl_Workset
 from htrc.torchlite.filters import torchlite_stopword_filter, torchlite_stemmer, torchlite_lemmatizer
 from htrc.torchlite.middleware import TorchliteVersionHeaderMiddleware
@@ -52,15 +52,6 @@ def set_defaults(app: Torchlite, ef_api: Api, config: dict) -> None:
     for data in config["featured_worksets"]:
         app.add_workset(**data)
 
-    default_workset = tl_Workset("64407dbd3300005208a5dca4", ef_api)
-    default_dashboard = Dashboard()
-    default_dashboard.workset = default_workset
-    default_dashboard.id = "default_dashboard"
-    widget = TimeLineWidget()
-    widget.id = "default_widget"
-    default_dashboard.add_widget(widget)
-
-    app.add_dashboard(default_dashboard)
     app.register_filter("stopwords", torchlite_stopword_filter)
     app.register_filter("stemmer", torchlite_stemmer)
     app.register_filter("lemmatizer", torchlite_lemmatizer)
