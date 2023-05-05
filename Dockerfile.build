@@ -13,6 +13,7 @@ ENV PYTHONFAULTHANDLER 1
 ENV PYTHONHASHSEED random
 ENV PIP_NO_CACHE_DIR 1
 
+RUN pip install --upgrade pip
 RUN useradd -ms /bin/bash torchlite
 WORKDIR /home/torchlite
 
@@ -25,7 +26,7 @@ ENV POETRY_VERSION 1.4.2
 ENV POETRY_VIRTUALENVS_IN_PROJECT true
 ENV POETRY_DYNAMIC_VERSIONING_BYPASS true
 
-RUN pip install --upgrade pip pipx && pipx install "poetry==$POETRY_VERSION"
+RUN pip install --upgrade pipx && pipx install "poetry==$POETRY_VERSION"
 
 COPY poetry.lock pyproject.toml README.* ./
 COPY htrc ./htrc
@@ -36,13 +37,15 @@ RUN poetry install --no-interaction --no-ansi --no-root --only=main --sync && \
 
 FROM base as final
 
-COPY --chown=torchlite:torchlite --from=builder /home/torchlite/.venv ./.venv
+ENV PATH ".local/bin:$PATH"
+
 COPY --chown=torchlite:torchlite --from=builder /home/torchlite/dist .
 COPY --chown=torchlite:torchlite docker-entrypoint.sh .
+COPY --chown=torchlite:torchlite log_conf.yaml .
 
 USER torchlite
 
-RUN ./.venv/bin/pip install *.whl && rm -f *.whl
+RUN pip install *.whl && rm -f *.whl
 
 EXPOSE $TORCHLITE_PORT
 
