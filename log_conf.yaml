@@ -9,14 +9,20 @@ formatters:
     "()": uvicorn.logging.AccessFormatter
     datefmt: "%Y-%m-%dT%H:%M:%S"
     format: '[%(asctime)s.%(msecs)03dZ] %(name)s %(levelname)s %(message)s'
+filters:
+  healthcheck_filter:
+    "()": htrc.torchlite.logutils.HealthcheckFilter
 handlers:
   default:
     formatter: default
     class: logging.StreamHandler
+    # level: DEBUG
     stream: ext://sys.stderr
   access:
     formatter: access
     class: logging.StreamHandler
+    filters:
+      - healthcheck_filter
     stream: ext://sys.stdout
 loggers:
   uvicorn.error:
