@@ -15,7 +15,7 @@ class FacetsEnum(str, Enum):
 
 
 class WidgetBase(BaseModel):
-    pass
+    widget_type: str
 
 
 class WidgetCreate(WidgetBase):
@@ -24,7 +24,6 @@ class WidgetCreate(WidgetBase):
 
 class Widget(WidgetBase):
     id: int
-    type: str
     dashboard_id: int
 
     class Config:

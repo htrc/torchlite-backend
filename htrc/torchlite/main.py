@@ -39,9 +39,11 @@ def read_dashboard(dashboard_id: int, db: Session = Depends(get_db)):
     return db_dashboard
 
 
-@app.post("/dashboards/{dashboard_id}/widgets/", response_model=schemas.Widget)
-def create_widget_for_dashboard(dashboard_id: int, widget: schemas.WidgetCreate, db: Session = Depends(get_db)):
-    widget = crud.create_dashboard_widget(db=db, widget=widget, dashboard_id=dashboard_id)
+@app.post("/dashboards/{dashboard_id}/widgets/{widget_type}", response_model=schemas.Widget)
+def create_widget_for_dashboard(
+    dashboard_id: int, widget_type: str, widget: schemas.WidgetCreate, db: Session = Depends(get_db)
+):
+    widget = crud.create_dashboard_widget(db=db, widget=widget, dashboard_id=dashboard_id, widget_type=widget_type)
     return widget
 
 

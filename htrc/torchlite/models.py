@@ -17,7 +17,7 @@ class Widget(Base):
     __tablename__ = "widgets"
 
     id = Column(Integer, primary_key=True, index=True)
-    type = Column(String)
+    widget_type = Column(String)
     dashboard_id = Column(Integer, ForeignKey("dashboards.id"))
 
     dashboard = relationship("Dashboard", back_populates="widgets")

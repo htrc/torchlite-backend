@@ -18,8 +18,9 @@ def create_dashboard(db: Session, dashboard: schemas.DashboardCreate):
     return db_dashboard
 
 
-def create_dashboard_widget(db: Session, widget: schemas.WidgetCreate, dashboard_id: int):
+def create_dashboard_widget(db: Session, widget: schemas.WidgetCreate, dashboard_id: int, widget_type: str):
     db_widget = models.Widget(**widget.dict(), dashboard_id=dashboard_id)
+    db_widget.widget_type = widget_type
     db.add(db_widget)
     db.commit()
     db.refresh(db_widget)
