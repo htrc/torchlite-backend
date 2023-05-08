@@ -13,8 +13,8 @@ def clean_id(id: str) -> str:
     :param id: The HTID to convert
     :return: The "clean" version that can be used as a filename
     """
-    lib, libId = id.split(".")
-    cleaned = libId.translate(str.maketrans(":/.", "+=,"))
+    lib, lib_id = id.split(".")
+    cleaned = lib_id.translate(str.maketrans(":/.", "+=,"))
     return f"{lib}.{cleaned}"
 
 
