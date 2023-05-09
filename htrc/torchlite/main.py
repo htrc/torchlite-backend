@@ -56,9 +56,11 @@ def create_widget_for_dashboard(
 
 
 @app.put("/dashboards/{dashboard_id}/workset/{workset_id}", response_model=schemas.Dashboard)
-def update_dashboard_workset(dashboard_id: int, workset_id: str, db: Session = Depends(get_db)) -> None:
-    crud.set_dashboard_workset(db=db, dashboard_id=dashboard_id, workset_id=workset_id)
-    return None
+def update_dashboard_workset(
+    dashboard_id: int, workset_id: str, db: Session = Depends(get_db)
+) -> models.Dashboard | None:
+    result = crud.set_dashboard_workset(db=db, dashboard_id=dashboard_id, workset_id=workset_id)
+    return result
 
 
 @app.get("/widgets/", response_model=list[schemas.Widget])
