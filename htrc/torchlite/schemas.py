@@ -40,7 +40,7 @@ class DashboardCreate(DashboardBase):
 
 class Dashboard(DashboardBase):
     id: int
-    workset: int | None = None
+    workset: str | None = None
     widgets: list[Widget] = []
 
     class Config:

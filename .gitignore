@@ -139,3 +139,6 @@ dmypy.json
 
 # coverage
 test-results/
+
+# SQLAlchemy
+sql_app.db
