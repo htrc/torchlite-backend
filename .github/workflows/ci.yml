@@ -107,7 +107,7 @@ jobs:
         with:
           token: ${{ secrets.PAT }}
           repository: htrc/torchlite-argocd
-          event-type: dev_commit
+          event-type: dev_commit_backend
           client-payload: >-
             {
               "image": "${{ fromJSON(steps.meta.outputs.json).tags[0] }}",
