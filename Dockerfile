@@ -8,10 +8,7 @@ ENV PYTHONFAULTHANDLER 1
 ENV PYTHONHASHSEED random
 ENV PIP_NO_CACHE_DIR 1
 
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini.asc /tini.asc
-RUN chmod +x /tini
+RUN apt update && apt -y install dumb-init && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -ms /bin/bash torchlite
 WORKDIR /home/torchlite
@@ -24,5 +21,5 @@ USER torchlite
 
 EXPOSE $TORCHLITE_PORT
 
-ENTRYPOINT ["/tini", "--"]
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["./docker-entrypoint.sh"]
