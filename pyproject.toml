@@ -22,6 +22,9 @@ pydantic = "^1.10.6"
 nltk = "^3.8.1"
 pyyaml = "^6.0"
 fastapi-healthchecks = "^1.0.7"
+redis = "^4.5.5"
+types-redis = "^4.5.5.2"
+pydantic-redis = "^0.4.3"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
