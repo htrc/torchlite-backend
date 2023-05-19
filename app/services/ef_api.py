@@ -1,7 +1,7 @@
 import urllib.parse
 from typing import List, Optional
 import requests
-import app.schemas.ef as ef
+import app.models.ef as ef
 
 
 def clean_id(id: str) -> str:
@@ -55,11 +55,12 @@ class EFApi:
         else:
             return None
 
-    def volume_features(self, htid: str) -> ef.EF | None:
+    def volume_features(self, htid: str) -> ef.VolumeFeatures | None:
         uri: str = f"{self.volumes_uri}/{clean_id(htid)}"
         data: dict | None = self.get(uri)
         if data:
-            return ef.EF(**data)
+            volume: ef.EF = ef.EF(**data)
+            return volume.features
         else:
             return None
 
