@@ -11,8 +11,10 @@ class TorchliteObject:
 
 
 class Workset(TorchliteObject):
-    def __init__(self, ef_wsid: str | None = None) -> None:
+    def __init__(self, ef_wsid: str | None = None, name: str | None = None, description: str | None = None) -> None:
         super().__init__()
+        self.name: str | None = name
+        self.description: str | None = description
         self.ef_id: str | None = ef_wsid
         self._disabled_volumes: list = []
         self.volumes: list[Volume] | None = None
@@ -23,7 +25,7 @@ class Workset(TorchliteObject):
                 self.volumes = [Volume(htid) for htid in ef_workset.htids]
 
     def __repr__(self) -> str:
-        return f"Workset({self.id[-11:]})"
+        return f"Workset(name={self.name}, id={self.id[-11:]})"
 
     def disable_volume(self, htid: str) -> None:
         if self.volumes:
