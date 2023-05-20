@@ -2,6 +2,7 @@ import urllib.parse
 from typing import List, Optional
 import requests
 import app.models.ef as ef
+import app.models.tokens as tokens
 
 
 def clean_id(id: str) -> str:
@@ -21,9 +22,14 @@ class EFApi:
     worksets_uri: str = f"{base_uri}/worksets"
     volumes_uri: str = f"{base_uri}/volumes"
 
-    def get(self, uri: str) -> dict | None:
+    def get(self, uri: str, params: dict = {}) -> dict | None:
         headers = {"Accept": "application/json"}
-        r: requests.models.Response = requests.get(uri, headers=headers)
+        r: request.models.Response = None
+        if params:
+            r: requests.models.Response = requests.get(uri, headers=headers, params=params)
+        else:
+            r: requests.models.Response = requests.get(uri, headers=headers)
+
         r.raise_for_status()
         try:
             return r.json()["data"]
@@ -68,16 +74,19 @@ class EFApi:
         self, htid: str, pos: Optional[bool] = None, fields: Optional[List[str]] = None
     ) -> ef.EF | None:
         uri: str = f"{self.volumes_uri}/{clean_id(htid)}"
-        queries: dict = {}
+        params: dict = {}
         if pos is not None:
-            queries["pos"] = f"{str(pos).lower()}"
+            if pos is True:
+                params["pos"] = "true"
+            else:
+                params["pos"] = "false"
         if fields:
-            queries["fields"] = ",".join(fields)
+            params["fields"] = ",".join(fields)
 
         if queries:
             uri = f"{uri}?{urllib.parse.urlencode(queries)}"
 
-        data: dict | None = self.get(uri)
+        data: dict | None = self.get(uri, params=params)
         if data:
             return ef.EF(**data)
         else:
@@ -91,7 +100,23 @@ class EFApi:
         else:
             return None
 
-    def tokens(self, htid: str, sections: list[str] = ["body"]) -> set:
+    def tokens(self, htid: str):
+        uri: str = f"{self.volumes_uri}/{clean_id(htid)}"
+        params = {"pos": "false", "fields": "features.pages.body.tokensCount"}
+        data: dict | None = self.get(uri, params=params)
+        if data:
+            pages = data['features']['pages']
+            token_counter: tokens.TokenCounter = tokens.TokenCounter()
+            for page in pages:
+                tokensCount = page['body']['tokensCount']
+                if tokensCount:
+                    for tc in tokens.tokensCount(tokensCount):
+                        token_counter.add(tc)
+            return token_counter
+        else:
+            return None
+
+    def tokens_old(self, htid: str, sections: list[str] = ["body"]) -> set:
         token_set: set = set()
         pages = self.pages(htid)
         if pages:

@@ -108,9 +108,9 @@ class PageFeatures(BaseModel):
     lineCount: Optional[int] = None
     emptyLineCount: Optional[int] = None
     sentenceCount: Optional[int] = None
-    header: Union[PosSectionFeatures, SectionFeatures, None] = None
-    body: Union[PosSectionFeatures, SectionFeatures, None] = None
-    footer: Union[PosSectionFeatures, SectionFeatures, None] = None
+    header: PosSectionFeatures | SectionFeatures | None = None
+    body: PosSectionFeatures | SectionFeatures | None = None
+    footer: PosSectionFeatures | SectionFeatures | None = None
     calculatedLanguage: Optional[str] = None
 
 
