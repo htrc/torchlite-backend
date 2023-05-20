@@ -5,6 +5,12 @@ from app.models import db, torchlite
 from redis import Redis
 
 
+class PersistenceError(Exception):
+    """Persistence error of some kind"""
+
+    pass
+
+
 class Persister:
     def __init__(self) -> None:
         self._db: Redis = config.db
@@ -30,7 +36,10 @@ class WorksetPersister(Persister):
         return workset.id
 
     def retrieve(self, key: str) -> torchlite.Workset | None:
-        db_data: bytes = config.db.hget("worksets", key)
+        db_data: bytes | None = config.db.hget("worksets", key)
+        if db_data is None:
+            raise PersistenceError(f"could not retrieve {key} from database")
+
         data: dict = json.loads(db_data)
         db_object: db.Workset = db.Workset(**data)
         workset = torchlite.Workset(ef_wsid=db_object.ef_id, name=db_object.name, description=db_object.description)
@@ -51,15 +60,27 @@ class DashboardPersister(Persister):
     def __init__(self) -> None:
         super().__init__()
 
-    def persist(self, dashboard: db.Dashboard) -> None:
-        print("persisting")
-        if dashboard.dict():
-            config.db.hset("dashboards", dashboard.id, json.dumps(dashboard.dict()))
-            print("persisted")
-        else:
-            print("nothing to persist")
+    def persist(self, dashboard: torchlite.Dashboard) -> str:
+        db_object: db.Dashboard = db.Dashboard(id=dashboard.id, name=dashboard.name)
+        if dashboard.workset:
+            db_object.workset = dashboard.workset.id
 
-    def retrieve(self, id: str) -> db.Dashboard:
-        db_data: Any = self._db.hget("dashboards", id)
+        config.db.hset("dashboards", dashboard.id, json.dumps(db_object.dict()))
+        return dashboard.id
+
+    def retrieve(self, key: str) -> torchlite.Dashboard | None:
+        db_data: bytes | None = config.db.hget("dashboards", key)
+
+        if db_data is None:
+            raise PersistenceError(f"could not retrieve {key} from database")
+
         data: dict = json.loads(db_data)
-        return db.Dashboard(**data)
+        db_object: db.Dashboard = db.Dashboard(**data)
+
+        dashboard: torchlite.Dashboard = torchlite.Dashboard(name=db_object.name)
+        dashboard.id = db_object.id
+        if db_object.workset:
+            wsp = WorksetPersister()
+            ws = wsp.retrieve(db_object.workset)
+            dashboard.workset = ws
+        return dashboard

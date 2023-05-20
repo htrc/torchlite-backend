@@ -24,3 +24,7 @@ ws2 = p.retrieve(key)
 ws.disable_volume('mdp.35112103187797')
 p.persist(ws)
 w3 = p.retrieve(ws.id)
+
+dashboard = torchlite.Dashboard(name="a sample dashboard")
+dashboard.workset = w3
+persisters.DashboardPersister().persist(dashboard)

@@ -93,3 +93,13 @@ class Page(TorchliteObject):
 
     def __repr__(self) -> str:
         return f"Page({self.features.seq})"
+
+
+class Dashboard(TorchliteObject):
+    def __init__(self, name: str | None = None) -> None:
+        super().__init__()
+        self.name = name
+        self.workset: Workset | None = None
+
+    def __repr__(self) -> str:
+        return f"Dashboard(name={self.name}, id={self.id[-11:]})"
