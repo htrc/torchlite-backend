@@ -13,7 +13,7 @@ class Dashboard(BaseModel):
 
 class Workset(BaseModel):
     id: str = str(uuid4())
-    ef_workset_id: str = ""
+    ef_id: str = ""
     name: str = "anonymous workset"
 
     def __repr__(self) -> str:

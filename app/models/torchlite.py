@@ -13,17 +13,39 @@ class TorchliteObject:
 class Workset(TorchliteObject):
     def __init__(self, ef_wsid: str | None = None) -> None:
         super().__init__()
-        self.ef_id: str | None = None
-        self.volumes: list[Volume] = []
+        self.ef_id: str | None = ef_wsid
+        self._disabled_volumes: list = []
+        self.volumes: list[Volume] | None = None
 
-        if ef_wsid:
-            ef_workset: ef.Workset | None = EFApi().workset(ef_wsid)
+        if self.ef_id:
+            ef_workset = EFApi().workset(self.ef_id)
             if ef_workset:
-                self.ef_id = ef_workset.id
                 self.volumes = [Volume(htid) for htid in ef_workset.htids]
 
     def __repr__(self) -> str:
         return f"Workset({self.id[-11:]})"
+
+    def disable_volume(self, htid: str) -> None:
+        if self.volumes:
+            try:
+                vol = [v for v in self.volumes if v.htid == htid][0]
+            except IndexError:
+                vol = None
+
+            if vol:
+                self._disabled_volumes.append(vol)
+                self.volumes = [v for v in self.volumes if v.htid != htid]
+
+    def enable_volume(self, htid: str) -> None:
+        if self.volumes:
+            try:
+                vol = [v for v in self._disabled_volumes if v.htid == htid][0]
+            except IndexError:
+                vol = None
+
+            if vol:
+                self.volumes.append(vol)
+                self._disabled_volumes = [v for v in self._disabled_volumes if v.htid != htid]
 
     @property
     def metadata(self):

@@ -1,7 +1,7 @@
 from typing import Any
 import json
 import config
-from models import db
+from app.models import db, torchlite
 from redis import Redis
 
 
@@ -11,6 +11,17 @@ class Persister:
 
     def persist(self, object):
         pass
+
+
+class WorksetPersister(Persister):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def persist(self, workst: torchlite.Workset) -> None:
+        pass
+
+
+"""This is obsolete now; we should be persisting torchlite objects"""
 
 
 class DashboardPersister(Persister):
