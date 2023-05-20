@@ -1,6 +1,7 @@
 import urllib.parse
 from typing import List, Optional
 import requests
+from requests.models import Response
 import app.models.ef as ef
 import app.models.tokens as tokens
 
@@ -24,11 +25,10 @@ class EFApi:
 
     def get(self, uri: str, params: dict = {}) -> dict | None:
         headers = {"Accept": "application/json"}
-        r: request.models.Response = None
         if params:
-            r: requests.models.Response = requests.get(uri, headers=headers, params=params)
+            r: Response = requests.get(uri, headers=headers, params=params)
         else:
-            r: requests.models.Response = requests.get(uri, headers=headers)
+            r = requests.get(uri, headers=headers)
 
         r.raise_for_status()
         try:
@@ -75,18 +75,17 @@ class EFApi:
     ) -> ef.EF | None:
         uri: str = f"{self.volumes_uri}/{clean_id(htid)}"
         params: dict = {}
-        if pos is not None:
-            if pos is True:
+        match pos:
+            case True:
                 params["pos"] = "true"
-            else:
+            case False:
                 params["pos"] = "false"
+
         if fields:
             params["fields"] = ",".join(fields)
 
-        if queries:
-            uri = f"{uri}?{urllib.parse.urlencode(queries)}"
-
         data: dict | None = self.get(uri, params=params)
+
         if data:
             return ef.EF(**data)
         else:

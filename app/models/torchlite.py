@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from uuid import uuid4
 from app.services.ef_api import EFApi
 import app.models.ef as ef
-from app.models.tokens import tokenPosCount, Token
+from app.models.tokens import TokenCounter
 
 
 class TorchliteObject:
@@ -60,6 +60,7 @@ class Volume(TorchliteObject):
         self.htid: str = htid
         self._metadata: ef.VolumeMetadata | None = None
         self._features: ef.EF | None = None
+        self._tokens: TokenCounter | None = None
 
     def __repr__(self) -> str:
         return f"Volume({self.htid})"
@@ -76,6 +77,12 @@ class Volume(TorchliteObject):
             self._features = EFApi().volume_features(self.htid)
         return self._features
 
+    @property
+    def tokens(self) -> TokenCounter:
+        if self._tokens is None:
+            self._tokens = EFApi().tokens(self.htid)
+        return self._tokens
+
 
 class Page(TorchliteObject):
     def __init__(self, vol_id: str, page_features: ef.PageFeatures) -> None:
@@ -86,9 +93,3 @@ class Page(TorchliteObject):
 
     def __repr__(self) -> str:
         return f"Page({self.features.seq})"
-
-    @property
-    def tokens(self) -> list[Token]:
-        if self._tokens is None:
-            self._tokens = tokenPosCount(self.features.body.tokenPosCount)
-        return self._tokens
