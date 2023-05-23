@@ -1,0 +1,8 @@
+DB_HOST=localhost
+DB_PORT=6379
+DB_NUMBER=0
+DB_PASSWORD=None
+DB_SSL=False
+DB_POOL_MINSIZE=4
+DB_POOL_MAXSIZE=10
+TORCHLITE_CONFIG=https://raw.githubusercontent.com/htrc/torchlite-argocd/main/torchlite-backend/dev/config/config.yaml
