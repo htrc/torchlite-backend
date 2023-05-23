@@ -17,7 +17,7 @@ class WorksetPersistenceError(Exception):
 router: APIRouter = APIRouter(prefix="/worksets", tags=["worksets"], responses={404: {"description": "Not found"}})
 
 
-def pack(self, workset: torchlite.Workset) -> db.Workset:
+def pack(workset: torchlite.Workset) -> db.Workset:
     db_object: db.Workset = db.Workset(
         id=workset.id, ef_id=workset.ef_id, name=workset.name, description=workset.description
     )
@@ -43,7 +43,7 @@ def unpack(data: dict) -> torchlite.Workset:
 
 @router.get("/", tags=["worksets"], response_model=None)
 async def read_worksets(db: redis.Redis = Depends(get_db)) -> Any:
-    db_data: dict = db.hgetall("worksets")
+    db_data: Any = db.hgetall("worksets")
     data = []
     for _, v in db_data.items():
         thing = json.loads(v)
@@ -63,16 +63,16 @@ async def read_workset(key: str, db: redis.Redis = Depends(get_db)) -> Any:
     return unpack(data)
 
 
-async def read_workset_foo(key: str, db: redis.Redis = Depends(get_db)) -> Any:
-    db_data: bytes | None = db.hget("worksets", key)
+@router.put("/{key}/filter", tags=["worksets"], response_model=None)
+async def filter_workset(key: str, db: redis.Redis = Depends(get_db)) -> None:
+    db_data: Any = db.hget("worksets", key)
     if db_data is None:
         raise WorksetPersistenceError(f"could not retrieve {key} from database")
 
     data: dict = json.loads(db_data)
-    return unpack(data)
-
-
-async def read_worksets_old(db: redis.Redis = Depends(get_db)) -> Any:
-    mydb = db
-    db_data = mydb.hgetall("worksets")
-    return db_data
+    workset: torchlite.Workset = unpack(data)
+    volumes = workset.volumes
+    if volumes:
+        workset.disable_volume(volumes[0].htid)
+        db_object = pack(workset)
+        foo = db.hset("worksets", workset.id, json.dumps(db_object.dict()))
