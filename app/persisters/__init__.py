@@ -63,6 +63,18 @@ class WorksetPersister(Persister):
         if db_data is None:
             raise PersistenceError(f"could not retrieve anythinng from database")
 
+        workset_list = []
+        for k, v in db_data():
+            thing = json.loads(v)
+            workset: torchlite.Workset = self.unpack(thing)
+            workset_list.append(workset)
+        return workset_list
+
+    async def retrieve_all_old(self) -> list[torchlite.Workset] | None:
+        db_data: Any = await self.db.hgetall("worksets")
+        if db_data is None:
+            raise PersistenceError(f"could not retrieve anythinng from database")
+
         data: dict = json.loads(db_data)
         return_list = []
         for k, v in data.items():
