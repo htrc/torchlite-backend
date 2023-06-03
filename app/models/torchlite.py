@@ -1,3 +1,4 @@
+from typing import Any
 from pydantic import BaseModel
 from uuid import uuid4
 from app.services.ef_api import EFApi
@@ -103,3 +104,37 @@ class Dashboard(TorchliteObject):
 
     def __repr__(self) -> str:
         return f"Dashboard(name={self.name}, id={self.id[-11:]})"
+
+
+class Widget(TorchliteObject):
+    def __init__(self, name: str | None = None) -> None:
+        super().__init__()
+        self._widget_class = "generic"
+        self.workset: Workset | None = None
+        self._data: list | None = None
+
+    def __repr__(self) -> str:
+        return f"Widget(class={self._widget_class}, id={self.id[-11:]})"
+
+
+class TimelineWidget(Widget):
+    def __init__(self, name: str | None = None) -> None:
+        super().__init__()
+        self._widget_class = "timeline"
+
+    @property
+    def data(self) -> list[Any] | None:
+        if self._data is None:
+            if self.workset and self.workset.volumes:
+                self._data = [{"htid": vol.htid, "pubDate": vol.metadata.pubDate} for vol in self.workset.volumes]
+        return self._data
+
+
+class Projector(TorchliteObject):
+    def __init__(self, name: str | None = None) -> None:
+        super().__init__()
+        self.name = name
+        self.workset: Workset | None = None
+
+    def __repr__(self) -> str:
+        return f"Projector(name={self.name}, id={self.id[-11:]})"
