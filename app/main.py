@@ -7,7 +7,7 @@ from yaml import safe_load
 from fastapi import FastAPI
 from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
 from redis import asyncio as redis
-
+from app.config import persistence_db_pool
 
 import app.persisters
 import app.models.db as db
@@ -46,22 +46,8 @@ async def torchlite_startup():
         except IOError as e:
             raise TorchliteError(f"could not load config file {config_file_name}") from e
 
-    persistence_db_pool: redis.ConnectionPool = redis.ConnectionPool(
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        db=os.getenv("DB_NUMBER"),
-        password=os.getenv("DB_PASSWORD"),
-        ssl=os.getenv("DB_SSL"),
-        minsize=os.getenv("DB_POOL_MINSIZE"),
-        maxsize=os.getenv("DB_POOL_MAXSIZE"),
-        encoding="utf8",
-    )
-
-    persistence_db: redis.Redis = redis.Redis(connection_pool=persistence_db_pool, auto_close_connection_pool=False)
-
 
 async def torchlite_shutdown():
-    await persistence_db.close()
     await persistence_db_pool.disconnect()
 
 
@@ -74,16 +60,9 @@ async def lifespan(app: FastAPI):
     await torchlite_shutdown()
 
 
-def get_db():
-    persistence_db: redis.Redis = redis.Redis(connection_pool=persistence_db_pool, auto_close_connection_pool=False)
-    try:
-        yield persistence_db
-    finally:
-        persistence_db.close()
-
-
 if find_dotenv() is False:
     raise TorchliteError("could not load .env file")
+
 load_dotenv(find_dotenv())
 
 

@@ -1,11 +1,11 @@
 from typing import Any
+import redis.asyncio as redis
+import json
 from fastapi import APIRouter, Depends
 from app.persisters import WorksetPersister
 from app.models import torchlite as torchlite
 from app.models import db as db
-from app.database import get_db
-import redis.asyncio as redis
-import json
+from app.config import get_db
 
 
 class WorksetPersistenceError(Exception):
