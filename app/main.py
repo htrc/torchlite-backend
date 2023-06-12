@@ -48,7 +48,7 @@ async def torchlite_startup():
 
 
 async def torchlite_shutdown():
-    await persistence_db_pool.disconnect()
+    persistence_db_pool.disconnect()
 
 
 @asynccontextmanager
