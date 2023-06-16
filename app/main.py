@@ -16,6 +16,7 @@ from app.services.ef_api import EFApi
 from app.services.middleware import TorchliteVersionHeaderMiddleware
 from app.routers.dashboards import router as dashboard_router
 from app.routers.worksets import router as workset_router
+from app.routers.widgets import router as widget_router
 
 
 class TorchliteError(Exception):
@@ -70,3 +71,4 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(dashboard_router)
 app.include_router(workset_router)
+app.include_router(widget_router)
