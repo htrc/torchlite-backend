@@ -70,7 +70,7 @@ load_dotenv(find_dotenv())
 
 app = FastAPI(lifespan=lifespan)
 
-app.include_router(dashboard_router)
+# app.include_router(dashboard_router)
 app.include_router(workset_router)
-app.include_router(widget_router)
+# app.include_router(widget_router)
 app.include_router(data_router)

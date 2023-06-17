@@ -91,17 +91,44 @@ class Widget:
     pass
 
 
+# class MapWidget(Widget):
+#     def __init__(self, workset_id: str) -> None:
+#         self.workset_id = workset_id
+#         self._metadata = None
+#         self._data = None
+
+#     @property
+#     def metadata(self):
+#         if self._metadata is None:
+#             work_set = Workset(self.workset_id)
+#             self._metadata = work_set.metadata
+#         return self._metadata
+
+#     @property
+#     def contributors(self):
+#         clist = flatten([item.contributor for item in self.metadata if item.contributor != None])
+#         return list(filter(lambda x: x.type == 'http://id.loc.gov/ontologies/bibframe/Person', clist))
+
+#     @property
+#     def data(self):
+#         if self._data is None:
+#             viaf_ids = [c.id for c in self.contributors]
+#             wd_ids = [wd_id_of(id) for id in viaf_ids]
+#             self._data = [wikidata_data(id) for id in wd_ids]
+
+#         return self._data
+
+
 class MapWidget(Widget):
-    def __init__(self, workset_id: str) -> None:
-        self.workset_id = workset_id
+    def __init__(self, workset: Workset) -> None:
+        self.workset: Workset = workset
         self._metadata = None
         self._data = None
 
     @property
     def metadata(self):
         if self._metadata is None:
-            work_set = Workset(self.workset_id)
-            self._metadata = work_set.metadata
+            self._metadata = self.workset.metadata
         return self._metadata
 
     @property
