@@ -18,13 +18,16 @@ router: APIRouter = APIRouter(prefix="/worksets", tags=["worksets"], responses={
 
 
 def pack(workset: torchlite.Workset) -> db.Workset:
+    import pdb
+
+    pdb.set_trace()
     db_object: db.Workset = db.Workset(
         id=workset.id, ef_id=workset.ef_id, name=workset.name, description=workset.description
     )
     if workset.volumes:
         db_object.volumes = [v.htid for v in workset.volumes]
-        if workset._disabled_volumes:
-            db_object.disabled_volumes = [v.htid for v in workset._disabled_volumes]
+    if workset._disabled_volumes:
+        db_object.disabled_volumes = [v.htid for v in workset._disabled_volumes]
     return db_object
 
 
@@ -37,8 +40,24 @@ def unpack(data: dict) -> torchlite.Workset:
         workset._disabled_volumes = [torchlite.Volume(htid) for htid in data['disabled_volumes']]
         if data['volumes']:
             workset.volumes = [torchlite.Volume(htid) for htid in data['volumes']]
-
     return workset
+
+
+async def load(wsid: str, db: redis.Redis) -> torchlite.Workset:
+    db_data: Any = db.hget("worksets", wsid)
+    if db_data is None:
+        raise WorksetPersistenceError(f"could not retrieve {wsid} from database")
+    data: dict = json.loads(db_data)
+    workset: torchlite.Workset = unpack(data)
+    return workset
+
+
+async def store(workset: torchlite.Workset, db: redis.Redis) -> None:
+    db_object = pack(workset)
+    import pdb
+
+    pdb.set_trace()
+    db.hset("worksets", workset.id, json.dumps(db_object.dict()))
 
 
 @router.get("/", tags=["worksets"], response_model=None)
@@ -46,7 +65,7 @@ async def read_worksets(db: redis.Redis = Depends(get_db)) -> Any:
     db_data: Any = db.hgetall("worksets")
     data = []
     for _, v in db_data.items():
-        thing = json.loads(v)
+        # thing = json.loads(v)
         ws: torchlite.Workset = unpack(json.loads(v))
 
         data.append(ws)
@@ -55,12 +74,17 @@ async def read_worksets(db: redis.Redis = Depends(get_db)) -> Any:
 
 @router.get("/{wsid}", tags=["worksets"], response_model=None)
 async def read_workset(wsid: str, db: redis.Redis = Depends(get_db)) -> Any:
-    db_data: bytes | None = db.hget("worksets", wsid)
-    if db_data is None:
-        raise WorksetPersistenceError(f"could not retrieve {wsid} from database")
+    return await load(wsid, db)
 
-    data: dict = json.loads(db_data)
-    return unpack(data)
+
+# @router.get("/{wsid}", tags=["worksets"], response_model=None)
+# async def read_workset(wsid: str, db: redis.Redis = Depends(get_db)) -> Any:
+#     db_data: bytes | None = db.hget("worksets", wsid)
+#     if db_data is None:
+#         raise WorksetPersistenceError(f"could not retrieve {wsid} from database")
+
+#     data: dict = json.loads(db_data)
+#     return unpack(data)
 
 
 # @router.put("/{key}/filter", tags=["worksets"], response_model=None)
@@ -80,25 +104,13 @@ async def read_workset(wsid: str, db: redis.Redis = Depends(get_db)) -> Any:
 
 @router.delete("/{wsid}/{htid}", tags=["worksets"], response_model=None)
 async def remove_volume(wsid: str, htid: str, db: redis.Redis = Depends(get_db)) -> None:
-    db_data: Any = db.hget("worksets", wsid)
-    if db_data is None:
-        raise WorksetPersistenceError(f"could not retrieve {wsid} from database")
-
-    data: dict = json.loads(db_data)
-    workset: torchlite.Workset = unpack(data)
+    workset: torchlite.Workset = await load(wsid, db)
     workset.remove_volume(htid)
-    db_object = pack(workset)
-    db.hset("worksets", workset.id, json.dumps(db_object.dict()))
+    return await store(workset, db)
 
 
 @router.put("/{wsid}/{htid}", tags=["worksets"], response_model=None)
 async def add_volume(wsid: str, htid: str, db: redis.Redis = Depends(get_db)) -> None:
-    db_data: Any = db.hget("worksets", wsid)
-    if db_data is None:
-        raise WorksetPersistenceError(f"could not retrieve {wsid} from database")
-
-    data: dict = json.loads(db_data)
-    workset: torchlite.Workset = unpack(data)
+    workset: torchlite.Workset = await load(wsid, db)
     workset.add_volume(htid)
-    db_object = pack(workset)
-    db.hset("worksets", workset.id, json.dumps(db_object.dict()))
+    return await store(workset, db)
