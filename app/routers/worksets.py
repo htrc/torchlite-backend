@@ -53,26 +53,52 @@ async def read_worksets(db: redis.Redis = Depends(get_db)) -> Any:
     return data
 
 
-@router.get("/{key}", tags=["worksets"], response_model=None)
-async def read_workset(key: str, db: redis.Redis = Depends(get_db)) -> Any:
-    db_data: bytes | None = db.hget("worksets", key)
+@router.get("/{wsid}", tags=["worksets"], response_model=None)
+async def read_workset(wsid: str, db: redis.Redis = Depends(get_db)) -> Any:
+    db_data: bytes | None = db.hget("worksets", wsid)
     if db_data is None:
-        raise WorksetPersistenceError(f"could not retrieve {key} from database")
+        raise WorksetPersistenceError(f"could not retrieve {wsid} from database")
 
     data: dict = json.loads(db_data)
     return unpack(data)
 
 
-@router.put("/{key}/filter", tags=["worksets"], response_model=None)
-async def filter_workset(key: str, db: redis.Redis = Depends(get_db)) -> None:
-    db_data: Any = db.hget("worksets", key)
+# @router.put("/{key}/filter", tags=["worksets"], response_model=None)
+# async def filter_workset(key: str, db: redis.Redis = Depends(get_db)) -> None:
+#     db_data: Any = db.hget("worksets", key)
+#     if db_data is None:
+#         raise WorksetPersistenceError(f"could not retrieve {key} from database")
+
+#     data: dict = json.loads(db_data)
+#     workset: torchlite.Workset = unpack(data)
+#     volumes = workset.volumes
+#     if volumes:
+#         workset.disable_volume(volumes[0].htid)
+#         db_object = pack(workset)
+#         foo = db.hset("worksets", workset.id, json.dumps(db_object.dict()))
+
+
+@router.delete("/{wsid}/{htid}", tags=["worksets"], response_model=None)
+async def remove_volume(wsid: str, htid: str, db: redis.Redis = Depends(get_db)) -> None:
+    db_data: Any = db.hget("worksets", wsid)
     if db_data is None:
-        raise WorksetPersistenceError(f"could not retrieve {key} from database")
+        raise WorksetPersistenceError(f"could not retrieve {wsid} from database")
 
     data: dict = json.loads(db_data)
     workset: torchlite.Workset = unpack(data)
-    volumes = workset.volumes
-    if volumes:
-        workset.disable_volume(volumes[0].htid)
-        db_object = pack(workset)
-        foo = db.hset("worksets", workset.id, json.dumps(db_object.dict()))
+    workset.remove_volume(htid)
+    db_object = pack(workset)
+    db.hset("worksets", workset.id, json.dumps(db_object.dict()))
+
+
+@router.put("/{wsid}/{htid}", tags=["worksets"], response_model=None)
+async def add_volume(wsid: str, htid: str, db: redis.Redis = Depends(get_db)) -> None:
+    db_data: Any = db.hget("worksets", wsid)
+    if db_data is None:
+        raise WorksetPersistenceError(f"could not retrieve {wsid} from database")
+
+    data: dict = json.loads(db_data)
+    workset: torchlite.Workset = unpack(data)
+    workset.add_volume(htid)
+    db_object = pack(workset)
+    db.hset("worksets", workset.id, json.dumps(db_object.dict()))

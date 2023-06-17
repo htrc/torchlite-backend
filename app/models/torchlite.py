@@ -50,6 +50,19 @@ class Workset(TorchliteObject):
                 self.volumes.append(vol)
                 self._disabled_volumes = [v for v in self._disabled_volumes if v.htid != htid]
 
+    def add_volume(self, htid: str) -> None:
+        if self.volumes:
+            found = [v for v in self.volumes if v.htid == htid]
+            if not found:
+                self.volumes.append(Volume(htid))
+        else:
+            self.volumes = [Volume(htid)]
+
+    def remove_volume(self, htid: str) -> None:
+        if self.volumes:
+            remainder = [v for v in self.volumes if v.htid != htid]
+            self.volumes = remainder
+
     @property
     def metadata(self):
         return [v.metadata for v in self.volumes]
