@@ -26,6 +26,8 @@ redis = "^4.5.5"
 types-redis = "^4.5.5.2"
 pydantic-redis = "^0.4.3"
 python-dotenv = "^1.0.0"
+rdflib = "^6.3.2"
+sparqlwrapper = "^2.0.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
