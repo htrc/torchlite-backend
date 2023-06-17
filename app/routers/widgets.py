@@ -54,5 +54,3 @@ async def read_widget(widget_id: str, db: redis.Redis = Depends(get_db)) -> Any:
 
     data: dict = json.loads(db_data)
     return unpack(data)
-
-@router.get("/map/{workset_id}", tags=["widgets"], response_model=None)
