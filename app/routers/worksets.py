@@ -18,9 +18,6 @@ router: APIRouter = APIRouter(prefix="/worksets", tags=["worksets"], responses={
 
 
 def pack(workset: torchlite.Workset) -> db.Workset:
-    import pdb
-
-    pdb.set_trace()
     db_object: db.Workset = db.Workset(
         id=workset.id, ef_id=workset.ef_id, name=workset.name, description=workset.description
     )
@@ -54,9 +51,6 @@ async def load(wsid: str, db: redis.Redis) -> torchlite.Workset:
 
 async def store(workset: torchlite.Workset, db: redis.Redis) -> None:
     db_object = pack(workset)
-    import pdb
-
-    pdb.set_trace()
     db.hset("worksets", workset.id, json.dumps(db_object.dict()))
 
 
@@ -65,7 +59,6 @@ async def read_worksets(db: redis.Redis = Depends(get_db)) -> Any:
     db_data: Any = db.hgetall("worksets")
     data = []
     for _, v in db_data.items():
-        # thing = json.loads(v)
         ws: torchlite.Workset = unpack(json.loads(v))
 
         data.append(ws)
@@ -75,31 +68,6 @@ async def read_worksets(db: redis.Redis = Depends(get_db)) -> Any:
 @router.get("/{wsid}", tags=["worksets"], response_model=None)
 async def read_workset(wsid: str, db: redis.Redis = Depends(get_db)) -> Any:
     return await load(wsid, db)
-
-
-# @router.get("/{wsid}", tags=["worksets"], response_model=None)
-# async def read_workset(wsid: str, db: redis.Redis = Depends(get_db)) -> Any:
-#     db_data: bytes | None = db.hget("worksets", wsid)
-#     if db_data is None:
-#         raise WorksetPersistenceError(f"could not retrieve {wsid} from database")
-
-#     data: dict = json.loads(db_data)
-#     return unpack(data)
-
-
-# @router.put("/{key}/filter", tags=["worksets"], response_model=None)
-# async def filter_workset(key: str, db: redis.Redis = Depends(get_db)) -> None:
-#     db_data: Any = db.hget("worksets", key)
-#     if db_data is None:
-#         raise WorksetPersistenceError(f"could not retrieve {key} from database")
-
-#     data: dict = json.loads(db_data)
-#     workset: torchlite.Workset = unpack(data)
-#     volumes = workset.volumes
-#     if volumes:
-#         workset.disable_volume(volumes[0].htid)
-#         db_object = pack(workset)
-#         foo = db.hset("worksets", workset.id, json.dumps(db_object.dict()))
 
 
 @router.delete("/{wsid}/{htid}", tags=["worksets"], response_model=None)
