@@ -1,4 +1,3 @@
-import urllib.parse
 from typing import List, Optional
 import requests
 from requests.models import Response

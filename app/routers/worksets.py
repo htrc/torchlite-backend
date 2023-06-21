@@ -2,8 +2,6 @@ from typing import Any
 import redis.asyncio as redis
 import json
 from fastapi import APIRouter, Depends
-from app.persisters import WorksetPersister
-from app.services.ef_api import EFApi
 from app.models import torchlite as torchlite
 from app.models import db as db
 from app.config import get_db
@@ -53,7 +51,8 @@ async def load(wsid: str, db: redis.Redis) -> torchlite.Workset:
 
 async def store(workset: torchlite.Workset, db: redis.Redis) -> None:
     db_object = pack(workset)
-    db.hset("worksets", workset.id, json.dumps(db_object.dict()))
+    count: Any = db.hset("worksets", workset.id, json.dumps(db_object.dict()))
+    return None
 
 
 @router.get("/", tags=["worksets"], response_model=None)
@@ -76,7 +75,8 @@ async def read_workset(wsid: str, db: redis.Redis = Depends(get_db)) -> Any:
 async def remove_volume(wsid: str, htid: str, db: redis.Redis = Depends(get_db)) -> None:
     workset: torchlite.Workset = await load(wsid, db)
     workset.remove_volume(htid)
-    return await store(workset, db)
+    await store(workset, db)
+    return None
 
 
 @router.put("/{wsid}/{htid}", tags=["worksets"], response_model=None)

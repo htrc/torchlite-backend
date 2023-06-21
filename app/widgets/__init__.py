@@ -1,9 +1,7 @@
-from collections import namedtuple
-from SPARQLWrapper import SPARQLWrapper, JSON
-import requests
+from typing import Union, Dict, Any
 from rdflib import Graph, Namespace
-from app.services.ef_api import EFApi
-from app.models.torchlite import Workset, Volume
+from SPARQLWrapper import SPARQLWrapper, JSON, QueryResult
+from app.models.torchlite import Workset
 
 
 def wd_id_of(viaf_id):
@@ -13,7 +11,7 @@ def wd_id_of(viaf_id):
     g = Graph()
     try:
         g.parse(url)
-    except:
+    except Exception:
         return None
 
     try:
@@ -23,7 +21,7 @@ def wd_id_of(viaf_id):
                 g.objects(subject=None, predicate=SDO.sameAs),
             )
         )[0]
-    except:
+    except Exception:
         return None
 
     return str(u)
@@ -47,11 +45,12 @@ def wikidata_data(wikidata_id: str):
     sparql.setQuery(query)
 
     try:
-        results = sparql.queryAndConvert()
-        bindings = results['results']['bindings'][0]
-    except:
+        results: Any = sparql.queryAndConvert()
+        if results and results['results']['bindings']:
+            bindings: dict = results['results']['bindings'][0]
+    except Exception:
         return None
-    data = {
+    data: dict = {
         "coordinates": bindings['coord']['value'],
         "dob": bindings['dob']['value'],
     }
@@ -88,14 +87,14 @@ class MapWidget(Widget):
     @property
     def contributors(self):
         metadata = self.workset.metadata(["htid", "metadata.contributor"])
-        clist = flatten([v.metadata.contributor for v in metadata if v.metadata.contributor != None])
+        clist = flatten([v.metadata.contributor for v in metadata if v.metadata.contributor is not None])
         return list(filter(lambda x: x.type == 'http://id.loc.gov/ontologies/bibframe/Person', clist))
 
     def data(self):
         if self._data is None:
             viaf_ids = (c.id for c in self.contributors)
-            wd_ids = (wd_id_of(id) for id in viaf_ids if id != None)
-            self._data = (wikidata_data(id) for id in wd_ids if id != None)
+            wd_ids = (wd_id_of(id) for id in viaf_ids if id is not None)
+            self._data = (wikidata_data(id) for id in wd_ids if id is not None)
 
         return self._data
 

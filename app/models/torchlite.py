@@ -1,5 +1,3 @@
-from typing import Any
-from pydantic import BaseModel
 from uuid import uuid4
 from app.services.ef_api import EFApi
 import app.models.ef as ef

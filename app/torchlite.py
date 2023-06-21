@@ -9,14 +9,14 @@ class TorchliteBase:
         self.ef_model = None
 
 
-class Dashboard(TorchliteBase):
-    def __init__(self) -> None:
-        super().__init__()
-        self.persister = persisters.DashboardPersister()
+# class Dashboard(TorchliteBase):
+#     def __init__(self) -> None:
+#         super().__init__()
+#         self.persister = persisters.DashboardPersister()
 
-    def __repr__(self) -> str:
-        return f"torchlite.Dashboard(id={self.id[-11:]})"
+#     def __repr__(self) -> str:
+#         return f"torchlite.Dashboard(id={self.id[-11:]})"
 
-    def persist(self):
-        if self.persister and self.ef_model:
-            self.persister.persist(self.ef_model)
+#     def persist(self):
+#         if self.persister and self.ef_model:
+#             self.persister.persist(self.ef_model)

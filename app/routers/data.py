@@ -1,8 +1,6 @@
 from typing import Any
 from fastapi import APIRouter, Depends
 import redis.asyncio as redis
-import json
-from app.persisters import WorksetPersister
 from app.models import torchlite as torchlite
 from app.models import db as db
 from app.config import get_db

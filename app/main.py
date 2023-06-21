@@ -1,19 +1,15 @@
 import os
+from pathlib import Path
+from typing import Optional
 from urllib.parse import urlparse, ParseResult
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv, find_dotenv
 import requests
 from yaml import safe_load
 from fastapi import FastAPI
-from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
-from redis import asyncio as redis
 from app.config import persistence_db_pool
 
-import app.persisters
-import app.models.db as db
-import app.models.torchlite as torchlite
-from app.services.ef_api import EFApi
-from app.services.middleware import TorchliteVersionHeaderMiddleware
+# import app.persisters
 
 # from app.routers.dashboards import router as dashboard_router
 from app.routers.worksets import router as workset_router
@@ -39,14 +35,14 @@ async def torchlite_startup():
     if parse_result.scheme.startswith("http"):
         resp: requests.Response = requests.get(config_file_name)
         if resp.status_code == 200:
-            config = safe_load(resp.text)
+            safe_load(resp.text)
         else:
             raise TorchliteError(f"Could not load config {config_file_name} - HTTP error {resp.status_code}")
     else:
         p: Path = Path(parse_result.path)
         try:
             with open(p, mode="r", encoding="utf-8-sig") as f:
-                config = safe_load(f)
+                safe_load(f)
         except IOError as e:
             raise TorchliteError(f"could not load config file {config_file_name}") from e
 

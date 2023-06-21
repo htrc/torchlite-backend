@@ -28,8 +28,8 @@ class WorksetPersister(Persister):
         )
         if workset.volumes:
             db_object.volumes = [v.htid for v in workset.volumes]
-        if workset._disabled_volumes:
-            db_object.disabled_volumes = [v.htid for v in workset._disabled_volumes]
+        # if workset._disabled_volumes:
+        #     db_object.disabled_volumes = [v.htid for v in workset._disabled_volumes]
         return db_object
 
     def unpack(self, data: dict) -> torchlite.Workset:
@@ -37,8 +37,8 @@ class WorksetPersister(Persister):
         workset = torchlite.Workset(ef_wsid=db_object.ef_id, name=db_object.name, description=db_object.description)
         workset.id = db_object.id
 
-        if data['disabled_volumes']:
-            workset._disabled_volumes = [torchlite.Volume(htid) for htid in data['disabled_volumes']]
+        # if data['disabled_volumes']:
+        #     workset._disabled_volumes = [torchlite.Volume(htid) for htid in data['disabled_volumes']]
         if data['volumes']:
             workset.volumes = [torchlite.Volume(htid) for htid in data['volumes']]
 
@@ -61,7 +61,7 @@ class WorksetPersister(Persister):
     async def retrieve_all(self) -> list[torchlite.Workset] | None:
         db_data: Any = await self.db.hgetall("worksets")
         if db_data is None:
-            raise PersistenceError(f"could not retrieve anythinng from database")
+            raise PersistenceError("could not retrieve anythinng from database")
 
         workset_list = []
         for k, v in db_data():
@@ -73,7 +73,7 @@ class WorksetPersister(Persister):
     async def retrieve_all_old(self) -> list[torchlite.Workset] | None:
         db_data: Any = await self.db.hgetall("worksets")
         if db_data is None:
-            raise PersistenceError(f"could not retrieve anythinng from database")
+            raise PersistenceError("could not retrieve anythinng from database")
 
         data: dict = json.loads(db_data)
         return_list = []
