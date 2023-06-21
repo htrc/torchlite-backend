@@ -59,12 +59,14 @@ def wikidata_data(wikidata_id: str):
         bindings = results['results']['bindings'][0]
     except:
         return None
-
-    return {
-        "countryiso": bindings['code']['value'],
+    data = {
         "coordinates": bindings['coord']['value'],
         "dob": bindings['dob']['value'],
     }
+    if "code" in bindings:
+        data["countryiso"] = bindings['code']['value']
+
+    return data
 
 
 def map_data(viaf_id):
@@ -91,34 +93,6 @@ class Widget:
     pass
 
 
-# class MapWidget(Widget):
-#     def __init__(self, workset_id: str) -> None:
-#         self.workset_id = workset_id
-#         self._metadata = None
-#         self._data = None
-
-#     @property
-#     def metadata(self):
-#         if self._metadata is None:
-#             work_set = Workset(self.workset_id)
-#             self._metadata = work_set.metadata
-#         return self._metadata
-
-#     @property
-#     def contributors(self):
-#         clist = flatten([item.contributor for item in self.metadata if item.contributor != None])
-#         return list(filter(lambda x: x.type == 'http://id.loc.gov/ontologies/bibframe/Person', clist))
-
-#     @property
-#     def data(self):
-#         if self._data is None:
-#             viaf_ids = [c.id for c in self.contributors]
-#             wd_ids = [wd_id_of(id) for id in viaf_ids]
-#             self._data = [wikidata_data(id) for id in wd_ids]
-
-#         return self._data
-
-
 class MapWidget(Widget):
     def __init__(self, workset: Workset) -> None:
         self.workset: Workset = workset
@@ -126,21 +100,28 @@ class MapWidget(Widget):
         self._data = None
 
     @property
-    def metadata(self):
-        if self._metadata is None:
-            self._metadata = self.workset.metadata
-        return self._metadata
-
-    @property
     def contributors(self):
-        clist = flatten([item.contributor for item in self.metadata if item.contributor != None])
+        metadata = self.workset.metadata(["htid", "metadata.contributor"])
+        # clist = flatten([item.contributor for item in self.metadata if item.contributor != None])
+        clist = flatten([v.metadata.contributor for v in metadata if v.metadata.contributor != None])
         return list(filter(lambda x: x.type == 'http://id.loc.gov/ontologies/bibframe/Person', clist))
 
-    @property
     def data(self):
         if self._data is None:
-            viaf_ids = [c.id for c in self.contributors]
-            wd_ids = [wd_id_of(id) for id in viaf_ids]
-            self._data = [wikidata_data(id) for id in wd_ids]
+            viaf_ids = (c.id for c in self.contributors)
+            wd_ids = (wd_id_of(id) for id in viaf_ids if id != None)
+            self._data = (wikidata_data(id) for id in wd_ids if id != None)
 
+        return self._data
+
+
+class TimelineWidget(Widget):
+    def __init__(self, workset: Workset) -> None:
+        self.workset: Workset = workset
+        self._data = None
+
+    def data(self):
+        if self._data is None:
+            metadata = self.workset.metadata(["htid", "metadata.pubDate"])
+            self._data = [{"id": v.htid, "pubdate": v.metadata.pubDate} for v in metadata]
         return self._data

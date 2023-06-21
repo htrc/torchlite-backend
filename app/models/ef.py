@@ -139,3 +139,8 @@ class Workset(BaseModel):
     id: str
     htids: list[str]
     created: str
+
+
+class Volume(BaseModel):
+    htid: str
+    metadata: Optional[VolumeMetadata] = None

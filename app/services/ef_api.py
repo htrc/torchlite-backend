@@ -13,7 +13,7 @@ def clean_id(id: str) -> str:
     :param id: The HTID to convert
     :return: The "clean" version that can be used as a filename
     """
-    lib, lib_id = id.split(".")
+    lib, lib_id = id.split(".", 1)
     cleaned = lib_id.translate(str.maketrans(":/.", "+=,"))
     return f"{lib}.{cleaned}"
 
@@ -44,11 +44,35 @@ class EFApi:
         else:
             return None
 
-    def workset_metadata(self, wsid: str) -> List[ef.VolumeMetadata] | None:
+    # def workset_metadata(self, wsid: str) -> List[ef.VolumeMetadata] | None:
+    #     uri = f"{self.worksets_uri}/{wsid}/metadata"
+    #     response = self.get(uri)
+    #     if response:
+    #         return [ef.VolumeMetadata(**item) for item in response]
+    #     else:
+    #         return None
+
+    def workset_metadata(self, wsid: str, fields: Optional[List[str]]) -> List[ef.Volume] | None:
         uri = f"{self.worksets_uri}/{wsid}/metadata"
-        response = self.get(uri)
+        params: dict = {}
+        if fields:
+            params["fields"] = ",".join(fields)
+
+        response: dict | None = self.get(uri, params=params)
         if response:
-            return [ef.VolumeMetadata(**item) for item in response]
+            return [ef.Volume(**item) for item in response]
+        else:
+            return None
+
+    def workset_metadata_subfields(self, wsid: str, fields: Optional[List[str]]) -> List[ef.Volume] | None:
+        uri = f"{self.worksets_uri}/{wsid}/metadata"
+        params: dict = {}
+        if fields:
+            params["fields"] = ",".join(fields)
+
+        response: dict | None = self.get(uri, params=params)
+        if response:
+            return [ef.Volume(**item) for item in response]
         else:
             return None
 

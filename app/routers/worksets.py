@@ -3,6 +3,7 @@ import redis.asyncio as redis
 import json
 from fastapi import APIRouter, Depends
 from app.persisters import WorksetPersister
+from app.services.ef_api import EFApi
 from app.models import torchlite as torchlite
 from app.models import db as db
 from app.config import get_db
@@ -82,3 +83,10 @@ async def add_volume(wsid: str, htid: str, db: redis.Redis = Depends(get_db)) ->
     workset: torchlite.Workset = await load(wsid, db)
     workset.add_volume(htid)
     return await store(workset, db)
+
+
+@router.post("/{ef_wsid}", tags=["worksets"], response_model=None)
+async def create_workset(ef_wsid: str, db: redis.Redis = Depends(get_db)) -> str:
+    workset: torchlite.Workset = torchlite.Workset(ef_wsid=ef_wsid)
+    await store(workset, db)
+    return workset.id

@@ -63,9 +63,12 @@ class Workset(TorchliteObject):
             remainder = [v for v in self.volumes if v.htid != htid]
             self.volumes = remainder
 
-    @property
-    def metadata(self):
-        return [v.metadata for v in self.volumes]
+    # @property
+    # def metadata(self):
+    #     return [v.metadata for v in self.volumes]
+
+    def metadata(self, fields: list | None = None) -> list | None:
+        return EFApi().workset_metadata(self.ef_id, fields)
 
 
 class Volume(TorchliteObject):
