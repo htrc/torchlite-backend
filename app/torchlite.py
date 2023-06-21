@@ -1,5 +1,4 @@
 from uuid import uuid4
-import app.persisters as persisters
 
 
 class TorchliteBase:

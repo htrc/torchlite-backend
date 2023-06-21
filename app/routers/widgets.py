@@ -1,10 +1,6 @@
-from typing import Any
-from fastapi import APIRouter, Depends
-import redis.asyncio as redis
-import json
+from fastapi import APIRouter
 from app.models import torchlite as torchlite
 from app.models import db as db
-from app.config import get_db
 
 
 class WidgetPersistenceError(Exception):

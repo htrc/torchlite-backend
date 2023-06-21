@@ -34,8 +34,8 @@ def unpack(data: dict) -> torchlite.Workset:
 
     # if data['disabled_volumes']:
     #     workset._disabled_volumes = [torchlite.Volume(htid) for htid in data['disabled_volumes']]
-    if data['volumes']:
-        workset.volumes = [torchlite.Volume(htid) for htid in data['volumes']]
+    if data["volumes"]:
+        workset.volumes = [torchlite.Volume(htid) for htid in data["volumes"]]
     return workset
 
 
@@ -49,10 +49,10 @@ async def load(wsid: str, db: redis.Redis) -> torchlite.Workset:
     return workset
 
 
-async def store(workset: torchlite.Workset, db: redis.Redis) -> None:
+async def store(workset: torchlite.Workset, db: redis.Redis) -> Any:
     db_object = pack(workset)
-    count: Any = db.hset("worksets", workset.id, json.dumps(db_object.dict()))
-    return None
+    result: Any = db.hset("worksets", workset.id, json.dumps(db_object.dict()))
+    return result
 
 
 @router.get("/", tags=["worksets"], response_model=None)

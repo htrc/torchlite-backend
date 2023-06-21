@@ -127,10 +127,10 @@ class EFApi:
         params = {"pos": "false", "fields": "features.pages.body.tokensCount"}
         data: dict | None = self.get(uri, params=params)
         if data:
-            pages = data['features']['pages']
+            pages = data["features"]["pages"]
             token_counter: tokens.TokenCounter = tokens.TokenCounter()
             for page in pages:
-                tokensCount = page['body']['tokensCount']
+                tokensCount = page["body"]["tokensCount"]
                 if tokensCount:
                     for tc in tokens.tokensCount(tokensCount):
                         token_counter.add(tc)

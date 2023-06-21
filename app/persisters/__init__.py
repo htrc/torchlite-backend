@@ -39,8 +39,8 @@ class WorksetPersister(Persister):
 
         # if data['disabled_volumes']:
         #     workset._disabled_volumes = [torchlite.Volume(htid) for htid in data['disabled_volumes']]
-        if data['volumes']:
-            workset.volumes = [torchlite.Volume(htid) for htid in data['volumes']]
+        if data["volumes"]:
+            workset.volumes = [torchlite.Volume(htid) for htid in data["volumes"]]
 
         return workset
 

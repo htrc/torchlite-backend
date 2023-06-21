@@ -1,6 +1,6 @@
-from typing import Union, Dict, Any
+from typing import Any
 from rdflib import Graph, Namespace
-from SPARQLWrapper import SPARQLWrapper, JSON, QueryResult
+from SPARQLWrapper import SPARQLWrapper, JSON
 from app.models.torchlite import Workset
 
 
@@ -46,16 +46,16 @@ def wikidata_data(wikidata_id: str):
 
     try:
         results: Any = sparql.queryAndConvert()
-        if results and results['results']['bindings']:
-            bindings: dict = results['results']['bindings'][0]
+        if results and results["results"]["bindings"]:
+            bindings: dict = results["results"]["bindings"][0]
     except Exception:
         return None
     data: dict = {
-        "coordinates": bindings['coord']['value'],
-        "dob": bindings['dob']['value'],
+        "coordinates": bindings["coord"]["value"],
+        "dob": bindings["dob"]["value"],
     }
     if "code" in bindings:
-        data["countryiso"] = bindings['code']['value']
+        data["countryiso"] = bindings["code"]["value"]
 
     return data
 
@@ -88,7 +88,7 @@ class MapWidget(Widget):
     def contributors(self):
         metadata = self.workset.metadata(["htid", "metadata.contributor"])
         clist = flatten([v.metadata.contributor for v in metadata if v.metadata.contributor is not None])
-        return list(filter(lambda x: x.type == 'http://id.loc.gov/ontologies/bibframe/Person', clist))
+        return list(filter(lambda x: x.type == "http://id.loc.gov/ontologies/bibframe/Person", clist))
 
     def data(self):
         if self._data is None:
