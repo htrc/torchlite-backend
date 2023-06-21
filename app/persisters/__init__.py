@@ -83,33 +83,33 @@ class WorksetPersister(Persister):
         return return_list
 
 
-class DashboardPersister(Persister):
-    def __init__(self, db: redis.Redis) -> None:
-        super().__init__(db)
+# class DashboardPersister(Persister):
+#     def __init__(self, db: redis.Redis) -> None:
+#         super().__init__(db)
 
-    async def persist(self, dashboard: torchlite.Dashboard) -> str:
-        db_object: db.Dashboard = db.Dashboard(id=dashboard.id, name=dashboard.name)
-        if dashboard.workset:
-            db_object.workset = dashboard.workset.id
+#     async def persist(self, dashboard: torchlite.Dashboard) -> str:
+#         db_object: db.Dashboard = db.Dashboard(id=dashboard.id, name=dashboard.name)
+#         if dashboard.workset:
+#             db_object.workset = dashboard.workset.id
 
-        await self.db.hset("dashboards", dashboard.id, json.dumps(db_object.dict()))
-        return dashboard.id
+#         await self.db.hset("dashboards", dashboard.id, json.dumps(db_object.dict()))
+#         return dashboard.id
 
-    async def retrieve(self, key: str) -> torchlite.Dashboard | None:
-        db_data: bytes | None = await self.db.hget("dashboards", key)
+#     async def retrieve(self, key: str) -> torchlite.Dashboard | None:
+#         db_data: bytes | None = await self.db.hget("dashboards", key)
 
-        if db_data is None:
-            raise PersistenceError(f"could not retrieve {key} from database")
+#         if db_data is None:
+#             raise PersistenceError(f"could not retrieve {key} from database")
 
-        data: dict = json.loads(db_data)
-        db_object: db.Dashboard = db.Dashboard(**data)
+#         data: dict = json.loads(db_data)
+#         db_object: db.Dashboard = db.Dashboard(**data)
 
-        dashboard: torchlite.Dashboard = torchlite.Dashboard(name=db_object.name)
-        dashboard.id = db_object.id
+#         dashboard: torchlite.Dashboard = torchlite.Dashboard(name=db_object.name)
+#         dashboard.id = db_object.id
 
-        if db_object.workset:
-            wsp = WorksetPersister(self.db)
-            ws = await wsp.retrieve(db_object.workset)
-            dashboard.workset = ws
+#         if db_object.workset:
+#             wsp = WorksetPersister(self.db)
+#             ws = await wsp.retrieve(db_object.workset)
+#             dashboard.workset = ws
 
-        return dashboard
+#         return dashboard

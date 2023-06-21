@@ -41,15 +41,7 @@ def wikidata_data(wikidata_id: str):
     SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
     }}"""
 
-    query_template_1 = """select ?place ?placeLabel ?coord
-    where
-    {{ <{subject}> wdt:P19 ?place .
-    ?place wdt:P625 ?coord .
-    SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-    }}"""
-
     query = query_template.format(subject=wikidata_id)
-
     sparql: SPARQLWrapper = SPARQLWrapper(endpoint)
     sparql.setReturnFormat(JSON)
     sparql.setQuery(query)
@@ -74,11 +66,6 @@ def map_data(viaf_id):
     return wikidata_data(wikidata_id)
 
 
-wsid = "6416163a2d0000f9025c8284"
-ws = Workset(wsid)
-ptype = 'http://id.loc.gov/ontologies/bibframe/Person'
-
-
 def flatten(a_list):
     result = []
     for item in a_list:
@@ -96,13 +83,11 @@ class Widget:
 class MapWidget(Widget):
     def __init__(self, workset: Workset) -> None:
         self.workset: Workset = workset
-        self._metadata = None
         self._data = None
 
     @property
     def contributors(self):
         metadata = self.workset.metadata(["htid", "metadata.contributor"])
-        # clist = flatten([item.contributor for item in self.metadata if item.contributor != None])
         clist = flatten([v.metadata.contributor for v in metadata if v.metadata.contributor != None])
         return list(filter(lambda x: x.type == 'http://id.loc.gov/ontologies/bibframe/Person', clist))
 

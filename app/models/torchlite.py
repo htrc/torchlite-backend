@@ -63,12 +63,11 @@ class Workset(TorchliteObject):
             remainder = [v for v in self.volumes if v.htid != htid]
             self.volumes = remainder
 
-    # @property
-    # def metadata(self):
-    #     return [v.metadata for v in self.volumes]
-
     def metadata(self, fields: list | None = None) -> list | None:
-        return EFApi().workset_metadata(self.ef_id, fields)
+        if self.ef_id:
+            return EFApi().workset_metadata(self.ef_id, fields)
+        else:
+            return None
 
 
 class Volume(TorchliteObject):
@@ -112,45 +111,45 @@ class Page(TorchliteObject):
         return f"Page({self.features.seq})"
 
 
-class Dashboard(TorchliteObject):
-    def __init__(self, name: str | None = None) -> None:
-        super().__init__()
-        self.name = name
-        self.workset: Workset | None = None
+# class Dashboard(TorchliteObject):
+#     def __init__(self, name: str | None = None) -> None:
+#         super().__init__()
+#         self.name = name
+#         self.workset: Workset | None = None
 
-    def __repr__(self) -> str:
-        return f"Dashboard(name={self.name}, id={self.id[-11:]})"
-
-
-class Widget(TorchliteObject):
-    def __init__(self, name: str | None = None) -> None:
-        super().__init__()
-        self._widget_class = "generic"
-        self.workset: Workset | None = None
-        self._data: list | None = None
-
-    def __repr__(self) -> str:
-        return f"Widget(class={self._widget_class}, id={self.id[-11:]})"
+#     def __repr__(self) -> str:
+#         return f"Dashboard(name={self.name}, id={self.id[-11:]})"
 
 
-class TimelineWidget(Widget):
-    def __init__(self, name: str | None = None) -> None:
-        super().__init__()
-        self._widget_class = "timeline"
+# class Widget(TorchliteObject):
+#     def __init__(self, name: str | None = None) -> None:
+#         super().__init__()
+#         self._widget_class = "generic"
+#         self.workset: Workset | None = None
+#         self._data: list | None = None
 
-    @property
-    def data(self) -> list[Any] | None:
-        if self._data is None:
-            if self.workset and self.workset.volumes:
-                self._data = [{"htid": vol.htid, "pubDate": vol.metadata.pubDate} for vol in self.workset.volumes]
-        return self._data
+#     def __repr__(self) -> str:
+#         return f"Widget(class={self._widget_class}, id={self.id[-11:]})"
 
 
-class Projector(TorchliteObject):
-    def __init__(self, name: str | None = None) -> None:
-        super().__init__()
-        self.name = name
-        self.workset: Workset | None = None
+# class TimelineWidget(Widget):
+#     def __init__(self, name: str | None = None) -> None:
+#         super().__init__()
+#         self._widget_class = "timeline"
 
-    def __repr__(self) -> str:
-        return f"Projector(name={self.name}, id={self.id[-11:]})"
+#     @property
+#     def data(self) -> list[Any] | None:
+#         if self._data is None:
+#             if self.workset and self.workset.volumes:
+#                 self._data = [{"htid": vol.htid, "pubDate": vol.metadata.pubDate} for vol in self.workset.volumes]
+#         return self._data
+
+
+# class Projector(TorchliteObject):
+#     def __init__(self, name: str | None = None) -> None:
+#         super().__init__()
+#         self.name = name
+#         self.workset: Workset | None = None
+
+#     def __repr__(self) -> str:
+#         return f"Projector(name={self.name}, id={self.id[-11:]})"

@@ -14,9 +14,11 @@ import app.models.db as db
 import app.models.torchlite as torchlite
 from app.services.ef_api import EFApi
 from app.services.middleware import TorchliteVersionHeaderMiddleware
-from app.routers.dashboards import router as dashboard_router
+
+# from app.routers.dashboards import router as dashboard_router
 from app.routers.worksets import router as workset_router
-from app.routers.widgets import router as widget_router
+
+# from app.routers.widgets import router as widget_router
 from app.routers.data import router as data_router
 
 
