@@ -2,7 +2,6 @@ from typing import Any
 from fastapi import APIRouter, Depends
 import redis.asyncio as redis
 from app.models import torchlite as torchlite
-from app.models import db as db
 from app.config import get_db
 from app.widgets import MapWidget, TimelineWidget
 from app.routers.worksets import read_workset
