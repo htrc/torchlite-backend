@@ -17,7 +17,7 @@ class Workset(TorchliteObject):
         self.name: str | None = name
         self.description: str | None = description
         self.ef_id: str | None = ef_wsid
-        self._disabled_volumes: list = []
+        # self._disabled_volumes: list = []
         self.volumes: list[Volume] | None = None
 
         if self.ef_id:
@@ -28,27 +28,27 @@ class Workset(TorchliteObject):
     def __repr__(self) -> str:
         return f"Workset(name={self.name}, id={self.id[-11:]})"
 
-    def disable_volume(self, htid: str) -> None:
-        if self.volumes:
-            try:
-                vol = [v for v in self.volumes if v.htid == htid][0]
-            except IndexError:
-                vol = None
+    # def disable_volume(self, htid: str) -> None:
+    #     if self.volumes:
+    #         try:
+    #             vol = [v for v in self.volumes if v.htid == htid][0]
+    #         except IndexError:
+    #             vol = None
 
-            if vol:
-                self._disabled_volumes.append(vol)
-                self.volumes = [v for v in self.volumes if v.htid != htid]
+    #         if vol:
+    #             self._disabled_volumes.append(vol)
+    #             self.volumes = [v for v in self.volumes if v.htid != htid]
 
-    def enable_volume(self, htid: str) -> None:
-        if self.volumes:
-            try:
-                vol = [v for v in self._disabled_volumes if v.htid == htid][0]
-            except IndexError:
-                vol = None
+    # def enable_volume(self, htid: str) -> None:
+    #     if self.volumes:
+    #         try:
+    #             vol = [v for v in self._disabled_volumes if v.htid == htid][0]
+    #         except IndexError:
+    #             vol = None
 
-            if vol:
-                self.volumes.append(vol)
-                self._disabled_volumes = [v for v in self._disabled_volumes if v.htid != htid]
+    #         if vol:
+    #             self.volumes.append(vol)
+    #             self._disabled_volumes = [v for v in self._disabled_volumes if v.htid != htid]
 
     def add_volume(self, htid: str) -> None:
         if self.volumes:

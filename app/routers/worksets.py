@@ -24,8 +24,8 @@ def pack(workset: torchlite.Workset) -> db.Workset:
     )
     if workset.volumes:
         db_object.volumes = [v.htid for v in workset.volumes]
-    if workset._disabled_volumes:
-        db_object.disabled_volumes = [v.htid for v in workset._disabled_volumes]
+    # if workset._disabled_volumes:
+    #     db_object.disabled_volumes = [v.htid for v in workset._disabled_volumes]
     return db_object
 
 
@@ -34,15 +34,16 @@ def unpack(data: dict) -> torchlite.Workset:
     workset = torchlite.Workset(ef_wsid=db_object.ef_id, name=db_object.name, description=db_object.description)
     workset.id = db_object.id
 
-    if data['disabled_volumes']:
-        workset._disabled_volumes = [torchlite.Volume(htid) for htid in data['disabled_volumes']]
-        if data['volumes']:
-            workset.volumes = [torchlite.Volume(htid) for htid in data['volumes']]
+    # if data['disabled_volumes']:
+    #     workset._disabled_volumes = [torchlite.Volume(htid) for htid in data['disabled_volumes']]
+    if data['volumes']:
+        workset.volumes = [torchlite.Volume(htid) for htid in data['volumes']]
     return workset
 
 
 async def load(wsid: str, db: redis.Redis) -> torchlite.Workset:
-    db_data: Any = db.hget("worksets", wsid)
+    collection = "worksets"
+    db_data: Any = db.hget(collection, wsid)
     if db_data is None:
         raise WorksetPersistenceError(f"could not retrieve {wsid} from database")
     data: dict = json.loads(db_data)
