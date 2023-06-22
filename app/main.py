@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, AsyncGenerator
 from urllib.parse import urlparse, ParseResult
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv, find_dotenv
@@ -8,13 +8,7 @@ import requests
 from yaml import safe_load
 from fastapi import FastAPI
 from app.config import persistence_db_pool
-
-# import app.persisters
-
-# from app.routers.dashboards import router as dashboard_router
 from app.routers.worksets import router as workset_router
-
-# from app.routers.widgets import router as widget_router
 from app.routers.data import router as data_router
 
 
@@ -24,7 +18,7 @@ class TorchliteError(Exception):
     pass
 
 
-async def torchlite_startup():
+async def torchlite_startup() -> None:
     config_file_name: Optional[str] = os.getenv("TORCHLITE_CONFIG")
     if not config_file_name:
         raise TorchliteError("TORCHLITE_CONFIG value is invalid or not set")
@@ -47,12 +41,12 @@ async def torchlite_startup():
             raise TorchliteError(f"could not load config file {config_file_name}") from e
 
 
-async def torchlite_shutdown():
+async def torchlite_shutdown() -> None:
     persistence_db_pool.disconnect()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator:
     await torchlite_startup()
 
     yield
@@ -68,7 +62,5 @@ load_dotenv(find_dotenv())
 
 app = FastAPI(lifespan=lifespan)
 
-# app.include_router(dashboard_router)
 app.include_router(workset_router)
-# app.include_router(widget_router)
 app.include_router(data_router)

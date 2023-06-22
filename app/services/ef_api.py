@@ -43,14 +43,6 @@ class EFApi:
         else:
             return None
 
-    # def workset_metadata(self, wsid: str) -> List[ef.VolumeMetadata] | None:
-    #     uri = f"{self.worksets_uri}/{wsid}/metadata"
-    #     response = self.get(uri)
-    #     if response:
-    #         return [ef.VolumeMetadata(**item) for item in response]
-    #     else:
-    #         return None
-
     def workset_metadata(self, wsid: str, fields: Optional[List[str]]) -> List[ef.Volume] | None:
         uri = f"{self.worksets_uri}/{wsid}/metadata"
         params: dict = {}
@@ -114,7 +106,7 @@ class EFApi:
         else:
             return None
 
-    def pages(self, htid: str):
+    def pages(self, htid: str) -> list[ef.PageFeatures] | None:
         uri: str = f"{self.volumes_uri}/{clean_id(htid)}/pages"
         data: dict | None = self.get(uri)
         if data:
@@ -122,7 +114,7 @@ class EFApi:
         else:
             return None
 
-    def tokens(self, htid: str):
+    def tokens(self, htid: str) -> tokens.TokenCounter | None:
         uri: str = f"{self.volumes_uri}/{clean_id(htid)}"
         params = {"pos": "false", "fields": "features.pages.body.tokensCount"}
         data: dict | None = self.get(uri, params=params)
@@ -137,15 +129,3 @@ class EFApi:
             return token_counter
         else:
             return None
-
-    def tokens_old(self, htid: str, sections: list[str] = ["body"]) -> set:
-        token_set: set = set()
-        pages = self.pages(htid)
-        if pages:
-            for page in pages:
-                for section_name in sections:
-                    section = page.dict()[section_name]
-                    if section and "tokenPosCount" in section.keys():
-                        section_toks: set = {tok for tok in section["tokenPosCount"].keys()}
-                        token_set = token_set | section_toks
-        return token_set

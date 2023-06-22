@@ -11,6 +11,7 @@ https://github.com/tegarimansyah/snippet/tree/main/python-fastapi/redis-connecti
 
 """
 import os
+from collections.abc import Generator
 import redis
 from dotenv import find_dotenv, load_dotenv
 
@@ -27,7 +28,7 @@ if find_dotenv() is False:
 load_dotenv(find_dotenv())
 
 
-def create_redis():
+def create_redis() -> redis.ConnectionPool:
     return redis.ConnectionPool(
         host=os.getenv("DB_HOST", default="localhost"),
         port=os.getenv("DB_PORT", default=6379),
@@ -37,7 +38,7 @@ def create_redis():
     )
 
 
-def get_db():
+def get_db() -> Generator:
     persistence_db: redis.Redis = redis.Redis(connection_pool=persistence_db_pool)
     try:
         yield persistence_db

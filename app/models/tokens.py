@@ -15,7 +15,7 @@ class TokenPosCount(BaseModel):
 
 
 class Token:
-    def __init__(self, string: str, pos: Optional[str] = None):
+    def __init__(self, string: str, pos: Optional[str] = None) -> None:
         self.id: int
         self._raw: str = string
         self._text: str = self.normalize(self._raw)
@@ -25,16 +25,18 @@ class Token:
         else:
             self.id = hash(self._text)
 
-    def normalize(self, input: str):
+    def normalize(self, input: str) -> str:
         new = input.strip()
         new = new.casefold()
         new = re.sub(r"\W+", "", new)
         return new
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Token({self._text}, {self._pos})"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: "Token") -> bool:
+        if not isinstance(other, "Token"):
+            return NotImplemented
         return self.id == other.id
 
 
@@ -59,7 +61,7 @@ class TokenCounter:
             return None
 
 
-def parse_ef_token(tok: str, pos_dict: dict):
+def parse_ef_token(tok: str, pos_dict: dict) -> list[Token]:
     result: list = []
     for pos, cnt in pos_dict.items():
         token: Token = Token(tok, pos)
@@ -86,17 +88,3 @@ def tokenPosCount(tok_pos_count: dict) -> list:
             cntr = Counter({token.id: cnt})
             result.append(TokenCount(token=token, counter=cntr))
     return result
-
-
-def parse_ef_token_old(tok: str, pos_dict: dict):
-    tok_list = [Token(tok, pos) for pos, _ in pos_dict.items()]
-    return tok_list
-
-
-def tokenPosCount_old(tok_pos_count: dict) -> list:
-    tokens = []
-    for tok, pos_dict in tok_pos_count.items():
-        parsed = parse_ef_token(tok, pos_dict)
-        for tok in parsed:
-            tokens.append(tok)
-    return tokens
