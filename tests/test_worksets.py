@@ -1,4 +1,3 @@
-from app.services.ef_api import EFApi
 from app.models.torchlite import Workset
 
 
