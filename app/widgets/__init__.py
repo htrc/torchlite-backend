@@ -30,12 +30,11 @@ def wd_id_of(viaf_id):
 def wikidata_data(wikidata_id: str):
     endpoint = "https://query.wikidata.org/sparql"
 
-    query_template = """select ?country ?countryLabel ?coord ?code ?dob
+    query_template = """select ?pob ?pobLabel ?coord ?dob
     where
-    {{ <{subject}> wdt:P27 ?country .
+    {{ <{subject}> wdt:P19 ?pob .
     <{subject}> wdt:P569 ?dob .
-    ?country wdt:P625 ?coord .
-    OPTIONAL {{ ?country wdt:P299 ?code }}
+    ?pob wdt:P625 ?coord .
     SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
     }}"""
 
@@ -51,11 +50,11 @@ def wikidata_data(wikidata_id: str):
     except Exception:
         return None
     data: dict = {
+        "pob": bindings["pob"]["value"],
+        "pobLabel": bindings["pobLabel"]["value"],
         "coordinates": bindings["coord"]["value"],
         "dob": bindings["dob"]["value"],
     }
-    if "code" in bindings:
-        data["countryiso"] = bindings["code"]["value"]
 
     return data
 
