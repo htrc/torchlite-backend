@@ -8,7 +8,7 @@ on:
 
 env:
   PYTHON_VERSION: "3.11"
-  POETRY_VERSION: "1.4.2"
+  POETRY_VERSION: "1.5.1"
 
 jobs:
   ruff:
@@ -49,4 +49,4 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction --sync
       - name: Run pyflakes
-        run: poetry run pyflakes htrc tests
+        run: poetry run pyflakes app tests
