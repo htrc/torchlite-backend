@@ -131,5 +131,5 @@ jobs:
           client-payload: >-
             {
               "image": "${{ fromJSON(steps.meta.outputs.json).tags[0] }}",
-              "commit_msg": ${{ env.HEAD_COMMIT_MESSAGE }}
+              "commit_msg": "Manual deployment by ${{ github.triggering_actor }}"
             }
