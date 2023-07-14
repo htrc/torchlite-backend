@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Torchlite backend service"
 authors = ["cwulfman <cwulfman@princeton.edu>"]
 readme = "README.org"
-packages = [{include = "htrc"}]
+packages = [{include = "app"}]
 repository = "https://github.com/htrc/torchlite-backend"
 
 [tool.poetry-dynamic-versioning]
@@ -88,7 +88,7 @@ norecursedirs = [
 asyncio_mode = "auto"
 
 [tool.coverage.run]
-source = ["htrc"]
+source = ["app"]
 
 [tool.coverage.xml]
 output = "test-results/coverage/cov.xml"
@@ -135,7 +135,7 @@ commands =
 
 [testenv:ruff]
 description = perform style checking
-commands = poetry run ruff htrc tests
+commands = poetry run ruff app tests
 
 [testenv:mypy]
 description = perform type checking
@@ -143,7 +143,7 @@ commands = poetry run mypy .
 
 [testenv:pyflakes]
 description = perform error checking
-commands = poetry run pyflakes htrc tests
+commands = poetry run pyflakes app tests
 
 [testenv:docs]
 description = invoke sphinx-build to build the HTML docs
