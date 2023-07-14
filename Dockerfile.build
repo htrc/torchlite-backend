@@ -24,14 +24,14 @@ FROM base as builder
 ENV PIP_DEFAULT_TIMEOUT 100
 ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 ENV PIPX_BIN_DIR /usr/local/bin
-ENV POETRY_VERSION 1.4.2
+ENV POETRY_VERSION 1.5.1
 ENV POETRY_VIRTUALENVS_IN_PROJECT true
 ENV POETRY_DYNAMIC_VERSIONING_BYPASS true
 
 RUN pip install --upgrade pipx && pipx install "poetry==$POETRY_VERSION"
 
 COPY poetry.lock pyproject.toml README.* ./
-COPY htrc ./htrc
+COPY app ./app
 
 RUN poetry install --no-interaction --no-ansi --no-root --only=main --sync \
     && poetry version "$TORCHLITE_VERSION" \

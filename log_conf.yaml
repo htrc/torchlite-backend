@@ -11,7 +11,7 @@ formatters:
     format: '[%(asctime)s.%(msecs)03dZ] %(name)s %(levelname)s %(message)s'
 filters:
   healthcheck_filter:
-    "()": htrc.torchlite.logutils.HealthcheckFilter
+    "()": app.logutils.HealthcheckFilter
 handlers:
   default:
     formatter: default
