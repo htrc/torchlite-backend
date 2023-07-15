@@ -5,12 +5,17 @@ from urllib.parse import urlparse, ParseResult
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv, find_dotenv
 import requests
+from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
 from yaml import safe_load
 from fastapi import FastAPI
 from app.config import persistence_db_pool
 from app.routers.worksets import router as workset_router
 from app.routers.data import router as data_router
+from app.services.middleware import TorchliteVersionHeaderMiddleware
+import logging
 
+
+log = logging.getLogger('torchlite')
 
 class TorchliteError(Exception):
     """Torchlite error of some kind"""
@@ -23,7 +28,7 @@ async def torchlite_startup() -> None:
     if not config_file_name:
         raise TorchliteError("TORCHLITE_CONFIG value is invalid or not set")
 
-    print(f"Loading configuration from {config_file_name}...")
+    log.info(f"Loading configuration from {config_file_name}...")
     parse_result: ParseResult = urlparse(config_file_name)
 
     if parse_result.scheme.startswith("http"):
@@ -64,3 +69,17 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(workset_router)
 app.include_router(data_router)
+app.include_router(
+    HealthcheckRouter(
+        Probe(
+            name="readiness",
+            checks=[],  # TBD
+        ),
+        Probe(
+            name="liveness",
+            checks=[],
+        ),
+    ),
+    prefix="/health",
+)
+app.add_middleware(TorchliteVersionHeaderMiddleware)

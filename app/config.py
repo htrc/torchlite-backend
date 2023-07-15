@@ -14,7 +14,9 @@ import os
 from collections.abc import Generator
 import redis
 from dotenv import find_dotenv, load_dotenv
+import logging
 
+log = logging.getLogger("torchlite")
 
 class TorchliteConfigError(Exception):
     """Torchlite error of some kind"""
@@ -29,10 +31,16 @@ load_dotenv(find_dotenv())
 
 
 def create_redis() -> redis.ConnectionPool:
+    db_config = dict(
+        db_host=os.getenv("DB_HOST", default="localhost"),
+        db_port=os.getenv("DB_PORT", default=6379),
+        db_number=os.getenv("DB_NUMBER", default=0),
+    )
+    log.info(f"Creating Redis connection pool with config {db_config}")
     return redis.ConnectionPool(
-        host=os.getenv("DB_HOST", default="localhost"),
-        port=os.getenv("DB_PORT", default=6379),
-        db=os.getenv("DB_NUMBER", default=0),
+        host=db_config['db_host'],
+        port=db_config['db_port'],
+        db=db_config['db_number'],
         encoding="utf8",
         decode_responses=True,
     )
