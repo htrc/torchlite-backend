@@ -5,6 +5,7 @@ from app.models.torchlite import Workset
 
 # mypy: ignore-errors
 
+
 def wd_id_of(viaf_id):
     SDO = Namespace("http://schema.org/")
     WDE = Namespace("http://www.wikidata.org/entity/")
