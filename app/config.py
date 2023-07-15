@@ -32,17 +32,22 @@ load_dotenv(find_dotenv())
 
 def create_redis() -> redis.ConnectionPool:
     db_config = dict(
-        db_host=os.getenv("DB_HOST", default="localhost"),
-        db_port=os.getenv("DB_PORT", default=6379),
-        db_number=os.getenv("DB_NUMBER", default=0),
+        host=os.getenv("DB_HOST", default="localhost"),
+        port=os.getenv("DB_PORT", default=6379),
+        password=os.getenv("DB_PASSWORD"),
+        db=os.getenv("DB", default=0),
     )
-    log.info(f"Creating Redis connection pool with config {db_config}")
+    log_config = dict(db_config)
+
+    if log_config['password']:
+        log_config['password'] = "******"
+
+    log.info(f"Creating Redis connection pool with config {log_config}")
+
     return redis.ConnectionPool(
-        host=db_config['db_host'],
-        port=db_config['db_port'],
-        db=db_config['db_number'],
         encoding="utf8",
         decode_responses=True,
+        **db_config,  # type: ignore
     )
 
 
