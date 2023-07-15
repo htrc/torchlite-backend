@@ -3,6 +3,7 @@ from rdflib import Graph, Namespace
 from SPARQLWrapper import SPARQLWrapper, JSON
 from app.models.torchlite import Workset
 
+# mypy: ignore-errors
 
 def wd_id_of(viaf_id):
     SDO = Namespace("http://schema.org/")

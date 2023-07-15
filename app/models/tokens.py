@@ -34,8 +34,8 @@ class Token:
     def __repr__(self) -> str:
         return f"Token({self._text}, {self._pos})"
 
-    def __eq__(self, other: "Token") -> bool:
-        if not isinstance(other, "Token"):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Token):
             return NotImplemented
         return self.id == other.id
 
