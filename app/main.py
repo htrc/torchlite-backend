@@ -1,21 +1,24 @@
+import logging
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional, AsyncGenerator
 from urllib.parse import urlparse, ParseResult
-from contextlib import asynccontextmanager
-from dotenv import load_dotenv, find_dotenv
+
 import requests
+from dotenv import load_dotenv, find_dotenv
+from fastapi import FastAPI
 from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
 from yaml import safe_load
-from fastapi import FastAPI
-from app.config import persistence_db_pool
-from app.routers.worksets import router as workset_router
-from app.routers.data import router as data_router
-from app.services.middleware import TorchliteVersionHeaderMiddleware
-import logging
 
+from app import __version__
+from app.config import persistence_db_pool
+from app.routers.data import router as data_router
+from app.routers.worksets import router as workset_router
+from app.services.middleware import TorchliteVersionHeaderMiddleware
 
 log = logging.getLogger('torchlite')
+
 
 class TorchliteError(Exception):
     """Torchlite error of some kind"""
@@ -24,6 +27,9 @@ class TorchliteError(Exception):
 
 
 async def torchlite_startup() -> None:
+    env = os.getenv("ENV", "dev")
+    log.info(f"Starting Torchlite Backend v{__version__} ({env})")
+
     config_file_name: Optional[str] = os.getenv("TORCHLITE_CONFIG")
     if not config_file_name:
         raise TorchliteError("TORCHLITE_CONFIG value is invalid or not set")
@@ -63,7 +69,6 @@ if find_dotenv() is False:
     raise TorchliteError("could not load .env file")
 
 load_dotenv(find_dotenv())
-
 
 app = FastAPI(lifespan=lifespan)
 
