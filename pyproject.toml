@@ -24,6 +24,7 @@ authlib = "^1.2.1"
 python-dotenv = "^1.0.0"
 sqlalchemy = {extras = ["postgresql-asyncpg"], version = "^2.0.21"}
 alembic = "^1.12.0"
+sqlalchemy-nested-mutable = "^0.2.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"

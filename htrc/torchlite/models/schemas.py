@@ -1,4 +1,7 @@
+from uuid import UUID
+
 from pydantic import BaseModel
+from sqlalchemy_nested_mutable import MutablePydanticBaseModel
 
 
 class WorksetSummary(BaseModel):
@@ -29,7 +32,7 @@ class WorksetInfo(WorksetSummary):
     volumes: list[VolumeMetadata]
 
 
-class FilterSettings(BaseModel):
+class FilterSettings(MutablePydanticBaseModel):
     title: list[str]
     pubDate: list[int]
     genre: list[str]
@@ -48,13 +51,13 @@ class Widget(BaseModel):
 
 
 class DashboardSummary(BaseModel):
-    id: str
-    owner: str
+    id: UUID
+    owner_id: UUID
     title: str
     description: str
     worksetId: str
     filters: FilterSettings
-    widgets: list[Widget]
+    widgets: list[str]
 
 
 class DashboardPatch(BaseModel):

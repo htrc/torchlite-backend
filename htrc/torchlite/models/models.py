@@ -4,6 +4,8 @@ from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
 
 from htrc.torchlite.database import Base
+from htrc.torchlite.models.pydantic import PydanticType
+from htrc.torchlite.models.schemas import FilterSettings
 
 
 class Dashboard(Base):
@@ -14,5 +16,7 @@ class Dashboard(Base):
     title = Column(String)
     description = Column(String)
     workset_id = Column(String, index=True, nullable=False)
-    filters = Column(JSONB, default=dict)
+    filters = Column(FilterSettings.as_mutable())
     widgets = Column(ARRAY(String))
+    # filters = Column(PydanticType(FilterSettings))
+    # widgets = Column(PydanticType(Widgets))

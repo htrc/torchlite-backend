@@ -1,16 +1,18 @@
 """adds dashboards table
 
-Revision ID: 7cd03ebe70fb
+Revision ID: bb492cdb70ac
 Revises: 
-Create Date: 2023-10-02 20:28:48.955118
+Create Date: 2023-10-03 18:28:25.088299
 
 """
 from alembic import op
 import sqlalchemy as sa
+import sqlalchemy_nested_mutable
+from htrc.torchlite.models.schemas import FilterSettings
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '7cd03ebe70fb'
+revision = 'bb492cdb70ac'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,7 +26,7 @@ def upgrade() -> None:
     sa.Column('title', sa.String(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('workset_id', sa.String(), nullable=False),
-    sa.Column('filters', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('filters', sqlalchemy_nested_mutable.mutable.PydanticType(FilterSettings), nullable=True),
     sa.Column('widgets', postgresql.ARRAY(sa.String()), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),

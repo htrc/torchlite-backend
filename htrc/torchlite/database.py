@@ -1,11 +1,21 @@
+import json
 from contextlib import asynccontextmanager
 
+from pydantic.json import pydantic_encoder
 from sqlalchemy import exc
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 
 from htrc.torchlite import VERSION
 from htrc.torchlite.config import config
 from htrc.torchlite.models.base import Base
+
+
+def _pydantic_json_serializer(*args, **kwargs) -> str:
+    """
+    Encodes JSON in the same way that pydantic does
+    """
+    return json.dumps(*args, default=pydantic_encoder, **kwargs)
+
 
 async_engine = create_async_engine(
     config.DB_URL,
@@ -20,6 +30,7 @@ async_engine = create_async_engine(
             "jit": "off",
         },
     },
+    # json_serializer=_pydantic_json_serializer,
 )
 
 async_session = async_sessionmaker(
