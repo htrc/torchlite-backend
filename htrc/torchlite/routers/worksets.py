@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import APIRouter
 
-from ..fake import generate_workset_summary, generate_workset_info
+from ..data import worksets, get_workset_info
 from ..models.schemas import WorksetSummary, WorksetInfo
 
 router = APIRouter(
@@ -18,11 +18,10 @@ router = APIRouter(
 
 @router.get("/")
 async def list_worksets(author: str | None = None) -> list[WorksetSummary]:
-    worksets = [generate_workset_summary() for _ in range(10)]
-    return worksets
+    return list(worksets.values())
 
 
 @router.get("/{workset_id}/metadata")
 async def get_workset_metadata(workset_id: str) -> WorksetInfo:
-    workset = generate_workset_info()
-    return workset
+    workset_info = get_workset_info(workset_id)
+    return workset_info

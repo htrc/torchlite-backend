@@ -1648,7 +1648,8 @@ files = [
 ]
 
 [package.dependencies]
-greenlet = {version = "!=0.4.17", markers = "platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\""}
+asyncpg = {version = "*", optional = true, markers = "extra == \"postgresql_asyncpg\""}
+greenlet = {version = "!=0.4.17", optional = true, markers = "platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\" or extra == \"postgresql_asyncpg\""}
 typing-extensions = ">=4.2.0"
 
 [package.extras]
@@ -2009,4 +2010,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d67384cd32a20ded6c245bcbc94c72fd5e5aae580806aaad6fe076d3ea1cb12f"
+content-hash = "9f922fd68f9d7f055d085a24560542cd4b27eab6ada4158c8061bf7e4a825b1d"

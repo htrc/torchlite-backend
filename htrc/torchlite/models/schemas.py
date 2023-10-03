@@ -13,15 +13,15 @@ class WorksetSummary(BaseModel):
 class VolumeMetadata(BaseModel):
     htid: str
     title: str
-    pubDate: int
+    pubDate: int | None
     genre: str | list[str]
     typeOfResource: str
-    category: str | list[str]
-    contributor: str | list[str]
-    publisher: str | list[str]
+    category: str | list[str] | None
+    contributor: str | list[str] | None
+    publisher: str | list[str] | None
     accessRights: str
-    pubPlace: str | list[str]
-    language: str | list[str]
+    pubPlace: str | list[str] | None
+    language: str | list[str] | None
     sourceInstitution: str
 
 
