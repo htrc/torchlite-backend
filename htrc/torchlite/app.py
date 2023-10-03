@@ -8,7 +8,7 @@ from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
 
 from .config import config
 from .database import init_db
-from .middleware import TorchliteVersionHeaderMiddleware
+from .middleware import TorchliteVersionHeaderMiddleware, TimingMiddleware
 from .routers.dashboards import router as dashboards_router
 from .routers.worksets import router as worksets_router
 from .splash import print_splash
@@ -62,6 +62,5 @@ api.include_router(
     ),
     prefix="/health",
 )
-api.add_middleware(
-    TorchliteVersionHeaderMiddleware,
-)
+api.add_middleware(TorchliteVersionHeaderMiddleware)
+api.add_middleware(TimingMiddleware)
