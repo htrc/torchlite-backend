@@ -7,7 +7,7 @@ with open('data/worksets.json', 'r') as f:
     worksets = {w['id']: WorksetSummary(**w) for w in arr}
 
 
-def sanitize(v):
+def sanitize(v: str | list[str] | None) -> str | list[str] | None:
     if isinstance(v, str):
         return v.strip() or None
 
