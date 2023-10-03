@@ -35,3 +35,8 @@ loggers:
     handlers:
       - access
     propagate: no
+  torchlite:
+    level: DEBUG
+    handlers:
+      - default
+    propagate: no
