@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
 
-from .config import Config
+from .config import config
 from .database import init_db
 from .middleware import TorchliteVersionHeaderMiddleware
 from .routers.dashboards import router as dashboards_router
@@ -14,7 +14,7 @@ from .routers.worksets import router as worksets_router
 from .splash import print_splash
 from .version import VERSION
 
-log = logging.getLogger(Config.PROJECT_NAME)
+log = logging.getLogger(config.PROJECT_NAME)
 
 
 async def torchlite_startup():

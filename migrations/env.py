@@ -1,6 +1,4 @@
 import asyncio
-import os
-import sys
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -30,8 +28,8 @@ target_metadata = models.Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-from htrc.torchlite.config import Config  # noqa: E402
-config.set_main_option("sqlalchemy.url", Config.DB_URL)
+from htrc.torchlite.config import config as torchlite_config  # noqa: E402
+config.set_main_option("sqlalchemy.url", torchlite_config.DB_URL)
 
 
 def run_migrations_offline() -> None:

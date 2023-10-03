@@ -21,3 +21,7 @@ class Config:
     TORCHLITE_CLIENT_ID = os.environ["TORCHLITE_CLIENT_ID"]
     TORCHLITE_CLIENT_SECRET = os.environ["TORCHLITE_CLIENT_SECRET"]
     TORCHLITE_DEFAULT_SCOPES = "openid email profile offline_access"
+    AUTH_LEEWAY = 11120
+
+
+config = Config
