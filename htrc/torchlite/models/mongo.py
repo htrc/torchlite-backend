@@ -43,6 +43,8 @@ class MongoModel(BaseModel):
     @classmethod
     async def from_mongo(cls, coro):
         data = await coro
+        if data is None:
+            return None
         if isinstance(data, list):
             return [cls.__from_mongo(d) for d in data]
         elif isinstance(data, dict):
