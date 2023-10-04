@@ -66,11 +66,11 @@ class Widget(BaseModel):
 
 class DashboardSummary(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    owner: UUID
-    title: str
-    description: str
+    owner: UUID | None
+    title: str | None
+    description: str | None
     workset_id: str = Field(..., alias='worksetId')
-    filters: FilterSettings
+    filters: FilterSettings | None
     widgets: list[Widget]
 
     class Config:
