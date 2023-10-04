@@ -77,14 +77,14 @@ class DashboardSummary(MongoModel):
     updated_at: datetime = Field(datetime.now(), alias="updatedAt")
 
 
-class DashboardCreate(BaseModel):
-    workset_id: str | None = Field(..., alias="worksetId")
-    filters: FilterSettings | None
-    widgets: list[Widget] | None
+class DashboardCreate(MongoModel):
+    workset_id: str | None = Field(None, alias="worksetId")
+    filters: FilterSettings | None = None
+    widgets: list[Widget] | None = None
 
     class Config:
         allow_population_by_field_name = True
 
 
 class DashboardPatch(DashboardCreate):
-    is_shared: bool | None = Field(..., alias="isShared")
+    is_shared: bool | None = Field(None, alias="isShared")

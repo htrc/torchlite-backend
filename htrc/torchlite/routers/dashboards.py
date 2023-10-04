@@ -2,6 +2,7 @@ from uuid import UUID
 
 from authlib.oidc.core import UserInfo
 from fastapi import APIRouter, Depends, HTTPException, status
+from pymongo import ReturnDocument
 
 from ..auth.auth import get_current_user
 from ..config import config
@@ -60,8 +61,27 @@ async def get_dashboard(dashboard_id: UUID,
 
 
 @router.patch("/{dashboard_id}")
-async def update_dashboard(dashboard_id: str, dashboard_patch: DashboardPatch):
-    pass
+async def update_dashboard(dashboard_id: UUID,
+                           dashboard_patch: DashboardPatch,
+                           user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
+    user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
+    dashboard = await DashboardSummary.from_mongo(
+        mongo_client.db["dashboards"].find_one_and_update(
+            filter={"_id": dashboard_id, "owner": user_id},
+            update={"$set": dashboard_patch.to_mongo()},
+            return_document=ReturnDocument.AFTER
+        )
+    )
+    if dashboard:
+        return dashboard
+    else:
+        dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
+        if not dashboard:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        elif dashboard.owner != user_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        else:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @router.get("/{dashboard_id}/widgets/{widget_type}/data")
