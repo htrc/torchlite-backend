@@ -9,7 +9,7 @@ class PyObjectId(ObjectId):
     @classmethod
     def validate(cls, v):
         if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
+            raise ValueError(f"Invalid ObjectId: {v}")
         return ObjectId(v)
 
     @classmethod

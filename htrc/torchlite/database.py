@@ -7,7 +7,7 @@ from htrc.torchlite.config import config
 class MongoDatabaseClient:
     class __Instance:
         def __init__(self, url: str):
-            self.client = AsyncIOMotorClient(url)
+            self.client = AsyncIOMotorClient(url, uuidRepresentation='standard')
             self.db = self.client.get_default_database()
 
     instance = None
@@ -21,6 +21,13 @@ class MongoDatabaseClient:
             self.instance = self.__Instance(self.url)
 
         return self.instance.db
+
+    @property
+    def client(self) -> AsyncIOMotorClient:
+        if not self.instance:
+            self.instance = self.__Instance(self.url)
+
+        return self.instance.client
 
     async def ping(self):
         if not self.instance:
