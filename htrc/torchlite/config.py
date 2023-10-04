@@ -18,9 +18,9 @@ class Config:
     TORCHLITE_CLIENT_ID = os.environ["TORCHLITE_CLIENT_ID"]
     TORCHLITE_CLIENT_SECRET = os.environ["TORCHLITE_CLIENT_SECRET"]
     TORCHLITE_DEFAULT_SCOPES = "openid email profile offline_access"
-    AUTH_LEEWAY = 11120
+    AUTH_LEEWAY = int(os.environ.get("AUTH_LEEWAY_SECONDS", "120"))  # seconds
 
-    TORCHLITE_UID = UUID("95164779-1fc9-4592-9c74-7a014407f46d")
+    TORCHLITE_UID = UUID("95164779-1fc9-4592-9c74-7a014407f46d")  # do not change
 
 
 config = Config

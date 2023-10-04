@@ -15,9 +15,9 @@ router = APIRouter(
 
 
 @router.get("/")
-async def list_dashboards(owner: str | None = None,
+async def list_dashboards(owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
-    if owner in ["torchlite", str(config.TORCHLITE_UID)]:
+    if owner == config.TORCHLITE_UID:
         return await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID}).to_list(1000)
         )
@@ -26,7 +26,7 @@ async def list_dashboards(owner: str | None = None,
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     user_id = UUID(user.get("htrc-guid", user.sub))
-    owner = UUID(owner) if owner else user_id
+    owner = owner or user_id
 
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
