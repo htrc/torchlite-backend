@@ -54,11 +54,15 @@ api.include_router(
     HealthcheckRouter(
         Probe(
             name="readiness",
-            checks=[],  # TBD
+            checks=[
+                mongo_client.health_check
+            ],
         ),
         Probe(
             name="liveness",
-            checks=[],
+            checks=[
+                mongo_client.health_check
+            ],
         ),
     ),
     prefix="/health",
