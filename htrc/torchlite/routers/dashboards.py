@@ -22,11 +22,11 @@ router = APIRouter(
 
 @router.get("/")
 async def list_dashboards(owner: str | None = None,
-                          user: UserInfo | None = Depends(get_current_user),
-                          response_model=list[DashboardSummary],
-                          response_model_by_alias=False):
+                          user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
     if owner in ["torchlite", str(config.TORCHLITE_UID)]:
-        return await mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID}).to_list(1000)
+        return await DashboardSummary.from_mongo(
+            mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID}).to_list(1000)
+        )
 
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -37,7 +37,9 @@ async def list_dashboards(owner: str | None = None,
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    return await mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)
+    return await DashboardSummary.from_mongo(
+        mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)
+    )
 
 
 @router.post("/", description="Create a new dashboard")

@@ -29,18 +29,30 @@ class MongoModel(BaseModel):
         }
 
     @classmethod
-    def from_mongo(cls, data: dict):
+    def __from_mongo(cls, data: dict):
         if not data:
             return data
         id = data.pop('_id', None)
         return cls(**dict(data, id=id))
 
-    def mongo(self, **kwargs):
+    @classmethod
+    async def from_mongo(cls, coro):
+        data = await coro
+        if isinstance(data, list):
+            return [cls.__from_mongo(d) for d in data]
+        elif isinstance(data, dict):
+            return cls.__from_mongo(data)
+        else:
+            raise ValueError(f"Unsupported data type: {type(data)}")
+
+    def to_mongo(self, **kwargs):
         exclude_unset = kwargs.pop('exclude_unset', True)
+        exclude_defaults = kwargs.pop('exclude_defaults', True)
         by_alias = kwargs.pop('by_alias', True)
 
         parsed = self.dict(
             exclude_unset=exclude_unset,
+            exclude_defaults=exclude_defaults,
             by_alias=by_alias,
             **kwargs,
         )

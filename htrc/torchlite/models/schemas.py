@@ -1,10 +1,9 @@
 from datetime import datetime
 from uuid import UUID
 
-from bson import ObjectId
 from pydantic import BaseModel, Field
 
-from .mongo import PyObjectId
+from .mongo import PyObjectId, MongoModel
 
 
 class WorksetSummary(BaseModel):
@@ -65,8 +64,8 @@ class Widget(BaseModel):
     type: str
 
 
-class DashboardSummary(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+class DashboardSummary(MongoModel):
+    id: PyObjectId = Field(default_factory=PyObjectId)
     owner: UUID | None
     title: str | None
     description: str | None
@@ -75,11 +74,6 @@ class DashboardSummary(BaseModel):
     widgets: list[Widget]
     created_at: datetime = Field(datetime.now(), alias="createdAt")
     updated_at: datetime = Field(default_factory=datetime.now, alias="updatedAt")
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str, datetime: lambda dt: dt.isoformat()}
 
 
 class DashboardPatch(BaseModel):

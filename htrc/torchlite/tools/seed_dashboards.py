@@ -27,7 +27,7 @@ async def main(args):
     if delete_result.deleted_count > 0:
         log.info(f"Removed {delete_result.deleted_count} existing records")
 
-    insert_result = await dashboards_col.insert_many([d.dict(by_alias=True, exclude_defaults=True) for d in dashboards])
+    insert_result = await dashboards_col.insert_many([d.to_mongo() for d in dashboards])
     if len(insert_result.inserted_ids) > 0:
         log.info(f"Inserted {len(insert_result.inserted_ids)} records")
 
