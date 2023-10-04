@@ -1,9 +1,8 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter
 
-from ..database import get_session
+from ..database import db
 from ..models.schemas import DashboardSummary, DashboardPatch
 
 router = APIRouter(
@@ -18,33 +17,27 @@ router = APIRouter(
 
 
 @router.get("/")
-async def list_dashboards(owner: str | None = None,
-                          session: AsyncSession = Depends(get_session)) -> list[DashboardSummary]:
+async def list_dashboards(owner: str | None = None) -> list[DashboardSummary]:
     dashboards = []
     return dashboards
 
 
 @router.post("/")
-async def create_dashboard(owner: str | None = None,
-                           session: AsyncSession = Depends(get_session)) -> DashboardSummary:
+async def create_dashboard(owner: str | None = None) -> DashboardSummary:
     dashboard = None
     return dashboard
 
 
 @router.get("/{dashboard_id}")
-async def get_dashboard(dashboard_id: str,
-                        session: AsyncSession = Depends(get_session)) -> DashboardSummary:
+async def get_dashboard(dashboard_id: str) -> DashboardSummary:
     pass
 
 
 @router.patch("/{dashboard_id}")
-async def update_dashboard(dashboard_id: str,
-                           dashboard_patch: DashboardPatch,
-                           session: AsyncSession = Depends(get_session)):
+async def update_dashboard(dashboard_id: str, dashboard_patch: DashboardPatch):
     pass
 
 
 @router.get("/{dashboard_id}/widgets/{widget_type}/data")
-async def get_widget_data(dashboard_id: str, widget_type: str,
-                          session: AsyncSession = Depends(get_session)):
+async def get_widget_data(dashboard_id: str, widget_type: str):
     pass

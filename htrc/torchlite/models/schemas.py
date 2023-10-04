@@ -1,7 +1,9 @@
 from uuid import UUID
 
-from pydantic import BaseModel
-from sqlalchemy_nested_mutable import MutablePydanticBaseModel
+from bson import ObjectId
+from pydantic import BaseModel, Field
+
+from .mongo import PyObjectId
 
 
 class WorksetSummary(BaseModel):
@@ -32,7 +34,7 @@ class WorksetInfo(WorksetSummary):
     volumes: list[VolumeMetadata]
 
 
-class FilterSettings(MutablePydanticBaseModel):
+class FilterSettings(BaseModel):
     title: list[str]
     pubDate: list[int]
     genre: list[str]
@@ -51,13 +53,22 @@ class Widget(BaseModel):
 
 
 class DashboardSummary(BaseModel):
-    id: UUID
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     owner_id: UUID
     title: str
     description: str
     worksetId: str
     filters: FilterSettings
-    widgets: list[str]
+    widgets: list[Widget]
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        # schema_extra = {
+        #     "example": {
+        #     }
+        # }
 
 
 class DashboardPatch(BaseModel):

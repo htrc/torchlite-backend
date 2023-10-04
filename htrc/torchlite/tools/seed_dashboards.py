@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import sys
-from htrc.torchlite.database import async_engine, async_session
 
 
 def main(args):
