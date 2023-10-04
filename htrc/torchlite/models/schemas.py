@@ -11,23 +11,23 @@ class WorksetSummary(BaseModel):
     name: str
     description: str
     author: str
-    isPublic: bool
-    numVolumes: int
+    is_public: bool = Field(..., alias='isPublic')
+    num_volumes: int = Field(..., alias='numVolumes')
 
 
 class VolumeMetadata(BaseModel):
     htid: str
     title: str
-    pubDate: int | None
+    pub_date: int | None = Field(..., alias='pubDate')
     genre: str | list[str]
-    typeOfResource: str
+    type_of_resource: str = Field(..., alias='typeOfResource')
     category: str | list[str] | None
     contributor: str | list[str] | None
     publisher: str | list[str] | None
-    accessRights: str
-    pubPlace: str | list[str] | None
+    access_rights: str = Field(..., alias='accessRights')
+    pub_place: str | list[str] | None = Field(..., alias='pubPlace')
     language: str | list[str] | None
-    sourceInstitution: str
+    source_institution: str = Field(..., alias='sourceInstitution')
 
 
 class WorksetInfo(WorksetSummary):
@@ -36,16 +36,16 @@ class WorksetInfo(WorksetSummary):
 
 class FilterSettings(BaseModel):
     title: list[str]
-    pubDate: list[int]
+    pub_date: list[int] = Field(..., alias='pubDate')
     genre: list[str]
-    typeOfResource: list[str]
+    type_of_resource: list[str] = Field(..., alias='typeOfResource')
     category: list[str]
     contributor: list[str]
     publisher: list[str]
-    accessRights: list[str]
-    pubPlace: list[str]
+    access_rights: list[str] = Field(..., alias='accessRights')
+    pub_place: list[str] = Field(..., alias='pubPlace')
     language: list[str]
-    sourceInstitution: list[str]
+    source_institution: list[str] = Field(..., alias='sourceInstitution')
 
 
 class Widget(BaseModel):
@@ -54,10 +54,10 @@ class Widget(BaseModel):
 
 class DashboardSummary(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    owner_id: UUID
+    owner: UUID
     title: str
     description: str
-    worksetId: str
+    workset_id: str = Field(..., alias='worksetId')
     filters: FilterSettings
     widgets: list[Widget]
 
@@ -65,13 +65,9 @@ class DashboardSummary(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        # schema_extra = {
-        #     "example": {
-        #     }
-        # }
 
 
 class DashboardPatch(BaseModel):
-    workset_id: str | None
+    workset_id: str | None = Field(..., alias='worksetId')
     filters: FilterSettings | None
     widgets: list[Widget] | None

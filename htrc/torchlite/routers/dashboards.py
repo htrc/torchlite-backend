@@ -22,7 +22,7 @@ async def list_dashboards(owner: str | None = None) -> list[DashboardSummary]:
     return dashboards
 
 
-@router.post("/")
+@router.post("/", description="Create a new dashboard")
 async def create_dashboard(owner: str | None = None) -> DashboardSummary:
     dashboard = None
     return dashboard
