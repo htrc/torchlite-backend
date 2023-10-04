@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 from fastapi import APIRouter
 
 from ..data import worksets, get_workset_info
@@ -8,11 +6,6 @@ from ..models.schemas import WorksetSummary, WorksetInfo
 router = APIRouter(
     prefix="/worksets",
     tags=["worksets"],
-    responses={
-        HTTPStatus.NOT_FOUND: {
-            "description": "Not found"
-        }
-    }
 )
 
 

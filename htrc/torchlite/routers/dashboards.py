@@ -1,4 +1,3 @@
-from http import HTTPStatus
 from uuid import UUID
 
 from authlib.oidc.core import UserInfo
@@ -12,11 +11,6 @@ from ..models.schemas import DashboardSummary, DashboardPatch
 router = APIRouter(
     prefix="/dashboards",
     tags=["dashboards"],
-    responses={
-        HTTPStatus.NOT_FOUND: {
-            "description": "Not found"
-        }
-    }
 )
 
 
