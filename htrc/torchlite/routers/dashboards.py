@@ -32,7 +32,7 @@ async def list_dashboards(owner: str | None = None,
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     user_id = UUID(user.get("htrc-guid", user.sub))
-    owner = UUID(owner) or user_id
+    owner = UUID(owner) if owner else user_id
 
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
