@@ -20,7 +20,7 @@ async def list_dashboards(owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
     if owner == config.TORCHLITE_UID:
         return await DashboardSummary.from_mongo(
-            mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True},).to_list(1000)
+            mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
         )
 
     if not user:
@@ -48,16 +48,18 @@ async def create_dashboard(dashboard_create: DashboardCreate,
 @router.get("/{dashboard_id}", description="Retrieve a dashboard")
 async def get_dashboard(dashboard_id: UUID,
                         user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
-    dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
-    if not dashboard:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
-
-    if dashboard.is_shared or dashboard.owner == user_id:
+    dashboard = await DashboardSummary.from_mongo(
+        mongo_client.db["dashboards"].find_one({"_id": dashboard_id, "$or": [{"isShared": True}, {"owner": user_id}]})
+    )
+    if dashboard:
         return dashboard
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED if not user else status.HTTP_403_FORBIDDEN)
+        dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
+        if not dashboard:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        else:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
 
 @router.patch("/{dashboard_id}")
