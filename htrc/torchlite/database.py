@@ -17,11 +17,16 @@ class MongoDatabaseClient:
 
     @property
     def db(self) -> Database:
-        if self.instance:
-            return self.instance.db
-        else:
+        if not self.instance:
             self.instance = self.__Instance(self.url)
-            return self.instance.db
+
+        return self.instance.db
+
+    async def ping(self):
+        if not self.instance:
+            self.instance = self.__Instance(self.url)
+
+        self.instance.client.admin.command("ping")
 
     def close(self):
         if self.instance:
