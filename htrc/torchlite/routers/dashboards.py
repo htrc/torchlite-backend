@@ -1,7 +1,11 @@
 from http import HTTPStatus
+from uuid import UUID
 
-from fastapi import APIRouter
+from authlib.oidc.core import UserInfo
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from ..auth.auth import get_current_user
+from ..config import config
 from ..database import mongo_client
 from ..models.schemas import DashboardSummary, DashboardPatch
 
@@ -17,9 +21,21 @@ router = APIRouter(
 
 
 @router.get("/")
-async def list_dashboards(owner: str | None = None) -> list[DashboardSummary]:
-    dashboards = []
-    return dashboards
+async def list_dashboards(owner: str | None = None,
+                          user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
+    if owner in ["torchlite", str(config.TORCHLITE_UID)]:
+        return await mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID}).to_list(1000)
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    user_id = UUID(user.get("htrc-guid", user.sub))
+    owner = UUID(owner) or user_id
+
+    if user_id != owner:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    return await mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)
 
 
 @router.post("/", description="Create a new dashboard")

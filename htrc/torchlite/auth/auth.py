@@ -3,9 +3,8 @@ from typing import Annotated
 from authlib.integrations.starlette_client import OAuth
 from authlib.jose import jwt
 from authlib.oidc.core import UserInfo
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OpenIdConnect
-from starlette import status
 
 from ..config import config
 

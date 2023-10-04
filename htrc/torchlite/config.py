@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from uuid import UUID
 
 from dotenv import load_dotenv
 
@@ -19,7 +20,7 @@ class Config:
     TORCHLITE_DEFAULT_SCOPES = "openid email profile offline_access"
     AUTH_LEEWAY = 11120
 
-    TORCHLITE_UID = "95164779-1fc9-4592-9c74-7a014407f46d"
+    TORCHLITE_UID = UUID("95164779-1fc9-4592-9c74-7a014407f46d")
 
 
 config = Config

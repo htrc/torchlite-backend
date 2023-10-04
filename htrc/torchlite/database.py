@@ -1,6 +1,7 @@
 from fastapi_healthchecks.checks import Check, CheckResult
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.database import Database
+from pymongo.server_api import ServerApi
 
 from htrc.torchlite.config import config
 
@@ -20,7 +21,7 @@ class MongoDatabaseClient:
 
     class __Instance:
         def __init__(self, url: str):
-            self.client = AsyncIOMotorClient(url, uuidRepresentation='standard')
+            self.client = AsyncIOMotorClient(url, server_api=ServerApi('1'), uuidRepresentation='standard')
             self.db = self.client.get_default_database()
 
     instance = None
