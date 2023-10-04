@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from .mongo import PyObjectId, MongoModel
+from .mongo import PyUuid, MongoModel
 
 
 class WorksetSummary(BaseModel):
@@ -65,7 +65,7 @@ class Widget(BaseModel):
 
 
 class DashboardSummary(MongoModel):
-    id: PyObjectId = Field(default_factory=PyObjectId)
+    id: PyUuid = Field(default_factory=PyUuid)
     owner: UUID | None
     title: str | None
     description: str | None

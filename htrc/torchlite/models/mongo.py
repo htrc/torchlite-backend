@@ -1,19 +1,24 @@
+import os
+import uuid
 from datetime import datetime
 
-from bson import ObjectId
 from pydantic import BaseModel, BaseConfig
 
 
-class PyObjectId(ObjectId):
+class PyUuid(uuid.UUID):
+    def __init__(self, s: str | None = None):
+        if not s:
+            super().__init__(bytes=os.urandom(16), version=4)
+        else:
+            super().__init__(s)
+
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
 
     @classmethod
     def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError(f"Invalid ObjectId: {v}")
-        return ObjectId(v)
+        return v if isinstance(v, uuid.UUID) else uuid.UUID(v)
 
     @classmethod
     def __modify_schema__(cls, field_schema):
@@ -25,7 +30,7 @@ class MongoModel(BaseModel):
         allow_population_by_field_name = True
         json_encoders = {
             datetime: lambda dt: dt.isoformat(),
-            ObjectId: str,
+            uuid.UUID: str,
         }
 
     @classmethod
