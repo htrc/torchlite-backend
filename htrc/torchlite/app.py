@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
 
 from .config import config
-from .database import init_db
+from .database import mongo_client
 from .middleware import TorchliteVersionHeaderMiddleware, TimingMiddleware
 from .routers.dashboards import router as dashboards_router
 from .routers.worksets import router as worksets_router
@@ -22,8 +22,6 @@ async def torchlite_startup():
     env = os.environ.get("ENV", "dev")
     log.info(f"Starting Torchlite API Server v{VERSION} ({env})")
 
-    await init_db()
-
     # config_file_name = os.getenv("TORCHLITE_CONFIG")
     # if not config_file_name:
     #     raise TorchliteError("TORCHLITE_CONFIG value is invalid or not set")
@@ -33,7 +31,7 @@ async def torchlite_startup():
 
 async def torchlite_shutdown():
     log.info("Server shutting down")
-    pass
+    mongo_client.close()
 
 
 @asynccontextmanager

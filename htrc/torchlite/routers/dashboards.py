@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import APIRouter
 
-from ..database import db
+from ..database import mongo_client
 from ..models.schemas import DashboardSummary, DashboardPatch
 
 router = APIRouter(
