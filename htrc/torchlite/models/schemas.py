@@ -14,6 +14,9 @@ class WorksetSummary(BaseModel):
     is_public: bool = Field(..., alias='isPublic')
     num_volumes: int = Field(..., alias='numVolumes')
 
+    class Config:
+        allow_population_by_field_name = True
+
 
 class VolumeMetadata(BaseModel):
     htid: str
@@ -29,9 +32,15 @@ class VolumeMetadata(BaseModel):
     language: str | list[str] | None
     source_institution: str = Field(..., alias='sourceInstitution')
 
+    class Config:
+        allow_population_by_field_name = True
+
 
 class WorksetInfo(WorksetSummary):
     volumes: list[VolumeMetadata]
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class FilterSettings(BaseModel):
@@ -46,6 +55,9 @@ class FilterSettings(BaseModel):
     pub_place: list[str] = Field(..., alias='pubPlace')
     language: list[str]
     source_institution: list[str] = Field(..., alias='sourceInstitution')
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class Widget(BaseModel):
@@ -71,3 +83,6 @@ class DashboardPatch(BaseModel):
     workset_id: str | None = Field(..., alias='worksetId')
     filters: FilterSettings | None
     widgets: list[Widget] | None
+
+    class Config:
+        allow_population_by_field_name = True

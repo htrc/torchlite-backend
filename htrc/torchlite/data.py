@@ -33,16 +33,16 @@ def parse_volume_meta(vol: dict) -> VolumeMetadata:
     return VolumeMetadata(
         htid=sanitize(vol['htid']),
         title=sanitize(meta['title']),
-        pubDate=sanitize(meta.get('pubDate')),
+        pub_date=sanitize(meta.get('pubDate')),
         genre=sanitize(meta['genre']),
-        typeOfResource=sanitize(meta['typeOfResource']),
+        type_of_resource=sanitize(meta['typeOfResource']),
         category=sanitize(meta.get('category')),
         contributor=parse_value(meta.get('contributor')),
         publisher=parse_value(meta.get('publisher')),
-        accessRights=sanitize(meta['accessRights']),
-        pubPlace=parse_value(meta.get('pubPlace')),
+        access_rights=sanitize(meta['accessRights']),
+        pub_place=parse_value(meta.get('pubPlace')),
         language=sanitize(meta.get('language')),
-        sourceInstitution=parse_value(meta['sourceInstitution']),
+        source_institution=parse_value(meta['sourceInstitution']),
     )
 
 
@@ -51,6 +51,6 @@ def get_workset_info(workset_id: str) -> WorksetInfo:
         data = json.load(f)
 
     volumes = [parse_volume_meta(vol) for vol in data['data']]
-    ws = worksets[workset_id]
+    ws: WorksetInfo = worksets[workset_id]
 
     return WorksetInfo(**ws.dict(), volumes=volumes)
