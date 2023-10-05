@@ -6,9 +6,9 @@ from pymongo import ReturnDocument
 
 from ..auth.auth import get_current_user
 from ..config import config
-from ..data import worksets
+from ..data import worksets, get_workset_info
 from ..database import mongo_client
-from ..models.schemas import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
+from ..models.schemas import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate, WorksetSummary
 
 router = APIRouter(
     prefix="/dashboards",
@@ -111,4 +111,14 @@ async def update_dashboard(dashboard_id: UUID,
 @router.get("/{dashboard_id}/widgets/{widget_type}/data", description="Retrieve widget data")
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
-    pass
+    dashboard = await get_dashboard(dashboard_id, user)
+    if widget_type not in {w.type for w in dashboard.widgets}:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
+        )
+
+    workset = get_workset_info(dashboard.workset_id)
+
+
+

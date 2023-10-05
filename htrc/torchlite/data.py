@@ -52,4 +52,4 @@ def get_workset_info(workset_id: str) -> WorksetInfo:
     volumes = [parse_volume_meta(vol) for vol in data['data']]
     ws = worksets[workset_id]
 
-    return WorksetInfo(**ws.dict(), volumes=volumes)
+    return WorksetInfo.construct(**ws.dict(), volumes=volumes)

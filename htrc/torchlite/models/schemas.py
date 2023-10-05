@@ -65,15 +65,18 @@ class Widget(BaseModel):
     type: Literal['MappingContributorData', 'PublicationDateTimeline']
 
 
-class DashboardSummary(MongoModel):
+class Dashboard(BaseModel):
     id: PyUuid = Field(default_factory=PyUuid)
+    workset_id: str = Field(..., alias="worksetId")
+    filters: FilterSettings | None
+    widgets: list[Widget]
+
+
+class DashboardSummary(Dashboard, MongoModel):
     owner: UUID | None
     title: str | None
     description: str | None
     is_shared: bool = Field(False, alias="isShared")
-    workset_id: str = Field(..., alias="worksetId")
-    filters: FilterSettings | None
-    widgets: list[Widget]
     created_at: datetime = Field(default_factory=datetime.now, alias="createdAt")
     updated_at: datetime = Field(default_factory=datetime.now, alias="updatedAt")
 
@@ -85,18 +88,12 @@ class DashboardCreate(MongoModel):
     filters: FilterSettings | None = None
     widgets: conlist(Widget, min_items=1, unique_items=True)
 
-    class Config:
-        allow_population_by_field_name = True
-
 
 class DashboardPatch(MongoModel):
     workset_id: str | None = Field(None, alias="worksetId")
     filters: FilterSettings | None = None
     widgets: list[Widget] | None = None
     is_shared: bool | None = Field(None, alias="isShared")
-
-    class Config:
-        allow_population_by_field_name = True
 
 
 class DashboardPatchUpdate(DashboardPatch):

@@ -1,0 +1,2 @@
+class MappingContributorData:
+    pass
