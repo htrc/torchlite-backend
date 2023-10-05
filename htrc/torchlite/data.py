@@ -4,7 +4,7 @@ from htrc.torchlite.models.schemas import WorksetSummary, VolumeMetadata, Workse
 
 with open('data/worksets.json', 'r') as f:
     arr = json.load(f)
-    worksets = {w['id']: WorksetSummary(**w) for w in arr}
+    worksets: dict[str, WorksetSummary] = {w['id']: WorksetSummary(**w) for w in arr}
 
 
 def sanitize(v: str | list[str] | None) -> str | list[str] | None:
@@ -29,7 +29,6 @@ def parse_value(v: dict | list[dict] | None, field: str = 'name') -> str | list[
 
 def parse_volume_meta(vol: dict) -> VolumeMetadata:
     meta = vol['metadata']
-    # print(meta)
     return VolumeMetadata(
         htid=sanitize(vol['htid']),
         title=sanitize(meta['title']),
@@ -51,6 +50,6 @@ def get_workset_info(workset_id: str) -> WorksetInfo:
         data = json.load(f)
 
     volumes = [parse_volume_meta(vol) for vol in data['data']]
-    ws: WorksetInfo = worksets[workset_id]
+    ws = worksets[workset_id]
 
     return WorksetInfo(**ws.dict(), volumes=volumes)
