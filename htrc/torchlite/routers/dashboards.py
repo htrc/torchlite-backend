@@ -88,7 +88,7 @@ async def update_dashboard(dashboard_id: UUID,
         )
 
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
-    dashboard_patch_update = DashboardPatchUpdate.construct(**dashboard_patch.dict())
+    dashboard_patch_update = DashboardPatchUpdate.construct(**dashboard_patch.dict(exclude_defaults=True))
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one_and_update(
             filter={"_id": dashboard_id, "owner": user_id},
