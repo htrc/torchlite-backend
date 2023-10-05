@@ -6,6 +6,7 @@ from pymongo import ReturnDocument
 
 from ..auth.auth import get_current_user
 from ..config import config
+from ..data import worksets
 from ..database import mongo_client
 from ..models.schemas import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
 
@@ -47,6 +48,12 @@ async def create_dashboard(dashboard_create: DashboardCreate,
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
+    if dashboard_create.workset_id not in worksets:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unknown workset id {dashboard_create.workset_id}"
+        )
+
     dashboard = DashboardSummary.construct(**dashboard_create.dict(exclude_defaults=True), owner=owner)
     await mongo_client.db["dashboards"].insert_one(dashboard.to_mongo(exclude_unset=False))
 
@@ -74,6 +81,12 @@ async def get_dashboard(dashboard_id: UUID,
 async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
+    if dashboard_patch.workset_id and dashboard_patch.workset_id not in worksets:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unknown workset id {dashboard_patch.workset_id}"
+        )
+
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     dashboard_patch_update = DashboardPatchUpdate.construct(**dashboard_patch.dict())
     dashboard = await DashboardSummary.from_mongo(
@@ -96,5 +109,6 @@ async def update_dashboard(dashboard_id: UUID,
 
 
 @router.get("/{dashboard_id}/widgets/{widget_type}/data", description="Retrieve widget data")
-async def get_widget_data(dashboard_id: str, widget_type: str):
+async def get_widget_data(dashboard_id: UUID, widget_type: str,
+                          user: UserInfo | None = Depends(get_current_user)):
     pass
