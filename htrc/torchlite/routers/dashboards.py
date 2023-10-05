@@ -41,7 +41,15 @@ async def list_dashboards(owner: UUID | None = None,
 async def create_dashboard(dashboard_create: DashboardCreate,
                            owner: UUID | None = None,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
-    dashboard = None
+    user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
+    owner = owner or user_id
+
+    if user_id != owner:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    dashboard = DashboardSummary.construct(**dashboard_create.dict(exclude_defaults=True), owner=owner)
+    await mongo_client.db["dashboards"].insert_one(dashboard.to_mongo(exclude_unset=False))
+
     return dashboard
 
 
