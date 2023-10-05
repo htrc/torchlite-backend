@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field, conlist
@@ -61,7 +62,7 @@ class FilterSettings(BaseModel):
 
 
 class Widget(BaseModel):
-    type: str
+    type: Literal['MappingContributorData', 'PublicationDateTimeline']
 
 
 class DashboardSummary(MongoModel):
