@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, conlist
 
 from .mongo import PyUuid, MongoModel
 
@@ -73,18 +73,30 @@ class DashboardSummary(MongoModel):
     workset_id: str = Field(..., alias="worksetId")
     filters: FilterSettings | None
     widgets: list[Widget]
-    created_at: datetime = Field(datetime.now(), alias="createdAt")
-    updated_at: datetime = Field(datetime.now(), alias="updatedAt")
+    created_at: datetime = Field(default_factory=datetime.now, alias="createdAt")
+    updated_at: datetime = Field(default_factory=datetime.now, alias="updatedAt")
 
 
 class DashboardCreate(MongoModel):
-    workset_id: str | None = Field(None, alias="worksetId")
+    title: str | None = None
+    description: str | None = None
+    workset_id: str = Field(..., alias="worksetId")
     filters: FilterSettings | None = None
-    widgets: list[Widget] | None = None
+    widgets: conlist(Widget, min_items=1, unique_items=True)
 
     class Config:
         allow_population_by_field_name = True
 
 
-class DashboardPatch(DashboardCreate):
+class DashboardPatch(MongoModel):
+    workset_id: str | None = Field(None, alias="worksetId")
+    filters: FilterSettings | None = None
+    widgets: list[Widget] | None = None
     is_shared: bool | None = Field(None, alias="isShared")
+
+    class Config:
+        allow_population_by_field_name = True
+
+
+class DashboardPatchUpdate(DashboardPatch):
+    updated_at: datetime = Field(default_factory=datetime.now, alias="updatedAt")

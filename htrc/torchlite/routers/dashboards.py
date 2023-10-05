@@ -7,7 +7,7 @@ from pymongo import ReturnDocument
 from ..auth.auth import get_current_user
 from ..config import config
 from ..database import mongo_client
-from ..models.schemas import DashboardSummary, DashboardPatch, DashboardCreate
+from ..models.schemas import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
 
 router = APIRouter(
     prefix="/dashboards",
@@ -62,15 +62,16 @@ async def get_dashboard(dashboard_id: UUID,
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
 
-@router.patch("/{dashboard_id}")
+@router.patch("/{dashboard_id}", description="Update a dashboard")
 async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
+    dashboard_patch_update = DashboardPatchUpdate.construct(**dashboard_patch.dict())
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one_and_update(
             filter={"_id": dashboard_id, "owner": user_id},
-            update={"$set": dashboard_patch.to_mongo()},
+            update={"$set": dashboard_patch_update.to_mongo(exclude_unset=False)},
             return_document=ReturnDocument.AFTER
         )
     )
@@ -86,6 +87,6 @@ async def update_dashboard(dashboard_id: UUID,
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/{dashboard_id}/widgets/{widget_type}/data")
+@router.get("/{dashboard_id}/widgets/{widget_type}/data", description="Retrieve widget data")
 async def get_widget_data(dashboard_id: str, widget_type: str):
     pass
