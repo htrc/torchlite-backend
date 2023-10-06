@@ -1,0 +1,4 @@
+from htrc.torchlite.widgets.mapping_contributor_data import MappingContributorDataWidget
+from htrc.torchlite.widgets.publication_date_timeline import PublicationDateTimelineWidget
+
+ALL_WIDGETS = MappingContributorDataWidget | PublicationDateTimelineWidget

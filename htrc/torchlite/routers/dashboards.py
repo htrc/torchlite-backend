@@ -118,6 +118,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
 
+
     workset = get_workset_info(dashboard.workset_id)
 
 

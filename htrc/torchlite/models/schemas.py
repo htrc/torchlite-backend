@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field, conlist
 
 from .mongo import PyUuid, MongoModel
+from ..widgets import ALL_WIDGETS
 
 
 class WorksetSummary(BaseModel):
@@ -61,15 +61,11 @@ class FilterSettings(BaseModel):
         allow_population_by_field_name = True
 
 
-class Widget(BaseModel):
-    type: Literal['MappingContributorData', 'PublicationDateTimeline']
-
-
 class Dashboard(BaseModel):
     id: PyUuid = Field(default_factory=PyUuid)
     workset_id: str = Field(..., alias="worksetId")
     filters: FilterSettings | None
-    widgets: list[Widget]
+    widgets: list[ALL_WIDGETS]
 
 
 class DashboardSummary(Dashboard, MongoModel):
@@ -86,13 +82,13 @@ class DashboardCreate(MongoModel):
     description: str | None = None
     workset_id: str = Field(..., alias="worksetId")
     filters: FilterSettings | None = None
-    widgets: conlist(Widget, min_items=1, unique_items=True)
+    widgets: conlist(ALL_WIDGETS, min_items=1, unique_items=True)
 
 
 class DashboardPatch(MongoModel):
     workset_id: str | None = Field(None, alias="worksetId")
     filters: FilterSettings | None = None
-    widgets: list[Widget] | None = None
+    widgets: list[ALL_WIDGETS] | None = None
     is_shared: bool | None = Field(None, alias="isShared")
 
 
