@@ -8,4 +8,4 @@ class MappingContributorDataWidget(WidgetBase):
     type: Literal['MappingContributorData'] = 'MappingContributorData'
 
     def get_data(self, workset_info: WorksetInfo) -> Any:
-        return self.model_dump()
+        return workset_info.model_dump()

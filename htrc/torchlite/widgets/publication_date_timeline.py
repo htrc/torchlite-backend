@@ -10,4 +10,4 @@ class PublicationDateTimelineWidget(WidgetBase):
     max_year: int | None = None
 
     def get_data(self, workset_info: WorksetInfo) -> Any:
-        return self.model_dump()
+        return workset_info.model_dump()
