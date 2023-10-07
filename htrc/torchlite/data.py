@@ -63,7 +63,7 @@ def make_set(value: str | list[str] | None) -> set[str]:
 def apply_filters(workset_info: WorksetInfo, filters: FilterSettings) -> WorksetInfo:
     filtered_volumes = []
     for volume_meta in workset_info.volumes:
-        if filters.titles and volume_meta.title not in filters.titles:
+        if filters.title and volume_meta.title not in filters.title:
             continue
         if filters.pub_date and volume_meta.pub_date not in filters.pub_date:
             continue
@@ -88,4 +88,4 @@ def apply_filters(workset_info: WorksetInfo, filters: FilterSettings) -> Workset
 
         filtered_volumes.append(volume_meta)
 
-    return WorksetInfo.model_construct(**workset_info.model_dump(), volumes=filtered_volumes)
+    return WorksetInfo.model_construct(**{**workset_info.model_dump(), 'volumes': filtered_volumes})
