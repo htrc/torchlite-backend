@@ -1,8 +1,10 @@
+import uuid
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field, conlist
+from pydantic import Field, conlist
 
+from .base import BaseModel
 from .mongo import PyUuid, MongoModel
 from ..widgets import ALL_WIDGETS
 
@@ -12,85 +14,73 @@ class WorksetSummary(BaseModel):
     name: str
     description: str
     author: str
-    is_public: bool = Field(..., alias="isPublic")
-    num_volumes: int = Field(..., alias="numVolumes")
-
-    class Config:
-        allow_population_by_field_name = True
+    is_public: bool
+    num_volumes: int
 
 
 class VolumeMetadata(BaseModel):
     htid: str
     title: str
-    pub_date: int | None = Field(..., alias="pubDate")
+    pub_date: int | None
     genre: str | list[str]
-    type_of_resource: str = Field(..., alias="typeOfResource")
+    type_of_resource: str
     category: str | list[str] | None
     contributor: str | list[str] | None
     publisher: str | list[str] | None
-    access_rights: str = Field(..., alias="accessRights")
-    pub_place: str | list[str] | None = Field(..., alias="pubPlace")
+    access_rights: str
+    pub_place: str | list[str] | None
     language: str | list[str] | None
-    source_institution: str = Field(..., alias="sourceInstitution")
-
-    class Config:
-        allow_population_by_field_name = True
+    source_institution: str
 
 
 class WorksetInfo(WorksetSummary):
     volumes: list[VolumeMetadata]
 
-    class Config:
-        allow_population_by_field_name = True
-
 
 class FilterSettings(BaseModel):
     title: list[str] = []
-    pub_date: list[int] = Field([], alias="pubDate")
+    pub_date: list[int] = []
     genre: list[str] = []
-    type_of_resource: list[str] = Field([], alias="typeOfResource")
+    type_of_resource: list[str] = []
     category: list[str] = []
     contributor: list[str] = []
     publisher: list[str] = []
-    access_rights: list[str] = Field([], alias="accessRights")
-    pub_place: list[str] = Field([], alias="pubPlace")
+    access_rights: list[str] = []
+    pub_place: list[str] = []
     language: list[str] = []
-    source_institution: list[str] = Field([], alias="sourceInstitution")
-
-    class Config:
-        allow_population_by_field_name = True
+    source_institution: list[str] = []
 
 
-class Dashboard(BaseModel):
-    id: PyUuid = Field(default_factory=PyUuid)
-    workset_id: str = Field(..., alias="worksetId")
+class Dashboard(BaseModel, arbitrary_types_allowed=True):
+    id: PyUuid = Field(default_factory=uuid.uuid4)
+    workset_id: str
     filters: FilterSettings | None
     widgets: list[ALL_WIDGETS]
 
 
 class DashboardSummary(Dashboard, MongoModel):
     owner: UUID | None
-    title: str | None
-    description: str | None
-    is_shared: bool = Field(False, alias="isShared")
-    created_at: datetime = Field(default_factory=datetime.now, alias="createdAt")
-    updated_at: datetime = Field(default_factory=datetime.now, alias="updatedAt")
+    title: str | None = None
+    description: str | None = None
+    is_shared: bool = False
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
 
 
 class DashboardCreate(MongoModel):
     title: str | None = None
     description: str | None = None
-    workset_id: str = Field(..., alias="worksetId")
+    workset_id: str
     filters: FilterSettings | None = None
-    widgets: conlist(ALL_WIDGETS, min_items=1, unique_items=True)
+    widgets: conlist(ALL_WIDGETS, min_length=1)
 
 
 class DashboardPatch(MongoModel):
-    workset_id: str | None = Field(None, alias="worksetId")
+    workset_id: str | None = None
     filters: FilterSettings | None = None
     widgets: list[ALL_WIDGETS] | None = None
-    is_shared: bool | None = Field(None, alias="isShared")
+    is_shared: bool | None = None
 
 
 class DashboardPatchUpdate(DashboardPatch):
-    updated_at: datetime = Field(default_factory=datetime.now, alias="updatedAt")
+    updated_at: datetime = Field(default_factory=datetime.now)

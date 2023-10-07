@@ -1,37 +1,33 @@
-import os
 import uuid
 from datetime import datetime
+from typing import Annotated, Any
 
-from pydantic import BaseModel, BaseConfig
+from pydantic import ConfigDict, AfterValidator, WithJsonSchema
+
+from .base import BaseModel
 
 
-class PyUuid(uuid.UUID):
-    def __init__(self, s: str | None = None):
-        if not s:
-            super().__init__(bytes=os.urandom(16), version=4)
-        else:
-            super().__init__(s)
+def validate_object_id(v: Any) -> uuid.UUID:
+    if isinstance(v, uuid.UUID):
+        return v
+    return uuid.UUID(v)
 
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
 
-    @classmethod
-    def validate(cls, v):
-        return v if isinstance(v, uuid.UUID) else uuid.UUID(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
+PyUuid = Annotated[
+    str | uuid.UUID,
+    AfterValidator(validate_object_id),
+    WithJsonSchema({"type": "string"}, mode="serialization"),
+]
 
 
 class MongoModel(BaseModel):
-    class Config(BaseConfig):
-        allow_population_by_field_name = True
-        json_encoders = {
+    model_config = ConfigDict(
+        **BaseModel.model_config,
+        json_encoders={
             datetime: lambda dt: dt.isoformat(),
             uuid.UUID: str,
-        }
+        },
+    )
 
     @classmethod
     def __from_mongo(cls, data: dict):
@@ -57,7 +53,7 @@ class MongoModel(BaseModel):
         exclude_defaults = kwargs.pop('exclude_defaults', True)
         by_alias = kwargs.pop('by_alias', True)
 
-        parsed = self.dict(
+        parsed = self.model_dump(
             exclude_unset=exclude_unset,
             exclude_defaults=exclude_defaults,
             by_alias=by_alias,

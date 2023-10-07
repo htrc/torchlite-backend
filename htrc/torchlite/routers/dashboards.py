@@ -3,12 +3,13 @@ from uuid import UUID
 from authlib.oidc.core import UserInfo
 from fastapi import APIRouter, Depends, HTTPException, status
 from pymongo import ReturnDocument
+from starlette.responses import JSONResponse
 
 from ..auth.auth import get_current_user
 from ..config import config
 from ..data import worksets, get_workset_info
 from ..database import mongo_client
-from ..models.schemas import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate, WorksetSummary
+from ..models.schemas import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
 
 router = APIRouter(
     prefix="/dashboards",
@@ -54,7 +55,8 @@ async def create_dashboard(dashboard_create: DashboardCreate,
             detail=f"Unknown workset id {dashboard_create.workset_id}"
         )
 
-    dashboard = DashboardSummary.construct(**dashboard_create.dict(exclude_defaults=True), owner=owner)
+    # dashboard = DashboardSummary.model_construct(**dashboard_create.model_dump(exclude_defaults=True), owner=owner)
+    dashboard = DashboardSummary(**(dashboard_create.model_dump(exclude_defaults=True)), owner=owner)
     await mongo_client.db["dashboards"].insert_one(dashboard.to_mongo(exclude_unset=False))
 
     return dashboard
@@ -88,7 +90,8 @@ async def update_dashboard(dashboard_id: UUID,
         )
 
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
-    dashboard_patch_update = DashboardPatchUpdate.construct(**dashboard_patch.dict(exclude_defaults=True))
+    # dashboard_patch_update = DashboardPatchUpdate.model_construct(**dashboard_patch.model_dump(exclude_defaults=True))
+    dashboard_patch_update = DashboardPatchUpdate(**dashboard_patch.model_dump(exclude_defaults=True))
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one_and_update(
             filter={"_id": dashboard_id, "owner": user_id},
@@ -112,14 +115,11 @@ async def update_dashboard(dashboard_id: UUID,
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
     dashboard = await get_dashboard(dashboard_id, user)
-    if widget_type not in {w.type for w in dashboard.widgets}:
+    widget = next((w for w in dashboard.widgets if w.type == widget_type), None)
+    if not widget:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
 
-
-    workset = get_workset_info(dashboard.workset_id)
-
-
-
+    return JSONResponse(widget.get_data(get_workset_info(dashboard.workset_id)))

@@ -1,6 +1,6 @@
 import json
 
-from htrc.torchlite.models.schemas import WorksetSummary, VolumeMetadata, WorksetInfo
+from htrc.torchlite.models.schemas import WorksetSummary, VolumeMetadata, WorksetInfo, FilterSettings
 
 with open('data/worksets.json', 'r') as f:
     arr = json.load(f)
@@ -52,4 +52,8 @@ def get_workset_info(workset_id: str) -> WorksetInfo:
     volumes = [parse_volume_meta(vol) for vol in data['data']]
     ws = worksets[workset_id]
 
-    return WorksetInfo.construct(**ws.dict(), volumes=volumes)
+    return WorksetInfo.model_construct(**ws.model_dump(), volumes=volumes)
+
+
+def apply_filters(workset_info: WorksetInfo, filters: FilterSettings) -> WorksetInfo:
+    pass
