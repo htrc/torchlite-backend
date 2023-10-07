@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from ..data import worksets, get_workset_info
-from ..models.schemas import WorksetSummary, WorksetInfo
+from ..models.workset import WorksetSummary, WorksetInfo
 
 router = APIRouter(
     prefix="/worksets",

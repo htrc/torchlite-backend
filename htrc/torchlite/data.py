@@ -1,6 +1,7 @@
 import json
 
-from htrc.torchlite.models.schemas import WorksetSummary, VolumeMetadata, WorksetInfo, FilterSettings
+from .models.dashboard import FilterSettings
+from .models.workset import WorksetSummary, VolumeMetadata, WorksetInfo
 
 with open('data/worksets.json', 'r') as f:
     arr = json.load(f)
@@ -55,5 +56,36 @@ def get_workset_info(workset_id: str) -> WorksetInfo:
     return WorksetInfo.model_construct(**ws.model_dump(), volumes=volumes)
 
 
+def make_set(value: str | list[str] | None) -> set[str]:
+    return set(value) if value is not None else set()
+
+
 def apply_filters(workset_info: WorksetInfo, filters: FilterSettings) -> WorksetInfo:
-    pass
+    filtered_volumes = []
+    for volume_meta in workset_info.volumes:
+        if filters.titles and volume_meta.title not in filters.titles:
+            continue
+        if filters.pub_date and volume_meta.pub_date not in filters.pub_date:
+            continue
+        if filters.genre and not make_set(volume_meta.genre).intersection(filters.genre):
+            continue
+        if filters.type_of_resource and volume_meta.type_of_resource not in filters.type_of_resource:
+            continue
+        if filters.category and not make_set(volume_meta.category).intersection(filters.category):
+            continue
+        if filters.contributor and not make_set(volume_meta.contributor).intersection(filters.contributor):
+            continue
+        if filters.publisher and not make_set(volume_meta.publisher).intersection(filters.publisher):
+            continue
+        if filters.access_rights and volume_meta.access_rights not in filters.access_rights:
+            continue
+        if filters.pub_place and not make_set(volume_meta.pub_place).intersection(filters.pub_place):
+            continue
+        if filters.language and not make_set(volume_meta.language).intersection(filters.language):
+            continue
+        if filters.source_institution and volume_meta.source_institution not in filters.source_institution:
+            continue
+
+        filtered_volumes.append(volume_meta)
+
+    return WorksetInfo.model_construct(**workset_info.model_dump(), volumes=filtered_volumes)

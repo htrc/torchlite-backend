@@ -6,7 +6,7 @@ import logging
 import sys
 
 from htrc.torchlite.database import mongo_client
-from htrc.torchlite.models.schemas import DashboardSummary
+from htrc.torchlite.models.dashboard import DashboardSummary
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("seed_dashboards")
