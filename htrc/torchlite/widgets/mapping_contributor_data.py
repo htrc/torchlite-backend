@@ -1,7 +1,7 @@
 import asyncio
 import random
 from datetime import datetime
-from typing import Any, Literal, Final, Pattern, AnyStr
+from typing import Literal, Final, Pattern, AnyStr
 
 import httpx
 import regex as re
@@ -59,7 +59,7 @@ class MappingContributorDataWidget(WidgetBase):
             contributor.id
             for v in volumes
             for contributor in make_list(v.metadata.contributor)
-            if str(contributor.type) == 'http://id.loc.gov/ontologies/bibframe/Person'
+            if contributor.type == 'http://id.loc.gov/ontologies/bibframe/Person'
         })
 
         return contributor_ids

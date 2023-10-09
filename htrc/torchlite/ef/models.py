@@ -1,7 +1,5 @@
 from typing import Literal
 
-from pydantic import AnyHttpUrl, AnyUrl
-
 from ..models.base import BaseModel
 
 
@@ -12,30 +10,30 @@ class Workset(BaseModel):
 
 
 class Contributor(BaseModel):
-    id: AnyHttpUrl
-    type: AnyHttpUrl
+    id: str
+    type: str
     name: str
 
 
 class Publisher(BaseModel):
-    id: AnyHttpUrl
-    type: AnyHttpUrl
+    id: str
+    type: str
     name: str
 
 
 class PublicationPlace(BaseModel):
-    id: AnyHttpUrl
-    type: AnyHttpUrl
+    id: str
+    type: str
     name: str | None = None
 
 
 class SourceInstitution(BaseModel):
-    type: AnyHttpUrl
+    type: str
     name: str
 
 
 class Journal(BaseModel):
-    id: AnyHttpUrl
+    id: str
     type: str
     journalTitle: str
 
@@ -44,8 +42,8 @@ VolumeType = Literal["DataFeedItem", "Book", "PublicationVolume", "CreativeWork"
 
 
 class VolumeMetadata(BaseModel):
-    schema_version: AnyHttpUrl | None
-    id: AnyHttpUrl | None
+    schema_version: str | None
+    id: str | None
     type: VolumeType | list[VolumeType]
     date_created: int
     title: str | None  # only for "Book" or "CreativeWork"
@@ -69,8 +67,8 @@ class VolumeMetadata(BaseModel):
     issn: str | list[str] | None = None
     isbn: str | list[str] | None = None
     category: str | list[str] | None = None
-    genre: AnyUrl | list[AnyUrl] | None = None
-    type_of_resource: AnyHttpUrl | None = None
+    genre: str | list[str] | None = None
+    type_of_resource: str | None = None
     last_rights_update_date: int | None = None
     is_part_of: Journal | None = None
 
