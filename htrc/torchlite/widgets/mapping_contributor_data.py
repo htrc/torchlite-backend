@@ -7,6 +7,7 @@ import httpx
 import regex as re
 
 from .base import WidgetBase
+from ..http_client import http
 from ..models.base import BaseModel
 from ..utils import make_list, make_batches, flatten, parse_dict
 
@@ -110,7 +111,7 @@ class MappingContributorDataWidget(WidgetBase):
 
         return entries
 
-    async def get_data(self, volumes: dict) -> Any:
+    async def get_data(self, volumes: dict) -> list[WikidataEntry]:
         contributor_ids = self.get_contributor_ids(volumes)
         contributor_ids = [c_id.replace('www.', '') for c_id in contributor_ids if 'viaf.org' in c_id]
         req_batches = make_batches(contributor_ids, self.BATCH_SIZE)
@@ -118,7 +119,6 @@ class MappingContributorDataWidget(WidgetBase):
         def delay():
             return (100 * random.randint(0, len(req_batches))) / 1000  # seconds
 
-        async with httpx.AsyncClient() as http:
-            data = await asyncio.gather(*[self.query_wikidata(batch, http, delay_sec=delay()) for batch in req_batches])
+        data = await asyncio.gather(*[self.query_wikidata(batch, http, delay_sec=delay()) for batch in req_batches])
 
         return flatten(data)

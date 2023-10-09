@@ -8,6 +8,7 @@ from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
 
 from .config import config
 from .database import mongo_client
+from .http_client import http
 from .middleware import TorchliteVersionHeaderMiddleware, TimingMiddleware
 from .routers.dashboards import router as dashboards_router
 from .routers.worksets import router as worksets_router
@@ -34,6 +35,7 @@ async def torchlite_startup():
 
 async def torchlite_shutdown():
     log.info("Server shutting down")
+    await http.aclose()
     mongo_client.close()
 
 
