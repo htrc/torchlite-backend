@@ -14,5 +14,5 @@ class WidgetBase(BaseModel):
         return result
 
     @abstractmethod
-    def get_data(self, workset_info: 'WorksetInfo') -> Any:
+    async def get_data(self, workset_info: 'WorksetInfo') -> Any:
         raise NotImplementedError

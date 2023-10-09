@@ -123,4 +123,4 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
         )
 
     filtered_volumes = apply_filters(get_full_meta(dashboard.workset_id), filters=dashboard.filters)
-    return JSONResponse(widget.get_data(filtered_volumes))
+    return JSONResponse(await widget.get_data(filtered_volumes))

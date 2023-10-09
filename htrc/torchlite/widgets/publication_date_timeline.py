@@ -9,7 +9,7 @@ class PublicationDateTimelineWidget(WidgetBase):
     min_year: int | None = None
     max_year: int | None = None
 
-    def get_data(self, volumes: dict) -> Any:
+    async def get_data(self, volumes: dict) -> Any:
         pub_date_counter = Counter(v['metadata']['pubDate'] for v in volumes if v['metadata']['pubDate'] is not None)
         return sorted([
             {'year': int(year), 'count': count}
