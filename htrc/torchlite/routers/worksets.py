@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from ..converters import torchlite_volume_meta_from_ef
-from ..data import worksets, get_workset_info
+from ..data import worksets
 from ..ef.api import ef_api
 from ..models.workset import WorksetSummary, WorksetInfo
 
