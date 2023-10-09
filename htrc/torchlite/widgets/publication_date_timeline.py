@@ -1,7 +1,14 @@
 from collections import Counter
 from typing import Any, Literal
 
+from pydantic import BaseModel
+
 from .base import WidgetBase
+
+
+class PubDateEntry(BaseModel):
+    year: int
+    count: int
 
 
 class PublicationDateTimelineWidget(WidgetBase):
@@ -12,6 +19,6 @@ class PublicationDateTimelineWidget(WidgetBase):
     async def get_data(self, volumes: dict) -> Any:
         pub_date_counter = Counter(v['metadata']['pubDate'] for v in volumes if v['metadata']['pubDate'] is not None)
         return sorted([
-            {'year': int(year), 'count': count}
+            PubDateEntry.model_construct(year=int(year), count=count)
             for year, count in pub_date_counter.items()
-        ], key=lambda d: d['year'])
+        ], key=lambda d: d.year)
