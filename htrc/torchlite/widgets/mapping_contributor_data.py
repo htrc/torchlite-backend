@@ -5,8 +5,10 @@ from typing import Any, Literal, Final, Pattern, AnyStr
 
 import httpx
 import regex as re
+from pydantic import AnyHttpUrl
 
 from .base import WidgetBase
+from ..ef import models as ef_models
 from ..http_client import http
 from ..models.base import BaseModel
 from ..utils import make_list, make_batches, flatten, parse_dict
@@ -52,12 +54,12 @@ class MappingContributorDataWidget(WidgetBase):
     POINT_RE: Final[Pattern[AnyStr]] = re.compile(r'Point\((?P<longitude>\S+) (?P<latitude>\S+)\)')
 
     @classmethod
-    def get_contributor_ids(cls, volumes: dict) -> list[str]:
+    def get_contributor_ids(cls, volumes: list[ef_models.Volume]) -> list[AnyHttpUrl]:
         contributor_ids = list({
-            contributor['id']
+            contributor.id
             for v in volumes
-            for contributor in make_list(v['metadata']['contributor'])
-            if contributor['type'] == 'http://id.loc.gov/ontologies/bibframe/Person'
+            for contributor in make_list(v.metadata.contributor)
+            if str(contributor.type) == 'http://id.loc.gov/ontologies/bibframe/Person'
         })
 
         return contributor_ids
@@ -111,7 +113,7 @@ class MappingContributorDataWidget(WidgetBase):
 
         return entries
 
-    async def get_data(self, volumes: dict) -> list[WikidataEntry]:
+    async def get_data(self, volumes: list[ef_models.Volume]) -> list[WikidataEntry]:
         contributor_ids = self.get_contributor_ids(volumes)
         contributor_ids = [c_id.replace('www.', '') for c_id in contributor_ids if 'viaf.org' in c_id]
         req_batches = make_batches(contributor_ids, self.BATCH_SIZE)

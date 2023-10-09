@@ -43,8 +43,8 @@ def parse_dict(d: dict, path: str, raise_if_not_exist: bool = False) -> Any | No
     return d
 
 
-def make_batches(l: list, chunk_size: int) -> list[list]:
-    return [l[i * chunk_size:(i + 1) * chunk_size] for i in range(math.ceil(len(l) / chunk_size))]
+def make_batches(lst: list[T], chunk_size: int) -> list[list[T]]:
+    return [lst[i * chunk_size:(i + 1) * chunk_size] for i in range(math.ceil(len(lst) / chunk_size))]
 
 
 def parse_value(v: T | list[T] | None, field: str = 'name') -> U | list[U] | None:

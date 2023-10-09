@@ -6,7 +6,7 @@ from pymongo import ReturnDocument
 
 from ..auth.auth import get_current_user
 from ..config import config
-from ..data import worksets, apply_filters, get_full_meta
+from ..data import worksets, apply_filters
 from ..database import mongo_client
 from ..ef.api import ef_api
 from ..models.dashboard import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate

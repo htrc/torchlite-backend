@@ -1,54 +1,20 @@
 import json
 
+from .converters import torchlite_volume_meta_from_ef
 from .ef.models import Volume
 from .models.dashboard import FilterSettings
-from .models.workset import WorksetSummary, VolumeMetadata, WorksetInfo
-from .utils import make_set, parse_value, sanitize
+from .models.workset import WorksetSummary
+from .utils import make_set
 
 with open('data/worksets.json', 'r') as f:
     arr = json.load(f)
     worksets: dict[str, WorksetSummary] = {w['id']: WorksetSummary(**w) for w in arr}
 
 
-def parse_volume_meta(vol: dict) -> VolumeMetadata:
-    meta = vol['metadata']
-    return VolumeMetadata(
-        htid=vol['htid'],
-        title=meta['title'],
-        pub_date=meta.get('pubDate'),
-        genre=meta['genre'],
-        type_of_resource=meta['typeOfResource'],
-        category=meta.get('category'),
-        contributor=parse_value(meta.get('contributor')),
-        publisher=parse_value(meta.get('publisher')),
-        access_rights=meta['accessRights'],
-        pub_place=parse_value(meta.get('pubPlace')),
-        language=meta.get('language'),
-        source_institution=parse_value(meta['sourceInstitution']),
-    )
-
-
-def get_workset_info(workset_id: str) -> WorksetInfo:
-    with open(f'data/{workset_id}.json', 'r') as f:
-        data = sanitize(json.load(f))
-
-    volumes = [parse_volume_meta(vol) for vol in data['data']]
-    ws = worksets[workset_id]
-
-    return WorksetInfo.model_construct(**ws.model_dump(), volumes=volumes)
-
-
-def get_full_meta(workset_id: str) -> dict:
-    with open(f'data/{workset_id}.json', 'r') as f:
-        data = sanitize(json.load(f))
-
-    return data['data']
-
-
 def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume]:
     filtered_volumes = []
     for volume in volumes:
-        volume_meta = volume.metadata
+        volume_meta = torchlite_volume_meta_from_ef(volume)
         if filters.title and volume_meta.title not in filters.title:
             continue
         if filters.pub_date and volume_meta.pub_date not in filters.pub_date:
