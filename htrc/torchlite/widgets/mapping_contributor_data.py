@@ -26,7 +26,7 @@ class WikidataEntry(BaseModel):
 class MappingContributorDataWidget(WidgetBase):
     type: Literal['MappingContributorData'] = 'MappingContributorData'
 
-    BATCH_SIZE: Final[int] = 10
+    BATCH_SIZE: Final[int] = 50
     WIKIDATA_URL: Final[str] = 'https://query.wikidata.org/sparql'
     SPARQL_QUERY_TEMPLATE: Final[str] = '''
         SELECT ?item ?countryiso ?cityCoords ?cityLabel ?dob
