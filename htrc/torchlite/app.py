@@ -8,7 +8,6 @@ from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
 
 from .config import config
 from .database import mongo_client
-from .ef.api import EfApi
 from .http_client import http
 from .middleware import TorchliteVersionHeaderMiddleware, TimingMiddleware
 from .routers.dashboards import router as dashboards_router

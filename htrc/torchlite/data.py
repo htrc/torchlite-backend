@@ -1,5 +1,6 @@
 import json
 
+from .ef.models import Volume
 from .models.dashboard import FilterSettings
 from .models.workset import WorksetSummary, VolumeMetadata, WorksetInfo
 from .utils import make_set, parse_value, sanitize
@@ -44,10 +45,10 @@ def get_full_meta(workset_id: str) -> dict:
     return data['data']
 
 
-def apply_filters(volumes: list[dict], filters: FilterSettings) -> list[dict]:
+def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume]:
     filtered_volumes = []
     for volume in volumes:
-        volume_meta = parse_volume_meta(volume)
+        volume_meta = volume.metadata
         if filters.title and volume_meta.title not in filters.title:
             continue
         if filters.pub_date and volume_meta.pub_date not in filters.pub_date:

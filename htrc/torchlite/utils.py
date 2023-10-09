@@ -2,17 +2,26 @@ import math
 from typing import Iterable, Any, TypeVar
 
 
-def make_set(value: str | list[str] | None) -> set[str]:
-    return set(value) if value is not None else set()
+T = TypeVar('T')
+U = TypeVar('U')
 
 
-def make_list(value: dict | list[dict] | None) -> list[dict]:
+def make_set(value: T | list[T] | None) -> set[T]:
+    if value is None:
+        return set()
+    elif isinstance(value, list):
+        return set(value)
+    else:
+        return {value}
+
+
+def make_list(value: T | list[T] | None) -> list[T]:
     if value is None:
         return []
-    elif isinstance(value, dict):
-        return [value]
-    else:
+    elif isinstance(value, list):
         return value
+    else:
+        return [value]
 
 
 def flatten(collection: Iterable[list]) -> list:
@@ -38,12 +47,7 @@ def make_batches(l: list, chunk_size: int) -> list[list]:
     return [l[i * chunk_size:(i + 1) * chunk_size] for i in range(math.ceil(len(l) / chunk_size))]
 
 
-T = TypeVar('T')
-U = TypeVar('U')
-
-
 def parse_value(v: T | list[T] | None, field: str = 'name') -> U | list[U] | None:
-    result = None
     if isinstance(v, list):
         result = [
             x for e in v

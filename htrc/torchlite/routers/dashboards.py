@@ -3,12 +3,12 @@ from uuid import UUID
 from authlib.oidc.core import UserInfo
 from fastapi import APIRouter, Depends, HTTPException, status
 from pymongo import ReturnDocument
-from starlette.responses import JSONResponse
 
 from ..auth.auth import get_current_user
 from ..config import config
-from ..data import worksets, get_workset_info, apply_filters, get_full_meta
+from ..data import worksets, apply_filters, get_full_meta
 from ..database import mongo_client
+from ..ef.api import ef_api
 from ..models.dashboard import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
 
 router = APIRouter(
@@ -122,5 +122,6 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
 
-    filtered_volumes = apply_filters(get_full_meta(dashboard.workset_id), filters=dashboard.filters)
+    workset_meta = await ef_api.get_workset_metadata(dashboard.workset_id)
+    filtered_volumes = apply_filters(workset_meta, filters=dashboard.filters)
     return await widget.get_data(filtered_volumes)
