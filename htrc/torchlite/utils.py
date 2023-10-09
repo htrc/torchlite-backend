@@ -1,5 +1,5 @@
 import math
-from typing import Iterable, Any
+from typing import Iterable, Any, TypeVar
 
 
 def make_set(value: str | list[str] | None) -> set[str]:
@@ -35,14 +35,35 @@ def parse_dict(d: dict, path: str, raise_if_not_exist: bool = False) -> Any | No
 
 
 def make_batches(l: list, chunk_size: int) -> list[list]:
-    return [l[i * chunk_size:(i+1) * chunk_size] for i in range(math.ceil(len(l) / chunk_size))]
+    return [l[i * chunk_size:(i + 1) * chunk_size] for i in range(math.ceil(len(l) / chunk_size))]
 
 
-def parse_value(v: dict | list[dict] | None, field: str = 'name') -> str | list[str] | None:
+T = TypeVar('T')
+U = TypeVar('U')
+
+
+def parse_value(v: T | list[T] | None, field: str = 'name') -> U | list[U] | None:
     result = None
     if isinstance(v, list):
-        result = [x for e in v if (x := e.get(field)) is not None] or None
+        result = [
+            x for e in v
+            if (x := e.get(field) if isinstance(e, dict) else getattr(e, field, None)) is not None
+        ]
+        result = result or None
     elif isinstance(v, dict):
         result = v.get(field)
+    else:
+        result = getattr(v, field, None)
 
     return result
+
+
+def sanitize(data):
+    if isinstance(data, str):
+        return data.strip() or None
+    elif isinstance(data, dict):
+        return {k: sanitize(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [v for e in data if (v := sanitize(e)) is not None] or None
+    else:
+        return data

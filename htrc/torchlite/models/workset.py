@@ -1,3 +1,5 @@
+from pydantic import AnyUrl, AnyHttpUrl
+
 from .base import BaseModel
 
 
@@ -14,8 +16,8 @@ class VolumeMetadata(BaseModel):
     htid: str
     title: str
     pub_date: int | None
-    genre: str | list[str]
-    type_of_resource: str
+    genre: AnyUrl | list[AnyUrl]
+    type_of_resource: AnyHttpUrl
     category: str | list[str] | None
     contributor: str | list[str] | None
     publisher: str | list[str] | None

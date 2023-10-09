@@ -2,22 +2,11 @@ import json
 
 from .models.dashboard import FilterSettings
 from .models.workset import WorksetSummary, VolumeMetadata, WorksetInfo
-from .utils import make_set, parse_value
+from .utils import make_set, parse_value, sanitize
 
 with open('data/worksets.json', 'r') as f:
     arr = json.load(f)
     worksets: dict[str, WorksetSummary] = {w['id']: WorksetSummary(**w) for w in arr}
-
-
-def sanitize(data):
-    if isinstance(data, str):
-        return data.strip() or None
-    elif isinstance(data, dict):
-        return {k: sanitize(v) for k, v in data.items()}
-    elif isinstance(data, list):
-        return [v for e in data if (v := sanitize(e)) is not None] or None
-    else:
-        return data
 
 
 def parse_volume_meta(vol: dict) -> VolumeMetadata:
