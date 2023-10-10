@@ -49,7 +49,7 @@ async def create_dashboard(dashboard_create: DashboardCreate,
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    if dashboard_create.workset_id not in worksets:
+    if dashboard_create.workset_id not in worksets:  # TODO: do proper check with the workset manager
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown workset id {dashboard_create.workset_id}"
@@ -83,7 +83,7 @@ async def get_dashboard(dashboard_id: UUID,
 async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
-    if dashboard_patch.workset_id and dashboard_patch.workset_id not in worksets:
+    if dashboard_patch.workset_id and dashboard_patch.workset_id not in worksets:  # TODO: do proper check
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown workset id {dashboard_patch.workset_id}"
