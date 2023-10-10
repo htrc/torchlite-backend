@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "torchlite"
-version = "0.0.0.post86.dev0+4dff42c.dirty"
+version = "0.0.0"
 description = "Torchlite API backend service"
 authors = [
   "capitanu <capitanu@illinois.edu>",
@@ -10,7 +10,7 @@ packages = [{include = "htrc"}]
 repository = "https://github.com/htrc/torchlite-backend"
 
 [tool.poetry-dynamic-versioning]
-enable = false
+enable = true
 vcs = "git"
 style = "pep440"
 dirty = true
