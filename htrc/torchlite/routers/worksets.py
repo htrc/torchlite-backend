@@ -11,13 +11,13 @@ router = APIRouter(
 )
 
 
-@router.get("/")
+@router.get("/", response_model_exclude_defaults=True)
 async def list_worksets(workset_manager: WorksetManager, author: str | None = None) -> list[WorksetSummary]:
     featured_worksets = await workset_manager.get_featured_worksets()
     return list(featured_worksets.values())
 
 
-@router.get("/{workset_id}/metadata")
+@router.get("/{workset_id}/metadata", response_model_exclude_defaults=True)
 async def get_workset_metadata(workset_id: str, workset_manager: WorksetManager) -> WorksetInfo:
     volumes = await ef_api.get_workset_metadata(workset_id)
     workset = (await workset_manager.get_featured_worksets())[workset_id]
