@@ -10,17 +10,17 @@ from ..widgets import ALL_WIDGETS
 
 
 class FilterSettings(BaseModel):
-    title: list[str] = []
-    pub_date: list[int] = []
-    genre: list[str] = []
-    type_of_resource: list[str] = []
-    category: list[str] = []
-    contributor: list[str] = []
-    publisher: list[str] = []
+    titles: list[str] = []
+    pub_dates: list[int] = []
+    genres: list[str] = []
+    type_of_resources: list[str] = []
+    categories: list[str] = []
+    contributors: list[str] = []
+    publishers: list[str] = []
     access_rights: list[str] = []
-    pub_place: list[str] = []
-    language: list[str] = []
-    source_institution: list[str] = []
+    pub_places: list[str] = []
+    languages: list[str] = []
+    source_institutions: list[str] = []
 
 
 class Dashboard(BaseModel, arbitrary_types_allowed=True):
