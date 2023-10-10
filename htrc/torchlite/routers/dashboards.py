@@ -18,7 +18,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", description="Retrieve the available dashboards for a user")
+@router.get("/", description="Retrieve the available dashboards for a user", response_model_exclude_defaults=True)
 async def list_dashboards(owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
     if owner == config.TORCHLITE_UID:
@@ -40,7 +40,7 @@ async def list_dashboards(owner: UUID | None = None,
     )
 
 
-@router.post("/", description="Create a new dashboard")
+@router.post("/", description="Create a new dashboard", response_model_exclude_defaults=True)
 async def create_dashboard(dashboard_create: DashboardCreate,
                            workset_manager: WorksetManager,
                            owner: UUID | None = None,
@@ -64,7 +64,7 @@ async def create_dashboard(dashboard_create: DashboardCreate,
     return dashboard
 
 
-@router.get("/{dashboard_id}", description="Retrieve a dashboard")
+@router.get("/{dashboard_id}", description="Retrieve a dashboard", response_model_exclude_defaults=True)
 async def get_dashboard(dashboard_id: UUID,
                         user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
@@ -81,7 +81,7 @@ async def get_dashboard(dashboard_id: UUID,
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
 
-@router.patch("/{dashboard_id}", description="Update a dashboard")
+@router.patch("/{dashboard_id}", description="Update a dashboard", response_model_exclude_defaults=True)
 async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            workset_manager: WorksetManager,
