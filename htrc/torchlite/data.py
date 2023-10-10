@@ -1,14 +1,7 @@
-import json
-
 from .converters import torchlite_volume_meta_from_ef
 from .ef.models import Volume
 from .models.dashboard import FilterSettings
-from .models.workset import WorksetSummary
 from .utils import make_set
-
-with open('data/worksets.json', 'r') as f:
-    arr = json.load(f)
-    worksets: dict[str, WorksetSummary] = {w['id']: WorksetSummary(**w) for w in arr}
 
 
 def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume]:
