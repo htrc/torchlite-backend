@@ -6,9 +6,10 @@ from pymongo import ReturnDocument
 
 from ..auth.auth import get_current_user
 from ..config import config
-from ..data import worksets, apply_filters
+from ..data import apply_filters
 from ..database import mongo_client
 from ..ef.api import ef_api
+from ..managers.workset_manager import WorksetManager
 from ..models.dashboard import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
 
 router = APIRouter(
@@ -41,6 +42,7 @@ async def list_dashboards(owner: UUID | None = None,
 
 @router.post("/", description="Create a new dashboard")
 async def create_dashboard(dashboard_create: DashboardCreate,
+                           workset_manager: WorksetManager,
                            owner: UUID | None = None,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
@@ -49,7 +51,7 @@ async def create_dashboard(dashboard_create: DashboardCreate,
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    if dashboard_create.workset_id not in worksets:  # TODO: do proper check with the workset manager
+    if not workset_manager.is_valid_workset(dashboard_create.workset_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown workset id {dashboard_create.workset_id}"
@@ -82,8 +84,9 @@ async def get_dashboard(dashboard_id: UUID,
 @router.patch("/{dashboard_id}", description="Update a dashboard")
 async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
+                           workset_manager: WorksetManager,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
-    if dashboard_patch.workset_id and dashboard_patch.workset_id not in worksets:  # TODO: do proper check
+    if dashboard_patch.workset_id and not workset_manager.is_valid_workset(dashboard_patch.workset_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown workset id {dashboard_patch.workset_id}"

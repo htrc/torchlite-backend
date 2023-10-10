@@ -26,6 +26,7 @@ async def torchlite_startup():
     # ensure DB is alive
     await mongo_client.ping()
 
+
     # config_file_name = os.getenv("TORCHLITE_CONFIG")
     # if not config_file_name:
     #     raise TorchliteError("TORCHLITE_CONFIG value is invalid or not set")

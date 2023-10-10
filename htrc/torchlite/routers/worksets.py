@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from ..converters import torchlite_volume_meta_from_ef
 from ..data import worksets
 from ..ef.api import ef_api
+from ..managers.workset_manager import WorksetManager
 from ..models.workset import WorksetSummary, WorksetInfo
 
 router = APIRouter(
@@ -12,8 +13,9 @@ router = APIRouter(
 
 
 @router.get("/")
-async def list_worksets(author: str | None = None) -> list[WorksetSummary]:
-    return list(worksets.values())
+async def list_worksets(workset_manager: WorksetManager, author: str | None = None) -> list[WorksetSummary]:
+    featured_worksets = await workset_manager.get_featured_worksets()
+    return list(featured_worksets.values())
 
 
 @router.get("/{workset_id}/metadata")
