@@ -25,6 +25,8 @@ class WikidataEntry(BaseModel):
 
 class MappingContributorDataWidget(WidgetBase):
     type: Literal['MappingContributorData'] = 'MappingContributorData'
+    min_year: int | None = None
+    max_year: int | None = None
 
     BATCH_SIZE: Final[int] = 50
     WIKIDATA_URL: Final[str] = 'https://query.wikidata.org/sparql'
