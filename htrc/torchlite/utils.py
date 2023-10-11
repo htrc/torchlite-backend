@@ -26,7 +26,7 @@ def make_list(value: T | list[T] | None) -> list[T]:
         return [value]
 
 
-def flatten(collection: Iterable[list]) -> list:
+def flatten(collection: Iterable[list[T]]) -> list[T]:
     flat_list = []
     for lst in collection:
         flat_list.extend(lst)
