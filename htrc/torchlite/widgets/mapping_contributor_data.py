@@ -102,6 +102,9 @@ class MappingContributorDataWidget(WidgetBase):
                 city = parse_dict(bindings, 'cityLabel.value')
                 city_coords = parse_dict(bindings, 'cityCoords.value')
 
+                if city is None or city_coords is None or not city_coords.startswith('Point'):
+                    continue
+
                 entry = {
                     'item': item,
                     'year_of_birth': dob.year if dob else None,
