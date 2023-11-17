@@ -51,6 +51,7 @@ async def create_dashboard(dashboard_create: DashboardCreate,
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
+    await workset_manager.get_featured_worksets()
     if not workset_manager.is_valid_workset(dashboard_create.workset_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
