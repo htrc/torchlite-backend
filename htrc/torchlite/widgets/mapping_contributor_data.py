@@ -16,7 +16,7 @@ from ..utils import make_list, make_batches, flatten, parse_dict
 
 class WikidataEntry(BaseModel):
     item: str
-    country_iso: str
+    country_iso: str | None
     city: str
     latitude: float
     longitude: float
