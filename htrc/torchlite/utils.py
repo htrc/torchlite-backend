@@ -29,6 +29,8 @@ def make_list(value: T | list[T] | None) -> list[T]:
 def flatten(collection: Iterable[list[T]]) -> list[T]:
     flat_list = []
     for lst in collection:
+        if lst is None:
+            continue
         flat_list.extend(lst)
 
     return flat_list
