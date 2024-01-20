@@ -35,3 +35,16 @@ loggers:
     handlers:
       - access
     propagate: no
+  torchlite:
+    level: DEBUG
+    handlers:
+      - default
+    propagate: no
+#  httpx:
+#    level: DEBUG
+#    handlers:
+#      - default
+#  httpcore:
+#    level: DEBUG
+#    handlers:
+#      - default

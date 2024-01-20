@@ -2,6 +2,12 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment (test|dev|prod)'
+        required: true
+        default: 'test'
+
   push:
     branches:
       - develop
@@ -11,7 +17,7 @@ permissions:
 
 env:
   PYTHON_VERSION: 3.11
-  POETRY_VERSION: 1.4.2
+  POETRY_VERSION: 1.7.0
   DOCKER_REGISTRY: ghcr.io
   DOCKER_IMAGE_NAME: ${{ github.repository }}
 
@@ -101,6 +107,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Repository Dispatch
+        if: github.event.inputs.environment == ''
         uses: peter-evans/repository-dispatch@v2
         env:
           HEAD_COMMIT_MESSAGE: ${{ toJSON(github.event.head_commit.message) }}
@@ -112,4 +119,18 @@ jobs:
             {
               "image": "${{ fromJSON(steps.meta.outputs.json).tags[0] }}",
               "commit_msg": ${{ env.HEAD_COMMIT_MESSAGE }}
+            }
+      - name: Manual Repository Dispatch
+        if: github.event.inputs.environment != ''
+        uses: peter-evans/repository-dispatch@v2
+        env:
+          HEAD_COMMIT_MESSAGE: ${{ toJSON(github.event.head_commit.message) }}
+        with:
+          token: ${{ secrets.PAT }}
+          repository: htrc/torchlite-argocd
+          event-type: ${{ github.event.inputs.environment }}_commit_backend
+          client-payload: >-
+            {
+              "image": "${{ fromJSON(steps.meta.outputs.json).tags[0] }}",
+              "commit_msg": "Manual deployment by ${{ github.triggering_actor }}"
             }

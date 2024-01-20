@@ -1,9 +1,11 @@
 [tool.poetry]
 name = "torchlite"
 version = "0.0.0"
-description = "Torchlite backend service"
-authors = ["cwulfman <cwulfman@princeton.edu>"]
-readme = "README.org"
+description = "Torchlite API backend service"
+authors = [
+  "capitanu <capitanu@illinois.edu>",
+]
+readme = "README.md"
 packages = [{include = "htrc"}]
 repository = "https://github.com/htrc/torchlite-backend"
 
@@ -15,13 +17,16 @@ dirty = true
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.95.1"
-uvicorn = {extras = ["standard"], version = "^0.22.0"}
-requests = "^2.28.2"
-pydantic = "^1.10.6"
-nltk = "^3.8.1"
-pyyaml = "^6.0"
+fastapi = {extras = ["full"], version = "^0.103.2"}
+uvicorn = {extras = ["standard"], version = "^0.23.2"}
 fastapi-healthchecks = "^1.0.7"
+authlib = "^1.2.1"
+python-dotenv = "^1.0.0"
+motor = "^3.3.1"
+httpx = "^0.25.0"
+pydantic = "^2.4.2"
+regex = "^2023.10.3"
+ruamel-yaml = "^0.17.35"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
@@ -43,6 +48,10 @@ types-setuptools = "^67.6.0.8"
 types-ujson = "^5.7.0.3"
 types-pyyaml = "^6.0.12.9"
 
+[tool.poetry.group.docs.dependencies]
+sphinx = "*"
+sphinx-autodoc-typehints = "*"
+
 [tool.mypy]
 no_implicit_optional = true
 show_error_codes = true
@@ -51,7 +60,6 @@ disallow_untyped_defs = true
 
 [[tool.mypy.overrides]]
 module = [
-  "nltk.*",
   "fastapi_healthchecks.api.router.*",
 ]
 ignore_missing_imports = true
@@ -114,37 +122,46 @@ legacy_tox_ini = """
 min_version = 4.0
 envlist = py{311}, ruff, mypy, pyflakes
 skipsdist = true
-requires = poetry==1.4.2
+requires = poetry==1.6.1
 
 [testenv]
 description = run the tests with {basepython}
 allowlist_externals =
     mkdir
     poetry
-commands_pre = poetry install --no-interaction --sync
+commands_pre =
 commands =
+    poetry install --no-interaction --no-root --without=lint,docs --sync
     mkdir -p test-results
     poetry run pytest {posargs} --junit-xml test-results/{envname}/junit.xml --cov-report html:test-results/{envname}/coverage/cov_html --cov-report xml:test-results/{envname}/coverage/cov.xml --html=test-results/{envname}/report.html
 
 [testenv:ruff]
 description = perform style checking
-commands = poetry run ruff htrc tests
+commands =
+    poetry install --no-interaction --no-root --only=lint
+    poetry run ruff htrc tests
 
 [testenv:mypy]
 description = perform type checking
-commands = poetry run mypy .
+commands =
+    poetry install --no-interaction --no-root --only=lint
+    poetry run mypy .
 
 [testenv:pyflakes]
 description = perform error checking
-commands = poetry run pyflakes htrc tests
+commands =
+    poetry install --no-interaction --no-root --only=lint
+    poetry run pyflakes htrc tests
 
 [testenv:docs]
 description = invoke sphinx-build to build the HTML docs
 basepython = python3.11
 deps = sphinx
        sphinx-autodoc-typehints
-commands = sphinx-build docs/sphinx/source html-doc --color -bhtml {posargs}
-           python -c 'import pathlib; print("documentation available under html-docs/index.html")'
+commands =
+    poetry install --no-interaction --no-root --only=docs
+    sphinx-build docs/sphinx/source html-doc --color -bhtml {posargs}
+    python -c 'import pathlib; print("documentation available under html-docs/index.html")'
 """
 
 [tool.black]

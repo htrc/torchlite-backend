@@ -136,6 +136,7 @@ dmypy.json
 # IDEs
 /.idea/
 *.iml
+/.vscode/
 
 # coverage
 test-results/
