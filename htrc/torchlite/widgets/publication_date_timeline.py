@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from .base import WidgetBase
+from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
 
 
@@ -14,6 +14,8 @@ class PubDateEntry(BaseModel):
 
 class PublicationDateTimelineWidget(WidgetBase):
     type: Literal['PublicationDateTimeline'] = 'PublicationDateTimeline'
+    data_type: WidgetDataTypes = WidgetDataTypes.metadata_only
+
     min_year: int | None = None
     max_year: int | None = None
 

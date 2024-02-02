@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 
 from ..models.base import BaseModel
@@ -6,7 +7,7 @@ from ..models.base import BaseModel
 class Workset(BaseModel):
     id: str
     htids: list[str]
-    created: int
+    created: datetime
 
 
 class Contributor(BaseModel):
@@ -35,7 +36,7 @@ class SourceInstitution(BaseModel):
 class Journal(BaseModel):
     id: str
     type: str
-    journalTitle: str
+    journal_title: str
 
 
 VolumeType = Literal["DataFeedItem", "Book", "PublicationVolume", "CreativeWork"]
@@ -73,7 +74,51 @@ class VolumeMetadata(BaseModel):
     is_part_of: Journal | None = None
 
 
+class PosSectionFeatures(BaseModel):
+    token_count: int | None = None
+    line_count: int | None = None
+    empty_line_count: int | None = None
+    sentence_count: int | None = None
+    cap_alpha_seq: int | None = None
+    begin_char_count: dict[str, int] | None = None
+    end_char_count: dict[str, int] | None = None
+    token_pos_count: dict | None
+
+
+class SectionFeatures(BaseModel):
+    token_count: int | None = None
+    line_count: int | None = None
+    empty_line_count: int | None = None
+    sentence_count: int | None = None
+    cap_alpha_seq: int | None = None
+    begin_char_count: dict[str, int] | None = None
+    end_char_count: dict[str, int] | None = None
+    tokens_count: dict | None
+
+
+class PageFeatures(BaseModel):
+    seq: str | None = None
+    version: str | None = None
+    token_count: int | None = None
+    line_count: int | None = None
+    empty_line_count: int | None = None
+    sentence_count: int | None = None
+    header: PosSectionFeatures | SectionFeatures | None = None
+    body: PosSectionFeatures | SectionFeatures | None = None
+    footer: PosSectionFeatures | SectionFeatures | None = None
+    calculated_language: str | None = None
+
+
+class VolumeFeatures(BaseModel):
+    type: str | None = None
+    id: str | None = None
+    schema_version: str | None = None
+    date_created: int | None = None
+    page_count: int | None = None
+    pages: list[PageFeatures] = []
+
+
 class Volume(BaseModel):
     htid: str
     metadata: VolumeMetadata
-    # features: VolumeFeatures
+    features: VolumeFeatures | None = None

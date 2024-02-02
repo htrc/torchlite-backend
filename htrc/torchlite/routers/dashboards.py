@@ -9,8 +9,10 @@ from ..config import config
 from ..data import apply_filters
 from ..database import mongo_client
 from ..ef.api import ef_api
+from ..errors import TorchliteError
 from ..managers.workset_manager import WorksetManager
 from ..models.dashboard import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
+from ..widgets.base import WidgetDataTypes
 
 router = APIRouter(
     prefix="/dashboards",
@@ -127,6 +129,18 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
 
-    workset_meta = await ef_api.get_workset_metadata(dashboard.workset_id)
-    filtered_volumes = apply_filters(workset_meta, filters=dashboard.filters)
+    match widget.data_type:
+        case WidgetDataTypes.metadata_only:
+            volumes = await ef_api.get_workset_metadata(dashboard.workset_id)
+
+        case WidgetDataTypes.vols_with_pos:
+            volumes = await ef_api.get_workset_volumes(dashboard.workset_id, include_pos=True)
+
+        case WidgetDataTypes.vols_no_pos:
+            volumes = await ef_api.get_workset_volumes(dashboard.workset_id, include_pos=False)
+
+        case _:
+            raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
+
+    filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
     return await widget.get_data(filtered_volumes)

@@ -38,14 +38,30 @@ class EfApi:
         else:
             raise EfApiError(f"EF API Exception for {response.url} - {data}")
 
-    async def get_workset(self, wsid: str) -> models.Workset:
-        data = await self._get(f"{self.ef_api_url}/worksets/{wsid}")
+    async def get_workset(self, wsid: str, **kwargs) -> models.Workset:
+        data = await self._get(f"{self.ef_api_url}/worksets/{wsid}", **kwargs)
         return models.Workset(**data)
 
-    async def get_workset_metadata(self, wsid: str, fields: list[str] | None = None) -> List[models.Volume]:
+    async def get_workset_metadata(self, wsid: str, fields: list[str] | None = None, **kwargs) -> List[models.Volume]:
         data = await self._get(
             f"{self.ef_api_url}/worksets/{wsid}/metadata",
-            params={"fields": ",".join(fields)} if fields else None
+            params={"fields": ",".join(fields or [])},
+            **kwargs
+        )
+        return [models.Volume(**sanitize(vol)) for vol in data]
+
+    async def get_workset_volumes(self,
+                                  wsid: str,
+                                  fields: list[str] | None = None,
+                                  include_pos: bool = False,
+                                  **kwargs) -> List[models.Volume]:
+        data = await self._get(
+            f"{self.ef_api_url}/worksets/{wsid}/volumes",
+            params={
+                "fields": ",".join(fields or []),
+                "pos": include_pos,
+            },
+            **kwargs
         )
         return [models.Volume(**sanitize(vol)) for vol in data]
 
