@@ -1,7 +1,7 @@
 import functools
-from re import Pattern
-
 import regex as re
+
+from re import Pattern
 from collections import Counter
 from typing import Literal, Set
 
@@ -27,7 +27,9 @@ class SimpleTagCloudWidget(WidgetBase):
             "same,so,than,too,very,say,says,said,shall,the".split(","))
     )
 
-    punctuation: Pattern = re.compile(r'(?u)[\u2000 -\u206F\u2E00 -\u2E7F\\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]+')
+    punctuation_regex: str = r'\p{P}'
+
+    _punct_regex: Pattern = re.compile(punctuation_regex)
 
     @staticmethod
     def aggregate_counts(p1: dict, p2: dict) -> dict:
@@ -48,4 +50,7 @@ class SimpleTagCloudWidget(WidgetBase):
         ]
 
         token_counts = functools.reduce(self.aggregate_counts, pages_with_tokens)
-        return { k: v for k, v in token_counts.items() if k not in self.stopwords}
+        return {
+            k: v for k, v in token_counts.items()
+            if k not in self.stopwords and (not self.punctuation_regex or not re.search(self._punct_regex, k))
+        }
