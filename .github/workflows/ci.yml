@@ -86,7 +86,7 @@ jobs:
           labels: |
             org.opencontainers.image.vendor=HathiTrust Research Center
       - name: Retrieve saved wheels
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: torchlite-wheels
           path: dist
