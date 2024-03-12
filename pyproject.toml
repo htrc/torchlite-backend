@@ -17,7 +17,7 @@ dirty = true
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = {version = "0.109.2", extras = ["=full"]}
+fastapi = {version = "0.109.2", extras = ["full"]}
 uvicorn = {extras = ["standard"], version = "^0.23.2"}
 fastapi-healthchecks = "^1.0.7"
 authlib = "^1.2.1"
