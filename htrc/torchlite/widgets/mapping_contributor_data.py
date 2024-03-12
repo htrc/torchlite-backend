@@ -7,7 +7,7 @@ import httpx
 import regex as re
 from pydantic import AnyHttpUrl
 
-from .base import WidgetBase
+from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
 from ..http_client import http
 from ..models.base import BaseModel
@@ -25,6 +25,8 @@ class WikidataEntry(BaseModel):
 
 class MappingContributorDataWidget(WidgetBase):
     type: Literal['MappingContributorData'] = 'MappingContributorData'
+    data_type: WidgetDataTypes = WidgetDataTypes.metadata_only
+
     min_year: int | None = None
     max_year: int | None = None
 

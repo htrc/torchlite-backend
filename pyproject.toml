@@ -122,7 +122,7 @@ legacy_tox_ini = """
 min_version = 4.0
 envlist = py{311}, ruff, mypy, pyflakes
 skipsdist = true
-requires = poetry==1.6.1
+requires = poetry==1.7.1
 
 [testenv]
 description = run the tests with {basepython}

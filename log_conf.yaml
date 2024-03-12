@@ -21,8 +21,8 @@ handlers:
   access:
     formatter: access
     class: logging.StreamHandler
-    filters:
-      - healthcheck_filter
+#    filters:
+#      - healthcheck_filter
     stream: ext://sys.stdout
 loggers:
   uvicorn.error:

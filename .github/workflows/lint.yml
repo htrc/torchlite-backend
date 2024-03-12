@@ -7,8 +7,8 @@ on:
       - '**.py'
 
 env:
-  PYTHON_VERSION: "3.11"
-  POETRY_VERSION: "1.4.2"
+  PYTHON_VERSION: "3.12"
+  POETRY_VERSION: "1.7.1"
 
 jobs:
   ruff:
