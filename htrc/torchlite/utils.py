@@ -78,5 +78,8 @@ def sanitize(data):
 
 
 async def load_yaml(url: str) -> dict:
-    response = await http.get(url)
-    return YAML().load(response.content)
+    with open('./htrc/torchlite/config.yaml','r') as stopgap_featured_worksets:
+        file_response = YAML().load(stopgap_featured_worksets)
+        return file_response
+    #response = await http.get(url)
+    #return YAML().load(response.content)
