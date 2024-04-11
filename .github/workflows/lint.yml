@@ -2,13 +2,14 @@ name: Lint
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     paths:
       - '**.py'
 
 env:
   PYTHON_VERSION: "3.12"
-  POETRY_VERSION: "1.7.1"
+  POETRY_VERSION: "1.8.2"
 
 jobs:
   ruff:
