@@ -17,7 +17,7 @@ dirty = true
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = {extras = ["full"], version = "^0.109.1"}
+fastapi = {version = "0.109.2", extras = ["full"]}
 uvicorn = {extras = ["standard"], version = "^0.23.2"}
 fastapi-healthchecks = "^1.0.7"
 authlib = "^1.2.1"
@@ -40,7 +40,7 @@ tox = "^4.0.0"
 
 [tool.poetry.group.lint.dependencies]
 ruff = "^0.0.262"
-black = "^23.3.0"
+black = "^24.3.0"
 mypy = "^0.950"
 pyflakes = "^3.0.1"
 types-requests = "^2.28.11.17"
