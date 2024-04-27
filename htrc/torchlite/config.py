@@ -22,6 +22,8 @@ class Config:
 
     TORCHLITE_UID = UUID("95164779-1fc9-4592-9c74-7a014407f46d")  # do not change
     EF_API_URL = os.environ.get("EF_API_URL", "https://tools.htrc.illinois.edu/ef-api")
+    REGISTRY_API_URL = os.environ.get("REGISTRY_API_URL")
+    FEATURED_WORKSET_USER = os.environ.get("FEATURED_WORKSET_USER")
 
     FEATURED_WORKSETS_URL = os.environ.get("FEATURED_WORKSETS_URL")
 

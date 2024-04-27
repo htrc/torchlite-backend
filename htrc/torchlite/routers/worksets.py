@@ -13,7 +13,11 @@ router = APIRouter(
 
 @router.get("/", response_model_exclude_defaults=True)
 async def list_worksets(workset_manager: WorksetManager, author: str | None = None) -> list[WorksetSummary]:
-    featured_worksets = await workset_manager.get_featured_worksets()
+    if author:
+        featured_worksets = await workset_manager.get_featured_worksets()
+    else:
+        featured_worksets = await workset_manager.get_public_workset()
+
     return list(featured_worksets.values())
 
 
