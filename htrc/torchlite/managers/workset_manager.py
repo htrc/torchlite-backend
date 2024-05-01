@@ -15,17 +15,16 @@ class _WorksetManager:
         self.featured_worksets = None
         self.public_worksets = None
 
-    async def get_featured_worksets(self) -> dict[str, WorksetSummary]:
+    def get_featured_worksets(self) -> dict[str, WorksetSummary]:
         if self.featured_worksets is None:
-            data = await load_yaml(config.FEATURED_WORKSETS_URL)
             self.featured_worksets = {
-                workset['id']: WorksetSummary.model_construct(**workset)
-                for workset in data['featured_worksets']
+                workset: self.public_worksets[workset]
+                for workset in self.public_worksets if self.public_worksets[workset].author == config.FEATURED_WORKSET_USER
             }
 
         return self.featured_worksets
-    
-    async def get_public_workset(self) -> dict[str, WorksetSummary]:
+
+    async def get_public_worksets(self) -> dict[str, WorksetSummary]:
         if self.public_worksets is None:
             headers = {'Accept': 'application/json'}
             response = await http.get(f"{config.REGISTRY_API_URL}/publicworksets", headers=headers)
@@ -38,7 +37,7 @@ class _WorksetManager:
         return self.public_worksets
 
     def is_valid_workset(self, wsid: str) -> bool:
-        return wsid in self.featured_worksets
+        return wsid in self.public_worksets
 
 
 WorksetManager = Annotated[_WorksetManager, Depends()]
