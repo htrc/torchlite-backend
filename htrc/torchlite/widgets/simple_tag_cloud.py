@@ -1,7 +1,5 @@
 import functools
 import regex as re
-import json
-from pathlib import Path
 
 from re import Pattern
 from collections import Counter
@@ -16,7 +14,6 @@ class SimpleTagCloudWidget(WidgetBase):
 
 
     # Reading the entire file content and then parsing it
-    # stopwords: Set[str] = json.loads(Path(r'C:\Users\pidap\torchlite-backend\htrc\torchlite\widgets\stop_words_english.json').read_text(encoding='utf-8'))
 
 
     stopwords: Set[str] = (
