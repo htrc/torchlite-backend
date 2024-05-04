@@ -4,7 +4,7 @@ from fastapi import Depends
 
 from htrc.torchlite.config import config
 from htrc.torchlite.models.workset import WorksetSummary
-from htrc.torchlite.utils import load_yaml
+#from htrc.torchlite.utils import load_yaml
 from htrc.torchlite.http_client import http
 import json
 
@@ -37,10 +37,10 @@ class _WorksetManager:
         return self.public_worksets
 
     def is_valid_workset(self, wsid: str) -> bool:
-        if type(wsid) != str:
-            wsid_string = str(wsid)
-        else:
+        if isinstance(wsid,str):
             wsid_string = wsid
+        else:
+            wsid_string = str(wsid)
 
         return wsid_string in self.public_worksets
 
