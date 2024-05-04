@@ -37,7 +37,12 @@ class _WorksetManager:
         return self.public_worksets
 
     def is_valid_workset(self, wsid: str) -> bool:
-        return wsid in self.public_worksets
+        if type(wsid) != str:
+            wsid_string = str(wsid)
+        else:
+            wsid_string = wsid
+
+        return wsid_string in self.public_worksets
 
 
 WorksetManager = Annotated[_WorksetManager, Depends()]
