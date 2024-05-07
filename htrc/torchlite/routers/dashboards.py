@@ -106,10 +106,10 @@ async def update_dashboard(dashboard_id: UUID,
 #    print(dashboard_id)
 #    print(dashboard_patch)
     await workset_manager.get_public_worksets()
-    if dashboard_patch.workset_id and not workset_manager.is_valid_workset(dashboard_patch.workset_id):
+    if dashboard_patch.imported_id and not workset_manager.is_valid_workset(dashboard_patch.imported_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unknown workset id {dashboard_patch.workset_id}"
+            detail=f"Unknown workset id {dashboard_patch.imported_id}"
         )
 
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None

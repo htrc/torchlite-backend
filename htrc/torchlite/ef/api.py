@@ -64,6 +64,27 @@ class EfApi:
             **kwargs
         )
         return [models.Volume(**sanitize(vol)) for vol in data]
+    
+    async def create_workset(self, volumes: list[str]) -> str:
+        try:
+            headers = {
+                "Content-Type": "text/plain",
+                "Accept": "application/json"
+            }
+            response = await self.http.post(
+                f"{self.ef_api_url}/worksets",
+                data=volumes,
+                headers=headers
+            )
+            response.raise_for_status()
+        except httpx.HTTPError as e:
+            raise EfApiError(f"HTTP Exception for {e.request.url} - {e}")
+        
+        data = response.json()
+        if data["code"] == status.HTTP_200_OK:
+            return data.get("data").get('id')
+        else:
+            raise EfApiError(f"EF API Exception for {response.url} - {data}")
 
 
 ef_api = EfApi(ef_api_url=config.EF_API_URL, http_client=http)

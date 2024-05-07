@@ -35,6 +35,12 @@ class _WorksetManager:
             }
 
         return self.public_worksets
+    
+    async def get_public_workset_volumes(self, wsid: str) -> str:
+        headers = {'Accept': 'application/json'}
+        response = await http.get(f"{config.REGISTRY_API_URL}/publicworksets/{wsid}", headers=headers)
+        data = json.loads(response.content)
+        return [htid['id'] for htid in data['workset']['content']['volumes']['volume']]
 
     def is_valid_workset(self, wsid: str) -> bool:
         if isinstance(wsid,str):
