@@ -66,7 +66,7 @@ class SummaryWidget(WidgetBase):
 
             for page in volume.features.pages:
                 body = page.body
-                if body.tokens_count != None:
+                if body.tokens_count is not None:
                     update_dict(body.tokens_count,loacalPerVolDict[volume.htid])
                     updatedset(body.tokens_count, per_vol_set[volume.htid], volume.htid)
                 
