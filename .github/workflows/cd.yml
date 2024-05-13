@@ -23,7 +23,7 @@ env:
   DOCKER_IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  ci:
+  cd:
     name: Build, test & package
     runs-on: ubuntu-latest
     steps:
