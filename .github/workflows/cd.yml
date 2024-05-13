@@ -119,10 +119,11 @@ jobs:
           client-payload: >-
             {
               "image": "${{ fromJSON(steps.meta.outputs.json).tags[0] }}",
-              "commit_msg": "[${{ github.head_ref || github.ref_name }}]: ${{ env.HEAD_COMMIT_MESSAGE }}",
+              "commit_msg": ${{ env.HEAD_COMMIT_MESSAGE }},
               "repository": "${{ github.event.repository.name }}",
               "environment": "${{ github.event.inputs.environment }}",
-              "ref": "${{ github.head_ref || github.ref_name }}"
+              "ref": "${{ github.head_ref || github.ref_name }}",
+              "actor": "${{ github.triggering_actor }}"
             }
       - name: Manual Repository Dispatch
         if: github.event.inputs.environment != ''
@@ -136,8 +137,9 @@ jobs:
           client-payload: >-
             {
               "image": "${{ fromJSON(steps.meta.outputs.json).tags[0] }}",
-              "commit_msg": "[${{ github.head_ref || github.ref_name }}]: Manual deployment by ${{ github.triggering_actor }}",
+              "commit_msg": ${{ env.HEAD_COMMIT_MESSAGE }},
               "repository": "${{ github.event.repository.name }}",
               "environment": "${{ github.event.inputs.environment }}",
-              "ref": "${{ github.head_ref || github.ref_name }}"
+              "ref": "${{ github.head_ref || github.ref_name }}",
+              "actor": "${{ github.triggering_actor }}"
             }
