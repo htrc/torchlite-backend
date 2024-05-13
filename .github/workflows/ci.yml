@@ -1,17 +1,11 @@
 name: CI
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deployment environment (dev|stage|prod)'
-        required: true
-        default: 'dev'
-
   push:
-    branches:
-      - develop
-      - release
+    branches: [ "develop", "release" ]
+
+  pull_request:
+    branches: [ "develop", "release" ]
 
 permissions:
   contents: read
@@ -19,11 +13,9 @@ permissions:
 env:
   PYTHON_VERSION: 3.12
   POETRY_VERSION: 1.8.3
-  DOCKER_REGISTRY: ghcr.io
-  DOCKER_IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  ci:
+  test:
     name: Build, test & package
     runs-on: ubuntu-latest
     steps:
@@ -49,91 +41,3 @@ jobs:
         with:
           files: test-results/coverage/cov.xml
           flags: unittests
-      - name: Build wheels
-        run: poetry build --format=wheel
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: torchlite-wheels
-          path: dist
-          retention-days: 1
-
-  docker-build:
-    name: Build and push Docker image
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-    needs: ci
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Show GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}
-          tags: |
-            type=sha,prefix={{branch}}-,priority=750,enable=${{ startsWith(github.ref, 'refs/heads/') }}
-            type=ref,event=branch
-            type=ref,event=pr
-            type=pep440,pattern={{version}}
-            type=pep440,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable={{is_default_branch}}
-          labels: |
-            org.opencontainers.image.vendor=HathiTrust Research Center
-      - name: Retrieve saved wheels
-        uses: actions/download-artifact@v4
-        with:
-          name: torchlite-wheels
-          path: dist
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.DOCKER_REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push Docker images
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      - name: Repository Dispatch
-        if: github.event.inputs.environment == ''
-        uses: peter-evans/repository-dispatch@v3
-        env:
-          HEAD_COMMIT_MESSAGE: ${{ toJSON(github.event.head_commit.message) }}
-        with:
-          token: ${{ secrets.PAT }}
-          repository: htrc/torchlite-argocd
-          event-type: ${{ github.head_ref || github.ref_name }}_commit_backend
-          client-payload: >-
-            {
-              "image": "${{ fromJSON(steps.meta.outputs.json).tags[0] }}",
-              "commit_msg": ${{ env.HEAD_COMMIT_MESSAGE }},
-              "repository": "${{ github.event.repository.name }}"
-            }
-      - name: Manual Repository Dispatch
-        if: github.event.inputs.environment != ''
-        uses: peter-evans/repository-dispatch@v3
-        env:
-          HEAD_COMMIT_MESSAGE: ${{ toJSON(github.event.head_commit.message) }}
-        with:
-          token: ${{ secrets.PAT }}
-          repository: htrc/torchlite-argocd
-          event-type: ${{ github.event.inputs.environment }}_commit_backend
-          client-payload: >-
-            {
-              "image": "${{ fromJSON(steps.meta.outputs.json).tags[0] }}",
-              "commit_msg": "Manual deployment by ${{ github.triggering_actor }}",
-              "repository": "${{ github.event.repository.name }}"
-            }
