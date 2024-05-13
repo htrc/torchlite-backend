@@ -115,12 +115,14 @@ jobs:
         with:
           token: ${{ secrets.PAT }}
           repository: htrc/torchlite-argocd
-          event-type: ${{ github.head_ref || github.ref_name }}_commit_backend
+          event-type: argocd
           client-payload: >-
             {
               "image": "${{ fromJSON(steps.meta.outputs.json).tags[0] }}",
-              "commit_msg": ${{ env.HEAD_COMMIT_MESSAGE }},
-              "repository": "${{ github.event.repository.name }}"
+              "commit_msg": "[${{ github.head_ref || github.ref_name }}]: ${{ env.HEAD_COMMIT_MESSAGE }}",
+              "repository": "${{ github.event.repository.name }}",
+              "environment": "${{ github.event.inputs.environment }}",
+              "ref": "${{ github.head_ref || github.ref_name }}"
             }
       - name: Manual Repository Dispatch
         if: github.event.inputs.environment != ''
@@ -130,10 +132,12 @@ jobs:
         with:
           token: ${{ secrets.PAT }}
           repository: htrc/torchlite-argocd
-          event-type: ${{ github.event.inputs.environment }}_commit_backend
+          event-type: argocd-manual
           client-payload: >-
             {
               "image": "${{ fromJSON(steps.meta.outputs.json).tags[0] }}",
-              "commit_msg": "Manual deployment by ${{ github.triggering_actor }}",
-              "repository": "${{ github.event.repository.name }}"
+              "commit_msg": "[${{ github.head_ref || github.ref_name }}]: Manual deployment by ${{ github.triggering_actor }}",
+              "repository": "${{ github.event.repository.name }}",
+              "environment": "${{ github.event.inputs.environment }}",
+              "ref": "${{ github.head_ref || github.ref_name }}"
             }
