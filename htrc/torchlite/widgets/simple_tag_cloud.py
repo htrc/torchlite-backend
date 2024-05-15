@@ -8,10 +8,13 @@ from typing import Literal, Set
 from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
 
-
 class SimpleTagCloudWidget(WidgetBase):
     type: Literal['SimpleTagCloud'] = 'SimpleTagCloud'
     data_type: WidgetDataTypes = WidgetDataTypes.vols_no_pos
+
+
+    # Reading the entire file content and then parsing it
+
 
     stopwords: Set[str] = (
         set("i,me,my,myself,we,us,our,ours,ourselves,you,your,yours,yourself,yourselves,he,him,his,himself,"
@@ -24,12 +27,15 @@ class SimpleTagCloudWidget(WidgetBase):
             "but,if,or,because,as,until,while,of,at,by,for,with,about,against,between,into,through,during,"
             "before,after,above,below,to,from,up,upon,down,in,out,on,off,over,under,again,further,then,once,"
             "here,there,when,where,why,how,all,any,both,each,few,more,most,other,some,such,no,nor,not,only,own,"
-            "same,so,than,too,very,say,says,said,shall,the".split(","))
+            "same,so,than,too,very,say,says,said,shall,the,`,``,|".split(","))
     )
+    #print(stopwords)
 
-    punctuation_regex: str = r'\p{P}'
+    #punctuation_regex: str = r'\p{P}'
+    punctuation_and_numbers_regex: str = r'[\p{P}\d]'
 
-    _punct_regex: Pattern = re.compile(punctuation_regex)
+
+    _punct_regex: Pattern = re.compile(punctuation_and_numbers_regex)
 
     @staticmethod
     def aggregate_counts(p1: dict, p2: dict) -> dict:
@@ -50,7 +56,17 @@ class SimpleTagCloudWidget(WidgetBase):
         ]
 
         token_counts = functools.reduce(self.aggregate_counts, pages_with_tokens)
-        return {
-            k: v for k, v in token_counts.items()
-            if k not in self.stopwords and (not self.punctuation_regex or not re.search(self._punct_regex, k))
-        }
+        sorted_token_counts = sorted(
+                ((k, v) for k, v in token_counts.items() if len(k) > 2 and k not in self.stopwords and (not self.punctuation_and_numbers_regex or   
+                   not re.search(self._punct_regex, k))),
+                key=lambda item: item[1],
+                reverse=True
+                )
+        top_100_token_counts = sorted_token_counts[:50]
+        
+        return top_100_token_counts
+        # return {
+        #     #only char of length 2 or more are taken into consideration.
+        #     k: v for k, v in token_counts.items()
+        #     if len(k) > 2 and k not in self.stopwords and (not self.punctuation_and_numbers_regex or not re.search(self._punct_regex, k))
+        # }
