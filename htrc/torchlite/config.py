@@ -21,7 +21,7 @@ class Config:
     AUTH_LEEWAY = int(os.environ.get("AUTH_LEEWAY_SECONDS", "120"))  # seconds
 
     TORCHLITE_UID = UUID("95164779-1fc9-4592-9c74-7a014407f46d")  # do not change
-    EF_API_URL = os.environ.get("EF_API_URL", "https://tools.htrc.illinois.edu/ef-api")
+    EF_API_URL = "https://tools.htrc.illinois.edu/ef-api" #os.environ.get("EF_API_URL", "https://tools.htrc.illinois.edu/ef-api")
 
     FEATURED_WORKSETS_URL = os.environ.get("FEATURED_WORKSETS_URL")
 
