@@ -71,7 +71,7 @@ class EfApi:
                                   include_pos: bool = False,
                                   **kwargs) -> List[models.Volume]:
         data = await self._get(
-            f"{self.ef_api_url}/worksets/6646632b4a000042000df5dc/volumes/aggregated",#f"{self.ef_api_url}/worksets/{wsid}/volumes/aggregated",
+            f"{self.ef_api_url}/worksets/{wsid}/volumes/aggregated",
             params={
                 "fields": ",".join(fields or []),
                 "pos": include_pos,
