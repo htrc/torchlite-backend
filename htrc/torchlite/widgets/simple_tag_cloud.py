@@ -65,7 +65,7 @@ class SimpleTagCloudWidget(WidgetBase):
                 key=lambda item: item[1],
                 reverse=True
                 )
-        top_100_token_counts = sorted_token_counts[:50]
+        top_100_token_counts = sorted_token_counts[:100]
         
         return top_100_token_counts
         # return {
