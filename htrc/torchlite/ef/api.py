@@ -10,6 +10,8 @@ from ..config import config
 from ..http_client import http
 from ..utils import sanitize
 
+import datetime
+
 T = TypeVar('T')
 
 
@@ -25,11 +27,15 @@ class EfApi:
             yield cls(ef_api_url=ef_api_url, http_client=http_client)
 
     async def _get(self, *args, **kwargs) -> dict:
+        print(f"Starting get request at {datetime.datetime.now().time()}")
         try:
             response = await self.http.get(*args, **kwargs)
+            print(f"Response at {datetime.datetime.now().time()}")
             response.raise_for_status()
         except httpx.HTTPError as e:
+            print(f"Error at {datetime.datetime.now().time()}")
             raise EfApiError(f"HTTP Exception for {e.request.url} - {e}")
+        
 
         data = response.json()
 

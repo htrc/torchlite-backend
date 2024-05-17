@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Literal
+from pydantic import validator
 
 from ..models.base import BaseModel
 
@@ -72,6 +73,14 @@ class VolumeMetadata(BaseModel):
     type_of_resource: str | None = None
     last_rights_update_date: int | None = None
     is_part_of: Journal | None = None
+
+    # Custom validator here
+    @validator('pub_date', pre=True)
+    def int_or_none(cls, v):
+        try:
+            return int(v)
+        except ValueError:
+            return None
 
 
 class PosSectionFeatures(BaseModel):
