@@ -118,7 +118,23 @@ class VolumeFeatures(BaseModel):
     pages: list[PageFeatures] = []
 
 
+class VolumeAggFeaturesNoPos(BaseModel):
+    type: str | None = None
+    id: str | None = None
+    schema_version: str | None = None
+    date_created: int | None = None
+    page_count: int | None = None
+    token_count: int | None = None
+    line_count: int | None = None
+    empty_line_count: int | None = None
+    sentence_count: int | None = None
+    header: dict[str, int] | None = None
+    body: dict[str, int] | None = None
+    footer: dict[str, int] | None = None
+    calculated_language: list[str] | None = None
+
+
 class Volume(BaseModel):
     htid: str
     metadata: VolumeMetadata
-    features: VolumeFeatures | None = None
+    features: VolumeFeatures | VolumeAggFeaturesNoPos | None = None

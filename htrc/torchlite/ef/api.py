@@ -50,16 +50,14 @@ class EfApi:
         )
         return [models.Volume(**sanitize(vol)) for vol in data]
 
-    async def get_workset_volumes(self,
-                                  wsid: str,
-                                  fields: list[str] | None = None,
-                                  include_pos: bool = False,
-                                  **kwargs) -> List[models.Volume]:
+    async def get_workset_volumes_agg_no_pos(self,
+                                             wsid: str,
+                                             fields: list[str] | None = None,
+                                             **kwargs) -> List[models.Volume]:
         data = await self._get(
-            f"{self.ef_api_url}/worksets/{wsid}/volumes",
+            f"{self.ef_api_url}/worksets/{wsid}/volumesAggNoPos",
             params={
                 "fields": ",".join(fields or []),
-                "pos": include_pos,
             },
             **kwargs
         )
