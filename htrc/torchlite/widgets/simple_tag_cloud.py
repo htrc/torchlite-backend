@@ -1,7 +1,5 @@
 import functools
 import regex as re
-import json
-from pathlib import Path
 
 from re import Pattern
 from collections import Counter
@@ -45,13 +43,7 @@ class SimpleTagCloudWidget(WidgetBase):
     def lowercase(d: dict) -> dict:
         return {k.lower(): v for k, v in d.items()}
 
-    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:
-        # pages_with_tokens = [
-        #     self.lowercase(page.body.tokens_count)
-        #     for volume in volumes
-        #     for page in volume.features.pages if page.body.tokens_count
-        # ]
-                # Assuming that 'body' in AggregatedVolumeFeatures is a dict summarizing the token counts across all pages
+    async def get_data(self, volumes: list[ef_models.Volume]) -> list[(str,int)]:
         aggregated_tokens = [
             self.lowercase(volume.features.body)
             for volume in volumes if volume.features and volume.features.body
@@ -66,7 +58,6 @@ class SimpleTagCloudWidget(WidgetBase):
                 reverse=True
                 )
         top_100_token_counts = sorted_token_counts[:50]
-        #print(top_100_token_counts)
         
         return top_100_token_counts
    
