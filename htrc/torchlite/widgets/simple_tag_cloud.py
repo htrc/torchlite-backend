@@ -10,12 +10,9 @@ from ..ef import models as ef_models
 
 class SimpleTagCloudWidget(WidgetBase):
     type: Literal['SimpleTagCloud'] = 'SimpleTagCloud'
-    data_type: WidgetDataTypes = WidgetDataTypes.vols_no_pos
+    data_type: WidgetDataTypes = WidgetDataTypes.agg_no_pos
 
-
-    # Reading the entire file content and then parsing it
-
-
+    
     stopwords: Set[str] = (
         set("i,me,my,myself,we,us,our,ours,ourselves,you,your,yours,yourself,yourselves,he,him,his,himself,"
             "she,her,hers,herself,it,its,itself,they,them,their,theirs,themselves,what,which,who,whom,whose,"
@@ -29,9 +26,7 @@ class SimpleTagCloudWidget(WidgetBase):
             "here,there,when,where,why,how,all,any,both,each,few,more,most,other,some,such,no,nor,not,only,own,"
             "same,so,than,too,very,say,says,said,shall,the,`,``,|".split(","))
     )
-    #print(stopwords)
-
-    #punctuation_regex: str = r'\p{P}'
+    
     punctuation_and_numbers_regex: str = r'[\p{P}\d]'
 
 
@@ -48,14 +43,14 @@ class SimpleTagCloudWidget(WidgetBase):
     def lowercase(d: dict) -> dict:
         return {k.lower(): v for k, v in d.items()}
 
-    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:
-        pages_with_tokens = [
-            self.lowercase(page.body.tokens_count)
-            for volume in volumes
-            for page in volume.features.pages if page.body.tokens_count
+    async def get_data(self, volumes: list[ef_models.Volume]) -> list[(str,int)]:
+        aggregated_tokens = [
+            self.lowercase(volume.features.body)
+            for volume in volumes if volume.features and volume.features.body
         ]
 
-        token_counts = functools.reduce(self.aggregate_counts, pages_with_tokens)
+        token_counts = functools.reduce(self.aggregate_counts, aggregated_tokens)
+
         sorted_token_counts = sorted(
                 ((k, v) for k, v in token_counts.items() if len(k) > 2 and k not in self.stopwords and (not self.punctuation_and_numbers_regex or   
                    not re.search(self._punct_regex, k))),
@@ -65,8 +60,4 @@ class SimpleTagCloudWidget(WidgetBase):
         top_100_token_counts = sorted_token_counts[:50]
         
         return top_100_token_counts
-        # return {
-        #     #only char of length 2 or more are taken into consideration.
-        #     k: v for k, v in token_counts.items()
-        #     if len(k) > 2 and k not in self.stopwords and (not self.punctuation_and_numbers_regex or not re.search(self._punct_regex, k))
-        # }
+   
