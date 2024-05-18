@@ -83,22 +83,22 @@ class SummaryWidget(WidgetBase):
             document_lengths[volume.metadata.title] = {};
             }"""
             document_lengths[volume.metadata.title] = individualVol
-            print("document_lengths", document_lengths)
+            #print("document_lengths", document_lengths)
 
             document_words[volume.metadata.title] = individualVol
-            print("document_words", document_words)
+            #print("document_words", document_words)
     
             vocab_density[volume.metadata.title] = (individualVol / individualUni) / 100 
-            print("vocab_density", vocab_density)
+            #print("vocab_density", vocab_density)
         
             #read_score = calculate_readability(individualVol)
             #readability_score[volume.metadata.title] = read_score;
 
-            print("readability_score", readability_score)
+            #print("readability_score", readability_score)
 
-            print('Volume name:', volume.metadata.title)
-            print('Total words:', individualVol) 
-            print('Total Unique:', individualUni)
+            #print('Volume name:', volume.metadata.title)
+            #print('Total words:', individualVol) 
+            #print('Total Unique:', individualUni)
 
         output_data = { 'worksetSize': len(volumes), 'totalWords': total, 'uniqueWords': totalunique, 'lengthGraph': document_lengths, 'densityGraph': vocab_density }
 
@@ -130,5 +130,5 @@ class SummaryWidget(WidgetBase):
         #vocabs = vocab_density.items()
 
         # Check the type
-        print("pooj",type(documents))
+        #print("pooj",type(documents))
         return output_data
