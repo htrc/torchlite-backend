@@ -44,17 +44,19 @@ class SimpleTagCloudWidget(WidgetBase):
         return functools.reduce(lambda x, y: x + Counter(y), tokens, Counter())
 
     async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
-        vol_token_counts = (
+        vol_token_counts = [
             self.lowercase(volume.features.body)
             for volume in volumes
-        )
+        ]
 
         token_counts = functools.reduce(self.aggregate_counts, vol_token_counts)
-        token_counts = (
+        token_counts = [
             (k, v) for k, v in token_counts.items()
-            if k not in self.stopwords and not re.search(self._regex, k)
-        )
+            if len(k) > 2 and k not in self.stopwords and not re.search(self._regex, k)
+        ]
+        # FIXME: all these conditions should probably be input parameters to the widget that can be controlled from
+        #        the frontend rather than hardcoded here
 
-        token_counts = sorted(token_counts, key=lambda x: x[1], reverse=True)
-        
+        token_counts = sorted(token_counts, key=lambda x: x[1], reverse=True)[:100]
+
         return dict(token_counts)
