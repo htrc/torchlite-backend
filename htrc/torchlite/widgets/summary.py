@@ -6,9 +6,9 @@ from ..ef import models as ef_models
 
 class SummaryWidget(WidgetBase):
     type: Literal['Summary'] = 'Summary'
-    data_type: WidgetDataTypes = WidgetDataTypes.vols_no_pos
+    data_type: WidgetDataTypes = WidgetDataTypes.agg_no_pos
 
-    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:#list[PubDateEntry]:
+    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:
         @staticmethod
         def update_dict(tokenDict: dict, resultsDict: dict) -> None:
             if tokenDict:
@@ -64,14 +64,13 @@ class SummaryWidget(WidgetBase):
             loacalPerVolDict[volume.htid] = {}
             per_vol_set[volume.htid] = {}
 
-            for page in volume.features.pages:
-                body = page.body
-                if body.tokens_count is not None:
-                    update_dict(body.tokens_count,loacalPerVolDict[volume.htid])
-                    updatedset(body.tokens_count, per_vol_set[volume.htid], volume.htid)
-                
-                total += page.token_count
-                individualVol += page.token_count
+            body = volume.features.body
+            if body is not None:
+                update_dict(body,loacalPerVolDict[volume.htid])
+                updatedset(body, per_vol_set[volume.htid], volume.htid)
+            
+            total += volume.features.token_count
+            individualVol = volume.features.token_count
 
             volumeId = volume.htid
 
