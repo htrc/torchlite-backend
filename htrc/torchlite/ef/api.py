@@ -64,6 +64,26 @@ class EfApi:
             **kwargs
         )
         return [models.Volume(**sanitize(vol)) for vol in data]
+    
+    async def get_aggregated_workset_volumes(self,
+                                  wsid: str,
+                                  fields: list[str] | None = None,
+                                  include_pos: bool = False,
+                                  **kwargs) -> List[models.Volume]:
+        data = await self._get(
+            f"{self.ef_api_url}/worksets/{wsid}/volumes/aggregated",
+            params={
+                "fields": ",".join(fields or []),
+                "pos": include_pos,
+            },
+            **kwargs
+        )
+        print("DATA")
+        print(data)
+        for vol in data:
+            print(vol)
+            print(vol['htid'])
+        return [models.Volume(**sanitize(vol)) for vol in data]
 
 
 ef_api = EfApi(ef_api_url=config.EF_API_URL, http_client=http)
