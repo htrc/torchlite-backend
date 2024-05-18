@@ -55,7 +55,7 @@ class SummaryWidget(WidgetBase):
         document_lengths = {}
         document_words = {}
         vocab_density = {}
-        readability_score = {}
+        #readability_score = {}
         #read_score = 0
 
         for volume in volumes:
