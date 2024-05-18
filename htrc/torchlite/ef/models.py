@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal
+from typing import Literal, Generic, TypeVar
 
 from ..models.base import BaseModel
 
@@ -134,7 +134,10 @@ class VolumeAggFeaturesNoPos(BaseModel):
     calculated_language: list[str] | None = None
 
 
-class Volume(BaseModel):
+FeaturesT = TypeVar('FeaturesT')
+
+
+class Volume(BaseModel, Generic[FeaturesT]):
     htid: str
     metadata: VolumeMetadata
-    features: VolumeFeatures | VolumeAggFeaturesNoPos | None = None
+    features: FeaturesT | None = None

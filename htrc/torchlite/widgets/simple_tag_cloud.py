@@ -7,6 +7,7 @@ from typing import Literal, Set
 
 from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
+from ..ef.models import VolumeAggFeaturesNoPos
 
 
 class SimpleTagCloudWidget(WidgetBase):
@@ -42,7 +43,7 @@ class SimpleTagCloudWidget(WidgetBase):
         tokens = ({k.lower(): v} for k, v in d.items())
         return functools.reduce(lambda x, y: x + Counter(y), tokens, Counter())
 
-    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:
+    async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
         vol_token_counts = (
             self.lowercase(volume.features.body)
             for volume in volumes

@@ -6,6 +6,7 @@ from fastapi import status
 
 from . import models
 from .exceptions import EfApiError
+from .models import VolumeAggFeaturesNoPos, VolumeFeatures
 from ..config import config
 from ..http_client import http
 from ..utils import sanitize
@@ -48,12 +49,12 @@ class EfApi:
             params={"fields": ",".join(fields or [])},
             **kwargs
         )
-        return [models.Volume(**sanitize(vol)) for vol in data]
+        return [models.Volume[VolumeFeatures](**sanitize(vol)) for vol in data]
 
     async def get_workset_volumes_agg_no_pos(self,
                                              wsid: str,
                                              fields: list[str] | None = None,
-                                             **kwargs) -> List[models.Volume]:
+                                             **kwargs) -> List[models.Volume[VolumeAggFeaturesNoPos]]:
         data = await self._get(
             f"{self.ef_api_url}/worksets/{wsid}/volumesAggNoPos",
             params={
@@ -61,7 +62,7 @@ class EfApi:
             },
             **kwargs
         )
-        return [models.Volume(**sanitize(vol)) for vol in data]
+        return [models.Volume[VolumeAggFeaturesNoPos](**sanitize(vol)) for vol in data]
 
 
 ef_api = EfApi(ef_api_url=config.EF_API_URL, http_client=http)
