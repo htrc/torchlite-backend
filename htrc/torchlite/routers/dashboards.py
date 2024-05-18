@@ -139,6 +139,9 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
         case WidgetDataTypes.vols_no_pos:
             volumes = await ef_api.get_workset_volumes(dashboard.workset_id, include_pos=False)
 
+        case WidgetDataTypes.agg_no_pos:
+            volumes = await ef_api.get_aggregated_workset_volumes(dashboard.workset_id, include_pos=False)
+
         case _:
             raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
 
