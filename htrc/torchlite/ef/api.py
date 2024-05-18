@@ -78,11 +78,7 @@ class EfApi:
             },
             **kwargs
         )
-        print("DATA")
-        print(data)
-        for vol in data:
-            print(vol)
-            print(vol['htid'])
+        
         return [models.Volume(**sanitize(vol)) for vol in data]
 
 

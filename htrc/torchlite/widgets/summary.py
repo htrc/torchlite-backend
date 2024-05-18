@@ -6,9 +6,9 @@ from ..ef import models as ef_models
 
 class SummaryWidget(WidgetBase):
     type: Literal['Summary'] = 'Summary'
-    data_type: WidgetDataTypes = WidgetDataTypes.vols_no_pos
+    data_type: WidgetDataTypes = WidgetDataTypes.agg_no_pos
 
-    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:#list[PubDateEntry]:
+    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:
         @staticmethod
         def update_dict(tokenDict: dict, resultsDict: dict) -> None:
             if tokenDict:
@@ -55,7 +55,7 @@ class SummaryWidget(WidgetBase):
         document_lengths = {}
         document_words = {}
         vocab_density = {}
-        readability_score = {}
+        #readability_score = {}
         #read_score = 0
 
         for volume in volumes:
@@ -64,14 +64,13 @@ class SummaryWidget(WidgetBase):
             loacalPerVolDict[volume.htid] = {}
             per_vol_set[volume.htid] = {}
 
-            for page in volume.features.pages:
-                body = page.body
-                if body.tokens_count is not None:
-                    update_dict(body.tokens_count,loacalPerVolDict[volume.htid])
-                    updatedset(body.tokens_count, per_vol_set[volume.htid], volume.htid)
-                
-                total += page.token_count
-                individualVol += page.token_count
+            body = volume.features.body
+            if body is not None:
+                update_dict(body,loacalPerVolDict[volume.htid])
+                updatedset(body, per_vol_set[volume.htid], volume.htid)
+            
+            total += volume.features.token_count
+            individualVol = volume.features.token_count
 
             volumeId = volume.htid
 
@@ -83,22 +82,13 @@ class SummaryWidget(WidgetBase):
             document_lengths[volume.metadata.title] = {};
             }"""
             document_lengths[volume.metadata.title] = individualVol
-            #print("document_lengths", document_lengths)
 
             document_words[volume.metadata.title] = individualVol
-            #print("document_words", document_words)
     
             vocab_density[volume.metadata.title] = (individualVol / individualUni) / 100 
-            #print("vocab_density", vocab_density)
         
             #read_score = calculate_readability(individualVol)
             #readability_score[volume.metadata.title] = read_score;
-
-            #print("readability_score", readability_score)
-
-            #print('Volume name:', volume.metadata.title)
-            #print('Total words:', individualVol) 
-            #print('Total Unique:', individualUni)
 
         output_data = { 'worksetSize': len(volumes), 'totalWords': total, 'uniqueWords': totalunique, 'lengthGraph': document_lengths, 'densityGraph': vocab_density }
 
@@ -126,9 +116,5 @@ class SummaryWidget(WidgetBase):
         const lowestReadabilityDocument = Object.keys(readability_score).reduce((a, b) => readability_score[a] < readabilityScore[b] ? a : b);
         const lowestReadability = readability_score[lowestReadabilityDocument];"""
 
-        documents = document_lengths.items()
-        #vocabs = vocab_density.items()
-
         # Check the type
-        #print("pooj",type(documents))
         return output_data
