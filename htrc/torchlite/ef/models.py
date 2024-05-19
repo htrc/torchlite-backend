@@ -79,7 +79,7 @@ class VolumeMetadata(BaseModel):
     def int_or_none(cls, v):
         try:
             return int(v)
-        except ValueError:
+        except (ValueError, TypeError):
             return None
 
 
