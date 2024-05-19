@@ -55,7 +55,7 @@ class SummaryWidget(WidgetBase):
         document_lengths = {}
         document_words = {}
         vocab_density = {}
-        readability_score = {}
+        #readability_score = {}
         #read_score = 0
 
         for volume in volumes:
@@ -82,22 +82,13 @@ class SummaryWidget(WidgetBase):
             document_lengths[volume.metadata.title] = {};
             }"""
             document_lengths[volume.metadata.title] = individualVol
-            print("document_lengths", document_lengths)
 
             document_words[volume.metadata.title] = individualVol
-            print("document_words", document_words)
     
             vocab_density[volume.metadata.title] = (individualVol / individualUni) / 100 
-            print("vocab_density", vocab_density)
         
             #read_score = calculate_readability(individualVol)
             #readability_score[volume.metadata.title] = read_score;
-
-            print("readability_score", readability_score)
-
-            print('Volume name:', volume.metadata.title)
-            print('Total words:', individualVol) 
-            print('Total Unique:', individualUni)
 
         output_data = { 'worksetSize': len(volumes), 'totalWords': total, 'uniqueWords': totalunique, 'lengthGraph': document_lengths, 'densityGraph': vocab_density }
 
@@ -125,9 +116,5 @@ class SummaryWidget(WidgetBase):
         const lowestReadabilityDocument = Object.keys(readability_score).reduce((a, b) => readability_score[a] < readabilityScore[b] ? a : b);
         const lowestReadability = readability_score[lowestReadabilityDocument];"""
 
-        documents = document_lengths.items()
-        #vocabs = vocab_density.items()
-
         # Check the type
-        print("pooj",type(documents))
         return output_data
