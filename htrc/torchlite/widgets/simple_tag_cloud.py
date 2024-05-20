@@ -43,7 +43,7 @@ class SimpleTagCloudWidget(WidgetBase):
     def lowercase(d: dict) -> dict:
         return {k.lower(): v for k, v in d.items()}
 
-    async def get_data(self, volumes: list[ef_models.Volume]) -> list[(str,int)]:
+    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:
         aggregated_tokens = [
             self.lowercase(volume.features.body)
             for volume in volumes if volume.features and volume.features.body
@@ -52,12 +52,11 @@ class SimpleTagCloudWidget(WidgetBase):
         token_counts = functools.reduce(self.aggregate_counts, aggregated_tokens)
 
         sorted_token_counts = sorted(
-                ((k, v) for k, v in token_counts.items() if len(k) > 2 and k not in self.stopwords and (not self.punctuation_and_numbers_regex or   
-                   not re.search(self._punct_regex, k))),
-                key=lambda item: item[1],
+                [{'text': k, 'value': v} for k, v in token_counts.items() if len(k) > 2 and k not in self.stopwords and (not self.punctuation_and_numbers_regex or   
+                   not re.search(self._punct_regex, k))],
+                key=lambda item: item['value'],
                 reverse=True
                 )
-        top_100_token_counts = sorted_token_counts[:50]
-        
-        return top_100_token_counts
+        top_100_token_counts = sorted_token_counts[:100]
+        return {item['text']: item['value'] for item in top_100_token_counts}
    
