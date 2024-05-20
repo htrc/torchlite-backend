@@ -2,13 +2,14 @@ from typing import Literal, TypeAlias
 
 from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
+from ..ef.models import VolumeAggFeaturesNoPos
 
 
 class SummaryWidget(WidgetBase):
     type: Literal['Summary'] = 'Summary'
-    data_type: WidgetDataTypes = WidgetDataTypes.agg_no_pos
+    data_type: WidgetDataTypes = WidgetDataTypes.agg_vols_no_pos
 
-    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:
+    async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
         @staticmethod
         def update_dict(tokenDict: dict, resultsDict: dict) -> None:
             if tokenDict:

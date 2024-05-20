@@ -48,7 +48,7 @@ class MongoDatabaseClient:
         if not self.instance:
             self.instance = self.__Instance(self.url)
 
-        self.instance.client.admin.command("ping")
+        await self.instance.client.admin.command("ping")
 
     def close(self):
         if self.instance:

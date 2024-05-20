@@ -6,6 +6,7 @@ from fastapi import status
 
 from . import models
 from .exceptions import EfApiError
+from .models import VolumeFeatures, VolumeAggFeaturesNoPos
 from ..config import config
 from ..http_client import http
 from ..utils import sanitize
@@ -42,44 +43,49 @@ class EfApi:
         data = await self._get(f"{self.ef_api_url}/worksets/{wsid}", **kwargs)
         return models.Workset(**data)
 
-    async def get_workset_metadata(self, wsid: str, fields: list[str] | None = None, **kwargs) -> List[models.Volume]:
+    async def get_workset_metadata(self, wsid: str, fields: list[str] | None = None, **kwargs) -> List[models.Volume[VolumeFeatures]]:
+        params = {}
+        if fields:
+            params["fields"] = ",".join(fields)
+
         data = await self._get(
             f"{self.ef_api_url}/worksets/{wsid}/metadata",
-            params={"fields": ",".join(fields or [])},
+            params=params,
             **kwargs
         )
-        return [models.Volume(**sanitize(vol)) for vol in data]
+        return [models.Volume[VolumeFeatures](**sanitize(vol)) for vol in data]
 
     async def get_workset_volumes(self,
                                   wsid: str,
                                   fields: list[str] | None = None,
                                   include_pos: bool = False,
-                                  **kwargs) -> List[models.Volume]:
+                                  **kwargs) -> List[models.Volume[VolumeFeatures]]:
+        params = { "pos": include_pos }
+        if fields:
+            params["fields"] = ",".join(fields)
+
         data = await self._get(
             f"{self.ef_api_url}/worksets/{wsid}/volumes",
-            params={
-                "fields": ",".join(fields or []),
-                "pos": include_pos,
-            },
+            params=params,
             **kwargs
         )
-        return [models.Volume(**sanitize(vol)) for vol in data]
+        return [models.Volume[VolumeFeatures](**sanitize(vol)) for vol in data]
     
     async def get_aggregated_workset_volumes(self,
                                   wsid: str,
                                   fields: list[str] | None = None,
-                                  include_pos: bool = False,
-                                  **kwargs) -> List[models.Volume]:
+                                  **kwargs) -> List[models.Volume[VolumeAggFeaturesNoPos]]:
+        params = {}
+        if fields:
+            params["fields"] = ",".join(fields)
+
         data = await self._get(
             f"{self.ef_api_url}/worksets/{wsid}/volumes/aggregated",
-            params={
-                "fields": ",".join(fields or []),
-                "pos": include_pos,
-            },
+            params=params,
             **kwargs
         )
         
-        return [models.Volume(**sanitize(vol)) for vol in data]
+        return [models.Volume[VolumeAggFeaturesNoPos](**sanitize(vol)) for vol in data]
 
 
 ef_api = EfApi(ef_api_url=config.EF_API_URL, http_client=http)

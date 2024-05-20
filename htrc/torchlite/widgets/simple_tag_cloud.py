@@ -7,10 +7,11 @@ from typing import Literal, Set
 
 from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
+from ..ef.models import VolumeAggFeaturesNoPos
 
 class SimpleTagCloudWidget(WidgetBase):
     type: Literal['SimpleTagCloud'] = 'SimpleTagCloud'
-    data_type: WidgetDataTypes = WidgetDataTypes.agg_no_pos
+    data_type: WidgetDataTypes = WidgetDataTypes.agg_vols_no_pos
 
     
     stopwords: Set[str] = (
@@ -30,7 +31,7 @@ class SimpleTagCloudWidget(WidgetBase):
     punctuation_and_numbers_regex: str = r'[\p{P}\d]'
 
 
-    _punct_regex: Pattern = re.compile(punctuation_and_numbers_regex)
+    _regex: Pattern = re.compile(punctuation_and_numbers_regex)
 
     @staticmethod
     def aggregate_counts(p1: dict, p2: dict) -> dict:
@@ -43,7 +44,7 @@ class SimpleTagCloudWidget(WidgetBase):
     def lowercase(d: dict) -> dict:
         return {k.lower(): v for k, v in d.items()}
 
-    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:
+    async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
         aggregated_tokens = [
             self.lowercase(volume.features.body)
             for volume in volumes if volume.features and volume.features.body
@@ -53,7 +54,7 @@ class SimpleTagCloudWidget(WidgetBase):
 
         sorted_token_counts = sorted(
                 [{'text': k, 'value': v} for k, v in token_counts.items() if len(k) > 2 and k not in self.stopwords and (not self.punctuation_and_numbers_regex or   
-                   not re.search(self._punct_regex, k))],
+                   not re.search(self._regex, k))],
                 key=lambda item: item['value'],
                 reverse=True
                 )
