@@ -44,9 +44,13 @@ class EfApi:
         return models.Workset(**data)
 
     async def get_workset_metadata(self, wsid: str, fields: list[str] | None = None, **kwargs) -> List[models.Volume]:
+        params = {}
+        if fields:
+            params["fields"] = ",".join(fields)
+
         data = await self._get(
             f"{self.ef_api_url}/worksets/{wsid}/metadata",
-            params={"fields": ",".join(fields or [])},
+            params=params,
             **kwargs
         )
         return [models.Volume[VolumeFeatures](**sanitize(vol)) for vol in data]
@@ -55,11 +59,13 @@ class EfApi:
                                              wsid: str,
                                              fields: list[str] | None = None,
                                              **kwargs) -> List[models.Volume[VolumeAggFeaturesNoPos]]:
+        params = {}
+        if fields:
+            params["fields"] = ",".join(fields)
+
         data = await self._get(
             f"{self.ef_api_url}/worksets/{wsid}/volumesAggNoPos",
-            params={
-                "fields": ",".join(fields or []),
-            },
+            params=params,
             **kwargs
         )
         return [models.Volume[VolumeAggFeaturesNoPos](**sanitize(vol)) for vol in data]

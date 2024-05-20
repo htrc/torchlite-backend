@@ -39,13 +39,22 @@ class SimpleTagCloudWidget(WidgetBase):
         return p1_counter + p2_counter
 
     @staticmethod
-    def lowercase(d: dict) -> dict:
-        tokens = ({k.lower(): v} for k, v in d.items())
-        return functools.reduce(lambda x, y: x + Counter(y), tokens, Counter())
+    def aggregate_word_counts(word_counts: dict) -> dict:
+        aggregated_counts = {}
+
+        for word, count in word_counts.items():
+            lower_word = word.lower()
+
+            if lower_word in aggregated_counts:
+                aggregated_counts[lower_word] += count
+            else:
+                aggregated_counts[lower_word] = count
+
+        return aggregated_counts
 
     async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
         vol_token_counts = [
-            self.lowercase(volume.features.body)
+            self.aggregate_word_counts(volume.features.body)
             for volume in volumes
         ]
 
