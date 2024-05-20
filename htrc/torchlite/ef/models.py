@@ -51,7 +51,7 @@ class VolumeMetadata(BaseModel):
     alternate_title: str | list[str] | None = None
     enumeration_chronology: str | None = None
     contributor: Contributor | list[Contributor] | None = None
-    pub_date: int | None
+    pub_date: int | str | None
     publisher: Publisher | list[Publisher] | None = None
     pub_place: PublicationPlace | list[PublicationPlace] | None = None
     language: str | list[str] | None = None
