@@ -43,7 +43,7 @@ class EfApi:
         data = await self._get(f"{self.ef_api_url}/worksets/{wsid}", **kwargs)
         return models.Workset(**data)
 
-    async def get_workset_metadata(self, wsid: str, fields: list[str] | None = None, **kwargs) -> List[models.Volume[VolumeFeatures]]:
+    async def get_workset_metadata(self, wsid: str, fields: list[str] | None = None, **kwargs) -> List[models.Volume]:
         params = {}
         if fields:
             params["fields"] = ",".join(fields)
