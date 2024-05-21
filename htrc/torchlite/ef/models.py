@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal
+from typing import Literal, Generic, TypeVar
 
 from ..models.base import BaseModel
 
@@ -117,7 +117,7 @@ class VolumeFeatures(BaseModel):
     page_count: int | None = None
     pages: list[PageFeatures] = []
 
-class AggregatedVolumeFeatures(BaseModel):
+class VolumeAggFeaturesNoPos(BaseModel):
     type: str | None = None
     id: str | None = None
     schema_version: str | None = None
@@ -132,7 +132,9 @@ class AggregatedVolumeFeatures(BaseModel):
     footer: dict[str, int] | None = None
     calculated_language: list[str] | None = None
 
-class Volume(BaseModel):
+FeaturesT = TypeVar('FeaturesT')
+
+class Volume(BaseModel, Generic[FeaturesT]):
     htid: str
     metadata: VolumeMetadata
-    features: AggregatedVolumeFeatures | VolumeFeatures | None = None
+    features: FeaturesT | None = None

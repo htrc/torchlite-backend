@@ -2,21 +2,20 @@ from typing import Literal, TypeAlias
 
 from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
+from ..ef.models import VolumeAggFeaturesNoPos
 
 
 class SummaryWidget(WidgetBase):
     type: Literal['Summary'] = 'Summary'
-    data_type: WidgetDataTypes = WidgetDataTypes.agg_no_pos
+    data_type: WidgetDataTypes = WidgetDataTypes.agg_vols_no_pos
 
-    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:
-        @staticmethod
+    async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
         def update_dict(tokenDict: dict, resultsDict: dict) -> None:
             if tokenDict:
                 for token, count in tokenDict.items():
                     lowercaseToken = token.lower()
                     resultsDict[lowercaseToken] = (resultsDict[lowercaseToken] if lowercaseToken in resultsDict else 0) + count
 
-        @staticmethod
         def updatedset(token_dict: dict, unique_word_forms: dict, volumeid: str) -> None:
             if token_dict:
                 for token, count in token_dict.items():
@@ -28,7 +27,6 @@ class SummaryWidget(WidgetBase):
                         #If the volume identifier doesn't exist, create a new set with the token
                         unique_word_forms[volumeid] = set([lowercaseToken])
 
-        @staticmethod
         def calculate_readability(num_words: int) -> float:
             avg_words_per_sentence = 15  
             avg_syllables_per_word = 1.2  
@@ -40,7 +38,6 @@ class SummaryWidget(WidgetBase):
             return readability_score
         
         Extremes: TypeAlias = Literal['max','min']        
-        @staticmethod
         def find_extreme_value(target: dict, extreme: Extremes) -> str:
             sortedDocuments = sorted(list(target.keys()), key=lambda a: target[a], reverse=(True if extreme == 'max' else False))
             limitedDocuments = sortedDocuments[:5]

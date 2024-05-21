@@ -7,10 +7,11 @@ from typing import Literal, Set
 
 from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
+from ..ef.models import VolumeAggFeaturesNoPos
 
 class SimpleTagCloudWidget(WidgetBase):
     type: Literal['SimpleTagCloud'] = 'SimpleTagCloud'
-    data_type: WidgetDataTypes = WidgetDataTypes.agg_no_pos
+    data_type: WidgetDataTypes = WidgetDataTypes.agg_vols_no_pos
 
     
     stopwords: Set[str] = (
@@ -28,9 +29,7 @@ class SimpleTagCloudWidget(WidgetBase):
     )
     
     punctuation_and_numbers_regex: str = r'[\p{P}\d]'
-
-
-    _punct_regex: Pattern = re.compile(punctuation_and_numbers_regex)
+    _regex: Pattern = re.compile(punctuation_and_numbers_regex)
 
     @staticmethod
     def aggregate_counts(p1: dict, p2: dict) -> dict:
@@ -40,23 +39,34 @@ class SimpleTagCloudWidget(WidgetBase):
         return p1_counter + p2_counter
 
     @staticmethod
-    def lowercase(d: dict) -> dict:
-        return {k.lower(): v for k, v in d.items()}
+    def aggregate_word_counts(word_counts: dict) -> dict:
+        aggregated_counts = {}
 
-    async def get_data(self, volumes: list[ef_models.Volume]) -> dict:
-        aggregated_tokens = [
-            self.lowercase(volume.features.body)
-            for volume in volumes if volume.features and volume.features.body
+        for word, count in word_counts.items():
+            lower_word = word.lower()
+
+            if lower_word in aggregated_counts:
+                aggregated_counts[lower_word] += count
+            else:
+                aggregated_counts[lower_word] = count
+
+        return aggregated_counts
+
+    async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
+        vol_token_counts = [
+            self.aggregate_word_counts(volume.features.body)
+            for volume in volumes
         ]
 
-        token_counts = functools.reduce(self.aggregate_counts, aggregated_tokens)
+        token_counts = functools.reduce(self.aggregate_counts, vol_token_counts)
+        token_counts = [
+            (k, v) for k, v in token_counts.items()
+            if len(k) > 2 and k not in self.stopwords and not re.search(self._regex, k)
+        ]
+        # FIXME: all these conditions should probably be input parameters to the widget that can be controlled from
+        #        the frontend rather than hardcoded here
 
-        sorted_token_counts = sorted(
-                [{'text': k, 'value': v} for k, v in token_counts.items() if len(k) > 2 and k not in self.stopwords and (not self.punctuation_and_numbers_regex or   
-                   not re.search(self._punct_regex, k))],
-                key=lambda item: item['value'],
-                reverse=True
-                )
-        top_100_token_counts = sorted_token_counts[:100]
-        return {item['text']: item['value'] for item in top_100_token_counts}
+        token_counts = sorted(token_counts, key=lambda x: x[1], reverse=True)[:100]
+
+        return(dict(token_counts))
    
