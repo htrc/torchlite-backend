@@ -43,6 +43,8 @@ class SummaryWidget(WidgetBase):
             limitedDocuments = sortedDocuments[:5]
             return ';  '.join([f"{target[doc]['title']} ({target[doc]['value']})" for doc in limitedDocuments])
 
+        print("Running get data on summary widget")
+        print(volumes)
         total = 0
         totalunique = 0
         loacalPerVolDict = {}
