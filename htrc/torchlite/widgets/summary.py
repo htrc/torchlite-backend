@@ -114,6 +114,4 @@ class SummaryWidget(WidgetBase):
         const lowestReadability = readability_score[lowestReadabilityDocument];"""
 
         # Check the type
-        print(output_data)
-        print(type(output_data))
         return output_data

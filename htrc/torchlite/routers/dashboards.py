@@ -146,4 +146,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
 
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
-    return await widget.get_data(filtered_volumes)
+    output = await widget.get_data(filtered_volumes)
+    print(output)
+    print("Got output")
+    return output
