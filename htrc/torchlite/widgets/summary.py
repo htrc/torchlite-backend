@@ -56,7 +56,6 @@ class SummaryWidget(WidgetBase):
         #read_score = 0
 
         for volume in volumes:
-            print(volume.htid)
             individualVol = 0
             individualUni = 0
             loacalPerVolDict[volume.htid] = {}
@@ -88,28 +87,23 @@ class SummaryWidget(WidgetBase):
             #read_score = calculate_readability(individualVol)
             #readability_score[volume.metadata.title] = read_score;
 
-        print("Processed each volume")
         output_data = { 'worksetSize': len(volumes), 'totalWords': total, 'uniqueWords': totalunique, 'lengthGraph': document_lengths, 'densityGraph': vocab_density }
 
         # Find the longest document
         longestDocumentsString = find_extreme_value(document_lengths,'max')
         output_data['longestDoc'] = longestDocumentsString
-        print("Found the longest document")
 
         # Find the shortest document
         shortestDocumentsString = find_extreme_value(document_lengths,'min')
         output_data['shortestDoc'] = shortestDocumentsString
-        print("Found the shortest document")
 
         # Find the document with the highest vocabulary density
         highestDense = find_extreme_value(vocab_density,'max')
         output_data['highestDensityDoc'] = highestDense
-        print("Found document with highest vocab density")
 
         # Find the document with the lowest vocabulary density
         lowestDense = find_extreme_value(vocab_density,'min')
         output_data['lowestDensityDoc'] = lowestDense
-        print("Found document with lowest vocab density")
 
         """ // Find the document with the highest readability score
         const highestReadabilityDocument = Object.keys(readability_score).reduce((a, b) => readability_score[a] > readabilityScore[b] ? a : b);
@@ -120,4 +114,6 @@ class SummaryWidget(WidgetBase):
         const lowestReadability = readability_score[lowestReadabilityDocument];"""
 
         # Check the type
+        print(output_data)
+        print(type(output_data))
         return output_data
