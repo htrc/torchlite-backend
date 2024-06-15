@@ -151,6 +151,6 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
     output = await widget.get_data(filtered_volumes)
-    print(output)
+    print(len(output))
     print("Got output")
     return output
