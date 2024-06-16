@@ -13,6 +13,7 @@ from ..errors import TorchliteError
 from ..managers.workset_manager import WorksetManager
 from ..models.dashboard import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
 from ..widgets.base import WidgetDataTypes
+import json
 
 router = APIRouter(
     prefix="/dashboards",
@@ -151,6 +152,8 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
     output = await widget.get_data(filtered_volumes)
-    print(len(output))
+    output_string = json.dumps(output)
+    print(len(output_string))
+    print(len(output_string.encode('utf-8')))
     print("Got output")
     return output
