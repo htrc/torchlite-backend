@@ -39,9 +39,9 @@ class SummaryWidget(WidgetBase):
         
         Extremes: TypeAlias = Literal['max','min']        
         def find_extreme_value(target: dict, extreme: Extremes) -> str:
-            sortedDocuments = sorted(list(target.keys()), key=lambda a: target[a], reverse=(True if extreme == 'max' else False))
+            sortedDocuments = sorted(list(target.keys()), key=lambda a: target[a]['value'], reverse=(True if extreme == 'max' else False))
             limitedDocuments = sortedDocuments[:5]
-            return ';  '.join([f"{doc} ({target[doc]})" for doc in limitedDocuments])
+            return ';  '.join([f"{target[doc]['title']} ({target[doc]['value']})" for doc in limitedDocuments])
 
         total = 0
         totalunique = 0
@@ -78,11 +78,11 @@ class SummaryWidget(WidgetBase):
             """if (!document_lengths[volume.metadata.title] || typeof document_lengths[volume.metadata.title] !== 'object') {
             document_lengths[volume.metadata.title] = {};
             }"""
-            document_lengths[volume.metadata.title] = individualVol
+            document_lengths[volume.metadata.id] = { 'title': volume.metadata.title, 'value': individualVol}
 
-            document_words[volume.metadata.title] = individualVol
+            document_words[volume.metadata.id] = { 'title': volume.metadata.title, 'value': individualVol}
     
-            vocab_density[volume.metadata.title] = (individualVol / individualUni) / 100 
+            vocab_density[volume.metadata.id] = { 'title': volume.metadata.title, 'value': (individualVol / individualUni) / 100 }
         
             #read_score = calculate_readability(individualVol)
             #readability_score[volume.metadata.title] = read_score;
