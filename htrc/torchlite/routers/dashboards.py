@@ -13,7 +13,6 @@ from ..errors import TorchliteError
 from ..managers.workset_manager import WorksetManager
 from ..models.dashboard import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
 from ..widgets.base import WidgetDataTypes
-import json
 
 router = APIRouter(
     prefix="/dashboards",
@@ -130,8 +129,6 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
 
-    print("Widget type:")
-    print(widget.data_type)
     match widget.data_type:
         case WidgetDataTypes.metadata_only:
             volumes = await ef_api.get_workset_metadata(dashboard.workset_id)
@@ -147,13 +144,6 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 
         case _:
             raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
-    print("Volumes:")
-    print(len(volumes))
 
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
-    output = await widget.get_data(filtered_volumes)
-    output_string = json.dumps(output)
-    print(len(output_string))
-    print(len(output_string.encode('utf-8')))
-    print("Got output")
-    return output
+    return await widget.get_data(filtered_volumes)
