@@ -25,5 +25,12 @@ class Config:
 
     FEATURED_WORKSETS_URL = os.environ.get("FEATURED_WORKSETS_URL")
 
+    # Cache settings
+    ENABLE_CACHE = os.environ.get("ENABLE_CACHE", "false").lower() == "true"
+    CACHE_EXPIRE = int(os.environ.get("CACHE_EXPIRE", "300"))
+    REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost")
+    REDIS_PREFIX = os.environ.get("REDIS_PREFIX", "torchlite-cache")
+    CACHE_STATUS_HEADER = "x-torchlite-cache"
+
 
 config = Config

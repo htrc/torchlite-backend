@@ -4,7 +4,11 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from fastapi import FastAPI
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
 from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
+from redis import asyncio as aioredis
 
 from .config import config
 from .database import mongo_client
@@ -23,9 +27,12 @@ async def torchlite_startup():
     env = os.environ.get("ENV", "dev")
     log.info(f"Starting Torchlite API Server v{VERSION} ({env})")
 
+    # Setup backend caching
+    redis = aioredis.from_url(config.REDIS_URL)
+    FastAPICache.init(RedisBackend(redis), enable=config.ENABLE_CACHE, prefix=config.REDIS_PREFIX, expire=config.CACHE_EXPIRE, cache_status_header=config.CACHE_STATUS_HEADER)
+
     # ensure DB is alive
     await mongo_client.ping()
-
 
     # config_file_name = os.getenv("TORCHLITE_CONFIG")
     # if not config_file_name:
