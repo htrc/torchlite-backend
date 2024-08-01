@@ -16,7 +16,8 @@ Backend API for the TORCHLITE application.
     ```
 2. Install dependencies
    ```bash
-   pip install poetry
+   pip install -r requirements.txt
+   poetry lock --no-update
    poetry install
    ```
 
