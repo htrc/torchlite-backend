@@ -4,8 +4,8 @@ Backend API for the TORCHLITE application.
 ## Pre-requisites
 1. Python 3.11 or higher.
 2. MongoDB (an alternative is to connect to an existing deployed MongoDB instance containing relevant data)
-3. Docker is installed and running (optional).
-
+3. Redis (an alternative is to connect to an existing deployed Redis instance)
+4. Docker is installed and running (optional).
 
 ## Local Installation Instructions
 
