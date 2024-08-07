@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal
+from typing import Literal, Generic, TypeVar
 
 from ..models.base import BaseModel
 
@@ -51,7 +51,7 @@ class VolumeMetadata(BaseModel):
     alternate_title: str | list[str] | None = None
     enumeration_chronology: str | None = None
     contributor: Contributor | list[Contributor] | None = None
-    pub_date: int | None
+    pub_date: int | str | None
     publisher: Publisher | list[Publisher] | None = None
     pub_place: PublicationPlace | list[PublicationPlace] | None = None
     language: str | list[str] | None = None
@@ -117,8 +117,24 @@ class VolumeFeatures(BaseModel):
     page_count: int | None = None
     pages: list[PageFeatures] = []
 
+class VolumeAggFeaturesNoPos(BaseModel):
+    type: str | None = None
+    id: str | None = None
+    schema_version: str | None = None
+    date_created: int | None = None
+    page_count: int | None = None
+    token_count: int | None = None
+    line_count: int | None = None
+    empty_line_count: int | None = None
+    sentence_count: int | None = None
+    header: dict[str, int] | None = None
+    body: dict[str, int] | None = None
+    footer: dict[str, int] | None = None
+    calculated_language: list[str] | None = None
 
-class Volume(BaseModel):
+FeaturesT = TypeVar('FeaturesT')
+
+class Volume(BaseModel, Generic[FeaturesT]):
     htid: str
     metadata: VolumeMetadata
-    features: VolumeFeatures | None = None
+    features: FeaturesT | None = None

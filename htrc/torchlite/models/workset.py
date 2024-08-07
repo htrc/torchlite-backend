@@ -15,7 +15,7 @@ class WorksetSummary(BaseModel):
 class VolumeMetadata(BaseModel):
     htid: str
     title: str
-    pub_date: int | None = None
+    pub_date: int | str | None = None
     genre: str | list[str]
     type_of_resource: str | None = None
     category: str | list[str] | None = None
