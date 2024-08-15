@@ -32,14 +32,12 @@ Backend API for the TORCHLITE application.
 
 1. Build the Docker image
     ```bash
-    docker build -t torchlite-api .
+    docker build -t torchlite-backend .
     ```
 2. Run the Docker container
     ```bash
-    docker run -d -p 8000:8000 torchlite-api
+    docker run -d -p 8000:8000 torchlite-backend
     ```
 
 ## API Documentation
-Open the API documentation in your browser
-    ```
-    http://127.0.0.1:8000/docs
+Open the API documentation in your browser at http://127.0.0.1:8000/docs.
