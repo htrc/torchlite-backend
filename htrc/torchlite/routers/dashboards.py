@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from authlib.oidc.core import UserInfo
+from authlib.oidc.core import UserInfo  # type: ignore
 from fastapi import APIRouter, Depends, HTTPException, status
 from pymongo import ReturnDocument
 

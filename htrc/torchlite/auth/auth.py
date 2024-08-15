@@ -1,8 +1,9 @@
 from typing import Annotated
 
-from authlib.integrations.starlette_client import OAuth
-from authlib.jose import jwt
-from authlib.oidc.core import UserInfo
+from authlib.integrations.starlette_client import OAuth  # type: ignore
+# TODO: A new package may be used to replace the below import: https://github.com/lepture/authlib/issues/460#issuecomment-1636175422
+from authlib.jose import jwt  # type: ignore
+from authlib.oidc.core import UserInfo  # type: ignore
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OpenIdConnect
 

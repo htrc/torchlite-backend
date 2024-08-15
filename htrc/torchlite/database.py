@@ -1,4 +1,4 @@
-from fastapi_healthchecks.checks import Check, CheckResult
+from fastapi_healthchecks.checks import Check, CheckResult  # type: ignore
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.database import Database
 from pymongo.server_api import ServerApi
