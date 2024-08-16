@@ -36,15 +36,21 @@ ENABLE_CACHE=<True/False>
 CACHE_EXPIRE=<cache_expiration_time_in_seconds>
 ```
 
-## Building Docker Image and Running the Container (Recommended)
+## Running the API using Docker Container (Recommended)
 
 1. Build the Docker image
     ```bash
     docker buildx build --no-cache -t torchlite-backend .
     ```
-2. Run the Docker container
+2. Run the TORCHLITE Backend using EITHER of the steps below.
+   
+   a. Using Docker Run command. This assumes that MongoDB and Redis are running on the host machine.
     ```bash
     docker run --env-file .env -p 8000:8000 torchlite-backend
+    ```
+   b. Using Docker Compose (further testing and updating the instructions may be needed)
+    ```bash
+    docker-compose up
     ```
 
 ## Running the API using Poetry (Alternative) 
