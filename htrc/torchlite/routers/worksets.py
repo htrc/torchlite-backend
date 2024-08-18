@@ -18,7 +18,7 @@ async def list_worksets(workset_manager: WorksetManager, author: str | None = No
     public_worksets = await workset_manager.get_public_worksets()
     featured_worksets = workset_manager.get_featured_worksets()
 
-    return { 'public': sorted(list(public_worksets.values()),key=lambda d: d.name), 'featured': sorted(list(featured_worksets.values()),key=lambda d: d.name)}
+    return { 'public': sorted(list(public_worksets.values()),key=lambda d: d.name), 'featured': sorted(list(featured_worksets.values()),key=lambda d: d.name), 'user': []}
 
 
 @router.get("/{imported_id}/metadata", response_model_exclude_defaults=True)
