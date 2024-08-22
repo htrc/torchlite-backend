@@ -20,12 +20,15 @@ async def list_worksets(workset_manager: WorksetManager, author: str | None = No
     public_worksets = await workset_manager.get_public_worksets()
     featured_worksets = workset_manager.get_featured_worksets()
 
-    return { 'public': sorted(list(public_worksets.values()),key=lambda d: d.name), 'featured': sorted(list(featured_worksets.values()),key=lambda d: d.name), 'user': []}
+    return {'public': sorted(list(public_worksets.values()), key=lambda d: d.name),
+            'featured': sorted(list(featured_worksets.values()), key=lambda d: d.name), 'user': []}
+
 
 @router.get("/{imported_id}/metadata", response_model_exclude_defaults=True)
 @cache()
 async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager) -> WorksetInfo:
-    imported_id_mapping = await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": UUID(imported_id)}).to_list(1000))
+    imported_id_mapping = await WorksetIdMapping.from_mongo(
+        mongo_client.db["id-mappings"].find({"importedId": UUID(imported_id)}).to_list(1000))
     if len(imported_id_mapping):
         imported_id_mapping = imported_id_mapping[0]
         ef_wsid = imported_id_mapping.workset_id
