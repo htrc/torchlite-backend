@@ -22,9 +22,8 @@ class Config:
 
     TORCHLITE_UID = UUID("95164779-1fc9-4592-9c74-7a014407f46d")  # do not change
     EF_API_URL = os.environ.get("EF_API_URL", "https://data.htrc.illinois.edu/ef-api")
-    REGISTRY_API_URL = os.environ.get("REGISTRY_API_URL")
+    REGISTRY_API_URL = os.environ.get("REGISTRY_API_URL", "https://analytics.dev.htrc.indiana.edu")
     FEATURED_WORKSET_USER = os.environ.get("FEATURED_WORKSET_USER")
-
     FEATURED_WORKSETS_URL = os.environ.get("FEATURED_WORKSETS_URL")
 
     # Cache settings
