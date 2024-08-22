@@ -34,6 +34,8 @@ MONGODB_URL=<mongodb_url>
 REDIS_URL=<redis_url>
 ENABLE_CACHE=<True/False>
 CACHE_EXPIRE=<cache_expiration_time_in_seconds>
+REGISTRY_API_URL=<registry_api_url>
+FEATURED_WORKSET_USER=<featured_workset_user>
 ```
 
 ## Running the API using Docker Container (Recommended)
