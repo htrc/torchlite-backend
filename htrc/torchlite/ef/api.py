@@ -64,7 +64,7 @@ class EfApi:
             params["fields"] = ",".join(fields)
 
         data = await self._get(
-            f"{self.ef_api_url}/worksets/{wsid}/volumesAggNoPos",
+            f"{self.ef_api_url}/worksets/{wsid}/volumes",
             params=params,
             **kwargs
         )
