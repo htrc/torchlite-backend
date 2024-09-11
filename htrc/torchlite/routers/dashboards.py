@@ -126,10 +126,12 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
     dashboard = await get_dashboard(dashboard_id, user)
 
-    #fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
-    #dashbaord to the expected model type if it is just a dict, so that dashbaord.widgets doesn't
-    #throw an error.
-    if isinstance(dashboard,dict):
+    # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
+    # dashboard to the expected model type if it is just a dict, so that dashboard.widgets doesn't
+    # throw an error.
+    # This is happening only when an endpoint calls another method that is cached. Direct calls to
+    # endpoints that return pydantic models are not affected.
+    if isinstance(dashboard, dict):
         dashboard = DashboardSummary.model_validate(dashboard)
         
     widget = next((w for w in dashboard.widgets if w.type == widget_type), None)
