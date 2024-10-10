@@ -1,4 +1,6 @@
 from .base import BaseModel
+from uuid import UUID
+from .mongo import MongoModel
 
 
 class WorksetSummary(BaseModel):
@@ -27,3 +29,7 @@ class VolumeMetadata(BaseModel):
 
 class WorksetInfo(WorksetSummary):
     volumes: list[VolumeMetadata]
+
+class WorksetIdMapping(MongoModel):
+    workset_id: str
+    imported_id: UUID

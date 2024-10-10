@@ -21,8 +21,8 @@ class PublicationDateTimelineWidget(WidgetBase):
 
     async def get_data(self, volumes: list[ef_models.Volume]) -> list[PubDateEntry]:
         pub_date_counter = Counter(
-            v.metadata.pub_date
-            for v in volumes if
+            v.metadata.pub_date 
+            for v in volumes if 
             v.metadata.pub_date is not None and (isinstance(v.metadata.pub_date, int) or v.metadata.pub_date.isdigit())
         )
         return sorted([

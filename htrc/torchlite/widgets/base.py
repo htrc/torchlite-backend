@@ -11,7 +11,9 @@ from ..models.workset import WorksetInfo
 
 class WidgetDataTypes(IntEnum):
     metadata_only = 1
-    agg_vols_no_pos = 2
+    vols_no_pos = 2
+    vols_with_pos = 3
+    agg_vols_no_pos = 4
 
 
 class WidgetBase(BaseModel):

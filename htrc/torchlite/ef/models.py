@@ -117,7 +117,6 @@ class VolumeFeatures(BaseModel):
     page_count: int | None = None
     pages: list[PageFeatures] = []
 
-
 class VolumeAggFeaturesNoPos(BaseModel):
     type: str | None = None
     id: str | None = None
@@ -133,9 +132,7 @@ class VolumeAggFeaturesNoPos(BaseModel):
     footer: dict[str, int] | None = None
     calculated_language: list[str] | None = None
 
-
 FeaturesT = TypeVar('FeaturesT')
-
 
 class Volume(BaseModel, Generic[FeaturesT]):
     htid: str

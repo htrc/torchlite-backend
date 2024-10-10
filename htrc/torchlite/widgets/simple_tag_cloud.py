@@ -9,11 +9,11 @@ from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
 from ..ef.models import VolumeAggFeaturesNoPos
 
-
 class SimpleTagCloudWidget(WidgetBase):
     type: Literal['SimpleTagCloud'] = 'SimpleTagCloud'
     data_type: WidgetDataTypes = WidgetDataTypes.agg_vols_no_pos
 
+    
     stopwords: Set[str] = (
         set("i,me,my,myself,we,us,our,ours,ourselves,you,your,yours,yourself,yourselves,he,him,his,himself,"
             "she,her,hers,herself,it,its,itself,they,them,their,theirs,themselves,what,which,who,whom,whose,"
@@ -27,7 +27,7 @@ class SimpleTagCloudWidget(WidgetBase):
             "here,there,when,where,why,how,all,any,both,each,few,more,most,other,some,such,no,nor,not,only,own,"
             "same,so,than,too,very,say,says,said,shall,the,`,``,|".split(","))
     )
-
+    
     punctuation_and_numbers_regex: str = r'[\p{P}\d]'
     _regex: Pattern = re.compile(punctuation_and_numbers_regex)
 
