@@ -27,8 +27,12 @@ async def torchlite_startup():
     log.info(f"Starting Torchlite API Server v{VERSION} ({env})")
 
     # Setup backend caching
-    redis = aioredis.from_url(config.REDIS_URL)
-    FastAPICache.init(RedisBackend(redis), enable=config.ENABLE_CACHE, prefix=config.REDIS_PREFIX, expire=config.CACHE_EXPIRE, cache_status_header=config.CACHE_STATUS_HEADER)
+    try:
+        redis = aioredis.from_url(config.REDIS_URL)
+        FastAPICache.init(RedisBackend(redis), enable=config.ENABLE_CACHE, prefix=config.REDIS_PREFIX, expire=config.CACHE_EXPIRE, cache_status_header=config.CACHE_STATUS_HEADER)
+        log.info('Cache initialized successfully')
+    except Exception as e:
+        log.error(f'Error initializing cache {e}')
 
     # ensure DB is alive
     await mongo_client.ping()
