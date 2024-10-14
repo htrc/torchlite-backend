@@ -26,7 +26,6 @@ router = APIRouter(
 @cache()
 async def list_dashboards(owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
-    print("Running list_dashboards()")
     if owner == config.TORCHLITE_UID:
         return await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
