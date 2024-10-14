@@ -12,6 +12,7 @@ from ..ef.api import ef_api
 from ..errors import TorchliteError
 from ..managers.workset_manager import WorksetManager
 from ..models.dashboard import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
+from ..models.workset import WorksetIdMapping
 from ..widgets.base import WidgetDataTypes
 
 router = APIRouter(
@@ -53,14 +54,13 @@ async def create_dashboard(dashboard_create: DashboardCreate,
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    await workset_manager.get_featured_worksets()
-    if not workset_manager.is_valid_workset(dashboard_create.workset_id):
+    await workset_manager.get_public_worksets()
+    if not workset_manager.is_valid_workset(dashboard_create.imported_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unknown workset id {dashboard_create.workset_id}"
+            detail=f"Unknown imported id {dashboard_create.imported_id}"
         )
 
-    # dashboard = DashboardSummary.model_construct(**dashboard_create.model_dump(exclude_defaults=True), owner=owner)
     dashboard = DashboardSummary(**(dashboard_create.model_dump(exclude_defaults=True)), owner=owner)
     await mongo_client.db["dashboards"].insert_one(dashboard.to_mongo(exclude_unset=False))
 
@@ -89,15 +89,14 @@ async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            workset_manager: WorksetManager,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
-    await workset_manager.get_featured_worksets()
-    if dashboard_patch.workset_id and not workset_manager.is_valid_workset(dashboard_patch.workset_id):
+    await workset_manager.get_public_worksets()
+    if dashboard_patch.imported_id and not workset_manager.is_valid_workset(dashboard_patch.imported_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unknown workset id {dashboard_patch.workset_id}"
+            detail=f"Unknown workset id {dashboard_patch.imported_id}"
         )
 
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
-    # dashboard_patch_update = DashboardPatchUpdate.model_construct(**dashboard_patch.model_dump(exclude_defaults=True))
     dashboard_patch_update = DashboardPatchUpdate(**dashboard_patch.model_dump(exclude_defaults=True))
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one_and_update(
@@ -128,19 +127,20 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
+    imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
 
     match widget.data_type:
         case WidgetDataTypes.metadata_only:
-            volumes = await ef_api.get_workset_metadata(dashboard.workset_id)
+            volumes = await ef_api.get_workset_metadata(imported_id_mapping.workset_id)
 
         case WidgetDataTypes.vols_with_pos:
-            volumes = await ef_api.get_workset_volumes(dashboard.workset_id, include_pos=True)
+            volumes = await ef_api.get_workset_volumes(imported_id_mapping.workset_id, include_pos=True)
 
         case WidgetDataTypes.vols_no_pos:
-            volumes = await ef_api.get_workset_volumes(dashboard.workset_id, include_pos=False)
+            volumes = await ef_api.get_workset_volumes(imported_id_mapping.workset_id, include_pos=False)
 
         case WidgetDataTypes.agg_vols_no_pos:
-            volumes = await ef_api.get_aggregated_workset_volumes(dashboard.workset_id)
+            volumes = await ef_api.get_aggregated_workset_volumes(imported_id_mapping.workset_id)
 
         case _:
             raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
