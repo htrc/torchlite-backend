@@ -21,7 +21,7 @@ from .version import VERSION
 log = logging.getLogger(config.PROJECT_NAME)
 
 
-async def torchlite_startup():
+async def torchlite_startup() -> redis.Redis:
     print_splash()
     env = os.environ.get("ENV", "dev")
     log.info(f"Starting Torchlite API Server v{VERSION} ({env})")
@@ -44,18 +44,21 @@ async def torchlite_startup():
     #
     # log.info(f"Loading configuration from {config_file_name}...")
 
+    return redis_connection
 
-async def torchlite_shutdown():
+
+async def torchlite_shutdown(redis_connection: redis.Redis):
     log.info("Server shutting down")
     await http.aclose()
+    await redis_connection.aclose()
     mongo_client.close()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
-    await torchlite_startup()
+    redis_connection = await torchlite_startup()
     yield
-    await torchlite_shutdown()
+    await torchlite_shutdown(redis_connection)
 
 
 api = FastAPI(
