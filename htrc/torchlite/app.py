@@ -28,6 +28,7 @@ async def torchlite_startup():
 
     # Setup backend caching
     try:
+        log.info(config.REDIS_URL)
         redis = aioredis.from_url(config.REDIS_URL)
 #        log.info(await redis.ping())
         await redis.ping()
