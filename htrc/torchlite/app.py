@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
-from redis import asyncio as aioredis
+from redis.cluster import RedisCluster
 
 from .config import config
 from .database import mongo_client
@@ -28,7 +28,7 @@ async def torchlite_startup():
 
     # Setup backend caching
     try:
-        redis = aioredis.from_url(config.REDIS_URL)
+        redis = RedisCluster.from_url(config.REDIS_URL)
 #        log.info(await redis.ping())
         await redis.ping()
         FastAPICache.init(RedisBackend(redis), enable=config.ENABLE_CACHE, prefix=config.REDIS_PREFIX, expire=config.CACHE_EXPIRE, cache_status_header=config.CACHE_STATUS_HEADER)
