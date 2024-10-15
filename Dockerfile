@@ -1,12 +1,12 @@
 FROM python:3.12-slim
 
-ENV TORCHLITE_PORT 8000
+ENV TORCHLITE_PORT=8000
 
 # Turns off buffering for easier container logging
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONFAULTHANDLER 1
-ENV PYTHONHASHSEED random
-ENV PIP_NO_CACHE_DIR 1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONFAULTHANDLER=1
+ENV PYTHONHASHSEED=random
+ENV PIP_NO_CACHE_DIR=1
 
 RUN apt update && apt -y install dumb-init && rm -rf /var/lib/apt/lists/*
 
