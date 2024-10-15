@@ -25,7 +25,8 @@ class FilterSettings(BaseModel):
 
 class Dashboard(BaseModel, arbitrary_types_allowed=True):
     id: PyUuid = Field(default_factory=uuid.uuid4)
-    workset_id: str
+    imported_id: UUID
+#    workset_id: str
     filters: FilterSettings | None
     widgets: list[ALL_WIDGETS]
 
@@ -37,18 +38,21 @@ class DashboardSummary(Dashboard, MongoModel):
     is_shared: bool = False
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
+    imported_id: UUID | None = None
 
 
 class DashboardCreate(MongoModel):
     title: str | None = None
     description: str | None = None
-    workset_id: str
+#    workset_id: str
+    imported_id: UUID
     filters: FilterSettings | None = None
     widgets: conlist(ALL_WIDGETS, min_length=1)
 
 
 class DashboardPatch(MongoModel):
-    workset_id: str | None = None
+#    workset_id: str | None = None
+    imported_id: UUID | None = None
     filters: FilterSettings | None = None
     widgets: list[ALL_WIDGETS] | None = None
     is_shared: bool | None = None
