@@ -40,6 +40,7 @@ class _WorksetManager:
     async def get_user_worksets(self, user_access_token: str | None) -> dict[str, WorksetSummary]:
         if self.user_worksets is None and user_access_token is not None:
             headers = {'Accept': 'application/json', 'Authorization': user_access_token}
+            print(headers)
             response = await http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
             print(response)
             print(response.url)
