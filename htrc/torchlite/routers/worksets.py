@@ -7,7 +7,7 @@ from ..ef.api import ef_api
 from ..managers.workset_manager import WorksetManager
 from ..models.workset import WorksetSummary, WorksetInfo, WorksetIdMapping
 from ..database import mongo_client
-from ..auth import get_current_user
+from ..auth.auth import get_current_user
 
 router = APIRouter(
     prefix="/worksets",
