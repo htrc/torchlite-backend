@@ -37,9 +37,9 @@ class _WorksetManager:
 
         return self.public_worksets
 
-    async def get_user_worksets(self) -> dict[str, WorksetSummary]:
-        if self.user_worksets is None:
-            headers = {'Accept': 'application/json'}
+    async def get_user_worksets(self, user_id: str | None) -> dict[str, WorksetSummary]:
+        if self.user_worksets is None and user_id is not None:
+            headers = {'Accept': 'application/json', 'Authorization': f'Bearer {user_id}'}
             response = await http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
             print(response)
             print(response.content)
