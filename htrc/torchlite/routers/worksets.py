@@ -7,7 +7,7 @@ from ..ef.api import ef_api
 from ..managers.workset_manager import WorksetManager
 from ..models.workset import WorksetSummary, WorksetInfo, WorksetIdMapping
 from ..database import mongo_client
-from ..auth.auth import get_current_user
+from ..auth.auth import get_user_access_token
 
 router = APIRouter(
     prefix="/worksets",
@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model_exclude_defaults=True)
-async def list_worksets(workset_manager: WorksetManager, user: Annotated[str | None, Depends(get_current_user)]) -> dict[str, list[WorksetSummary]]:
+async def list_worksets(workset_manager: WorksetManager, user: Annotated[str | None, Depends(get_user_access_token)]) -> dict[str, list[WorksetSummary]]:
     print(user)
 #    user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     public_worksets = await workset_manager.get_public_worksets()
