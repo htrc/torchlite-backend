@@ -17,6 +17,7 @@ router = APIRouter(
 
 @router.get("/", response_model_exclude_defaults=True)
 async def list_worksets(workset_manager: WorksetManager, user: Annotated[str | None, Depends(get_current_user)]) -> dict[str, list[WorksetSummary]]:
+    print(user)
 #    user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     public_worksets = await workset_manager.get_public_worksets()
     featured_worksets = workset_manager.get_featured_worksets()
