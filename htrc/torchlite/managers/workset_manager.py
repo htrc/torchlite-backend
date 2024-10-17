@@ -42,6 +42,8 @@ class _WorksetManager:
             headers = {'Accept': 'application/json', 'Authorization': f'Bearer {user_id}'}
             response = await http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
             print(response)
+            print(response.url)
+            print(response.headers)
             print(response.content)
             data = json.loads(response.content)
             self.user_worksets = {
