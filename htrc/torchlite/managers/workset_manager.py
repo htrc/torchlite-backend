@@ -42,6 +42,7 @@ class _WorksetManager:
             headers = {'Accept': 'application/json'}
             response = await http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
             print(response)
+            print(response.content)
             data = json.loads(response.content)
             self.user_worksets = {
                 workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
