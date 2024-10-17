@@ -31,8 +31,6 @@ Token = Annotated[str | None, Depends(fastapi_oauth2)]
 
 
 async def get_current_user(token: Token) -> UserInfo | None:
-    print("get_current_user")
-    print(token)
     user = None
 
     if token:
