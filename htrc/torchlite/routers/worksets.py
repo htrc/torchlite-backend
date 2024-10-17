@@ -17,6 +17,8 @@ router = APIRouter(
 async def list_worksets(workset_manager: WorksetManager, author: str | None = None) -> dict[str, list[WorksetSummary]]:
     public_worksets = await workset_manager.get_public_worksets()
     featured_worksets = workset_manager.get_featured_worksets()
+    user_worksets = await workset_manager.get_user_worksets()
+    print(user_worksets)
 
     return { 'public': sorted(list(public_worksets.values()),key=lambda d: d.name), 'featured': sorted(list(featured_worksets.values()),key=lambda d: d.name), 'user': []}
 

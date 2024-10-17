@@ -14,6 +14,7 @@ class _WorksetManager:
     def __init__(self):
         self.featured_worksets = None
         self.public_worksets = None
+        self.user_worksets = None
 
     def get_featured_worksets(self) -> dict[str, WorksetSummary]:
         if self.featured_worksets is None:
@@ -35,6 +36,18 @@ class _WorksetManager:
             }
 
         return self.public_worksets
+
+    async def get_user_worksets(self) -> dict[str, WorksetSummary]:
+        if self.user_worksets is None:
+            headers = {'Accept': 'application/json'}
+            response = await http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
+            data = json.loads(response.content)
+            self.user_worksets = {
+                workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
+                for workset in data['worksets']['workset']
+            }
+
+        return self.user_worksets
     
     async def get_public_workset_volumes(self, wsid: str) -> str:
         headers = {'Accept': 'application/json'}
