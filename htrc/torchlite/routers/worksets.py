@@ -1,11 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from uuid import UUID
+from typing import Annotated
 
 from ..converters import torchlite_volume_meta_from_ef
 from ..ef.api import ef_api
 from ..managers.workset_manager import WorksetManager
 from ..models.workset import WorksetSummary, WorksetInfo, WorksetIdMapping
 from ..database import mongo_client
+from ..auth import get_current_user
 
 router = APIRouter(
     prefix="/worksets",
@@ -14,7 +16,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model_exclude_defaults=True)
-async def list_worksets(workset_manager: WorksetManager, author: str | None = None) -> dict[str, list[WorksetSummary]]:
+async def list_worksets(workset_manager: WorksetManager, author: Annotated[str | None, Depends(get_current_user)]) -> dict[str, list[WorksetSummary]]:
     print(author)
     public_worksets = await workset_manager.get_public_worksets()
     featured_worksets = workset_manager.get_featured_worksets()
