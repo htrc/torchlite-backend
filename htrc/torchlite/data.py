@@ -1,8 +1,13 @@
+import nltk
 from .converters import torchlite_volume_meta_from_ef
 from .ef.models import Volume
 from .models.dashboard import FilterSettings
+from .models.dashboard import DataCleaningSettings
 from .utils import make_set
-
+from nltk.corpus import stopwords
+import os
+import json
+import regex as re
 
 def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume]:
     filtered_volumes = []
@@ -34,3 +39,57 @@ def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume
         filtered_volumes.append(volume)
 
     return filtered_volumes
+
+def load_stopwords(language, directory="stopword_lists"):
+    #COMMON CODE, SHOULD BE CALLED ONCE
+    default_languages = ['english', 'german', 'spanish', 'french']
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    for lang in default_languages:
+        stopword_list = stopwords.words(lang)
+        stopword_file_path = os.path.join(directory, f"{lang}_stopwords.json")
+        with open(stopword_file_path, 'w', encoding='utf-8') as file:
+            json.dump(stopword_list, file, ensure_ascii=False, indent=4)
+    ######
+
+    stopword_file_path = os.path.join(directory, f"{language}_stopwords.json")
+
+    if not os.path.exists(stopword_file_path):
+        print(f"Stopwords file for language '{language}' not found.")
+
+    with open(stopword_file_path, 'r', encoding='utf-8') as file:
+        stopword_list = json.load(file)
+    
+    return stopword_list
+
+def clean_volume_data(volume, stopwords, regex_pattern):
+    cleaned_data = {}
+
+    for word, count in volume['features']['body'].items():
+        lower_word = word.lower()
+
+        if lower_word not in stopwords and not re.search(regex_pattern, lower_word):
+            cleaned_data[lower_word] = count
+
+    return {
+        **volume,
+        'features': {
+            **volume['features'],
+            'body': cleaned_data
+        }
+    }
+
+def apply_datacleaning(filtered_volumes, cleaning_settings: DataCleaningSettings):
+    language = cleaning_settings.get('language', 'english')
+    
+    stopwords = load_stopwords(language)
+    regex_pattern = re.compile(r'[\p{P}\d]')
+
+    cleaned_volumes = []
+    for volume in filtered_volumes:
+        cleaned_volume = clean_volume_data(volume, stopwords, regex_pattern) 
+        cleaned_volumes.append(cleaned_volume)
+
+    return cleaned_volumes
+
+#new language list can be loaded when selected

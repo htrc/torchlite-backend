@@ -7,6 +7,7 @@ from pymongo import ReturnDocument
 from ..auth.auth import get_current_user
 from ..config import config
 from ..data import apply_filters
+from ..data import apply_datacleaning
 from ..database import mongo_client
 from ..ef.api import ef_api
 from ..errors import TorchliteError
@@ -24,6 +25,7 @@ router = APIRouter(
 @router.get("/", description="Retrieve the available dashboards for a user", response_model_exclude_defaults=True)
 async def list_dashboards(owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
+    print("Pooja DEbug")
     if owner == config.TORCHLITE_UID:
         return await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
@@ -120,6 +122,7 @@ async def update_dashboard(dashboard_id: UUID,
 @router.get("/{dashboard_id}/widgets/{widget_type}/data", description="Retrieve widget data")
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
+    print("Whatt")
     dashboard = await get_dashboard(dashboard_id, user)
     widget = next((w for w in dashboard.widgets if w.type == widget_type), None)
     if not widget:
@@ -146,4 +149,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
 
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
-    return await widget.get_data(filtered_volumes)
+    print("pooja")
+    cleaned_volumes = apply_datacleaning(filtered_volumes, cleaning_settings=dashboard.datacleaning)
+    
+    return await widget.get_data(cleaned_volumes)
