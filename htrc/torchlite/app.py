@@ -30,7 +30,7 @@ async def torchlite_startup() -> redis.Redis:
     try:
         redis_connection = redis.Redis(host=config.REDIS_HOST,port=config.REDIS_PORT,password=config.REDIS_PASSWORD,db=config.REDIS_DB)
         log.info(f"Ping successful: {await redis_connection.ping()}")
-        FastAPICache.init(RedisBackend(redis_connection), enable=config.ENABLE_CACHE, prefix=config.REDIS_PREFIX, expire=config.CACHE_EXPIRE, cache_status_header=config.CACHE_STATUS_HEADER)
+        FastAPICache.init(RedisBackend(redis_connection), enable=config.ENABLE_CACHE, expire=config.CACHE_EXPIRE, cache_status_header=config.CACHE_STATUS_HEADER)
         log.info('Cache initialized successfully')
     except Exception as e:
         log.error(f'Error initializing cache {e}')
