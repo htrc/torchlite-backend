@@ -33,7 +33,7 @@ class Config:
     REDIS_PORT = int(os.environ.get("REDIS_PORT", "6379"))
     REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD", "")
     REDIS_DB = int(os.environ.get("REDIS_DB", "1"))
-    REDIS_PREFIX = os.environ.get("REDIS_PREFIX", "torchlite-cache")
+#    REDIS_PREFIX = os.environ.get("REDIS_PREFIX", "torchlite-cache")
     CACHE_STATUS_HEADER = "x-torchlite-cache"
 
 
