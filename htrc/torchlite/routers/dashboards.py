@@ -25,21 +25,22 @@ router = APIRouter(
 @router.get("/", description="Retrieve the available dashboards for a user", response_model_exclude_defaults=True)
 async def list_dashboards(owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
-    print("Pooja DEbug")
+
+    print(owner)
     if owner == config.TORCHLITE_UID:
         return await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
         )
-
+    print("b")
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
+    print("c")
     user_id = UUID(user.get("htrc-guid", user.sub))
     owner = owner or user_id
-
+    print("d")
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-
+    print("e")
     return await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)
     )
@@ -118,11 +119,11 @@ async def update_dashboard(dashboard_id: UUID,
         else:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
+#dashboard_id/stopwords
 @router.get("/{dashboard_id}/widgets/{widget_type}/data", description="Retrieve widget data")
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
-    print("Whatt")
+    
     dashboard = await get_dashboard(dashboard_id, user)
     widget = next((w for w in dashboard.widgets if w.type == widget_type), None)
     if not widget:
@@ -131,7 +132,8 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
     imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
-
+    
+    #print(widget.data_type)
     match widget.data_type:
         case WidgetDataTypes.metadata_only:
             volumes = await ef_api.get_workset_metadata(imported_id_mapping.workset_id)
@@ -147,9 +149,9 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 
         case _:
             raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
-
+    #check widget type and perform cleaning
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
-    print("pooja")
+    print(f"Total volumes before cleaning: filtered_volumes {len(filtered_volumes)}")
     cleaned_volumes = apply_datacleaning(filtered_volumes, cleaning_settings=dashboard.datacleaning)
-    
-    return await widget.get_data(cleaned_volumes)
+    print(f"Total volumes to clean: cleaned_volumes {len(cleaned_volumes)}")
+    return await widget.get_data(filtered_volumes)

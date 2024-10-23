@@ -42,6 +42,7 @@ def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume
 
 def load_stopwords(language, directory="stopword_lists"):
     #COMMON CODE, SHOULD BE CALLED ONCE
+    #skip it if already exists
     default_languages = ['english', 'german', 'spanish', 'french']
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -62,32 +63,36 @@ def load_stopwords(language, directory="stopword_lists"):
     
     return stopword_list
 
-def clean_volume_data(volume, stopwords, regex_pattern):
+def clean_volume_data(volume, stopwords):
     cleaned_data = {}
 
-    for word, count in volume['features']['body'].items():
+    for word, count in volume.features.body.items():
         lower_word = word.lower()
 
-        if lower_word not in stopwords and not re.search(regex_pattern, lower_word):
-            cleaned_data[lower_word] = count
-
-    return {
-        **volume,
-        'features': {
-            **volume['features'],
-            'body': cleaned_data
-        }
-    }
+        if lower_word not in stopwords:
+            cleaned_data[lower_word] = count # checking word and just matches or not then pass through the data as cleaned
+        ##print the data before and after , just stopwords should be removed
+        #output to 2 file and run a diff
+    volume.features.body = cleaned_data
+    print("assigned")
+    return volume
 
 def apply_datacleaning(filtered_volumes, cleaning_settings: DataCleaningSettings):
-    language = cleaning_settings.get('language', 'english')
+    language = 'english'#cleaning_settings.language## if other thAN NONE APPLY LOGIC FOR STIPWORDS
     
     stopwords = load_stopwords(language)
-    regex_pattern = re.compile(r'[\p{P}\d]')
-
+    print(stopwords)
     cleaned_volumes = []
+    
+    count = 0
     for volume in filtered_volumes:
-        cleaned_volume = clean_volume_data(volume, stopwords, regex_pattern) 
+        
+        #print(volume.features.body)
+        print(f"'me' present before cleaning: {'me' in volume.features.body}")
+        cleaned_volume = clean_volume_data(volume, stopwords) 
+        count += 1
+        #print(count)
+        print(f"'me' present after cleaning: {'me' in cleaned_volume.features.body}")
         cleaned_volumes.append(cleaned_volume)
 
     return cleaned_volumes
