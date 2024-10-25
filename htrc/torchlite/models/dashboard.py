@@ -50,7 +50,7 @@ class DashboardCreate(MongoModel):
 #    workset_id: str
     imported_id: UUID
     filters: FilterSettings | None = None
-    datacleaning: DataCleaningSettings | None
+    datacleaning: DataCleaningSettings | None = None
     widgets: conlist(ALL_WIDGETS, min_length=1)
 
 
@@ -58,7 +58,7 @@ class DashboardPatch(MongoModel):
 #    workset_id: str | None = None
     imported_id: UUID | None = None
     filters: FilterSettings | None = None
-    datacleaning: DataCleaningSettings | None
+    datacleaning: DataCleaningSettings | None = None
     widgets: list[ALL_WIDGETS] | None = None
     is_shared: bool | None = None
 
