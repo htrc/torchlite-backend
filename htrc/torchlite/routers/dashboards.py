@@ -2,7 +2,11 @@ from uuid import UUID
 
 from authlib.oidc.core import UserInfo
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi_cache.decorator import cache
+from fastapi_cache import FastAPICache
 from pymongo import ReturnDocument
+from starlette.requests import Request
+from starlette.responses import Response
 
 from ..auth.auth import get_current_user
 from ..config import config
@@ -20,8 +24,14 @@ router = APIRouter(
     tags=["dashboards"],
 )
 
+def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None, args, **kwargs,):
+    try:
+        return request.url.path
+    except AttributeError:
+        return f"/dashboards/{args[0]}"
 
 @router.get("/", description="Retrieve the available dashboards for a user", response_model_exclude_defaults=True)
+@cache()
 async def list_dashboards(owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
     if owner == config.TORCHLITE_UID:
@@ -68,6 +78,7 @@ async def create_dashboard(dashboard_create: DashboardCreate,
 
 
 @router.get("/{dashboard_id}", description="Retrieve a dashboard", response_model_exclude_defaults=True)
+@cache(key_builder=request_key_builder)
 async def get_dashboard(dashboard_id: UUID,
                         user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
@@ -106,6 +117,12 @@ async def update_dashboard(dashboard_id: UUID,
         )
     )
     if dashboard:
+        try:
+            for w in dashboard.widgets:
+                await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/widgets/{w.type}/data")
+            await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}")
+        except Exception as e:
+            print(f"Error Clearing Cache: {e}")
         return dashboard
     else:
         dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
@@ -118,9 +135,19 @@ async def update_dashboard(dashboard_id: UUID,
 
 
 @router.get("/{dashboard_id}/widgets/{widget_type}/data", description="Retrieve widget data")
+@cache(key_builder=request_key_builder)
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
     dashboard = await get_dashboard(dashboard_id, user)
+
+    # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
+    # dashboard to the expected model type if it is just a dict, so that dashboard.widgets doesn't
+    # throw an error.
+    # This is happening only when an endpoint calls another method that is cached. Direct calls to
+    # endpoints that return pydantic models are not affected.
+    if isinstance(dashboard, dict):
+        dashboard = DashboardSummary.model_validate(dashboard)
+        
     widget = next((w for w in dashboard.widgets if w.type == widget_type), None)
     if not widget:
         raise HTTPException(

@@ -4,6 +4,7 @@ version = "0.0.0"
 description = "Torchlite API backend service"
 authors = [
   "capitanu <capitanu@illinois.edu>",
+  "Sandeep Puthanveetil Satheesan <sandeeps@illinois.edu>"
 ]
 readme = "README.md"
 packages = [{include = "htrc"}]
@@ -27,6 +28,7 @@ httpx = "^0.27.0"
 pydantic = "^2.4.2"
 regex = "^2024.5.10"
 ruamel-yaml = "^0.18.6"
+fastapi-cache2 = {version = "^0.2.2", extras = ["redis"]}
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.2"
