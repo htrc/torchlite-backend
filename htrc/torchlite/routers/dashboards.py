@@ -8,7 +8,7 @@ from pymongo import ReturnDocument
 from starlette.requests import Request
 from starlette.responses import Response
 
-from ..auth.auth import get_current_user
+from ..auth.auth import get_current_user, get_user_access_token
 from ..config import config
 from ..data import apply_filters
 from ..database import mongo_client
@@ -99,7 +99,11 @@ async def get_dashboard(dashboard_id: UUID,
 async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            workset_manager: WorksetManager,
-                           user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
+                           user_access_token: UserInfo | None = Depends(get_user_access_token)) -> DashboardSummary:
+    print("update_dashboard()")
+    print(user_access_token)
+    user = get_current_user(user_access_token)
+    print(user)
     await workset_manager.get_public_worksets()
     if dashboard_patch.imported_id and not workset_manager.is_valid_workset(dashboard_patch.imported_id):
         raise HTTPException(
