@@ -25,7 +25,8 @@ async def list_worksets(workset_manager: WorksetManager, user_access_token: Anno
     print(user_worksets)
 
     return {'public': sorted(list(public_worksets.values()), key=lambda d: d.name),
-            'featured': sorted(list(featured_worksets.values()), key=lambda d: d.name), 'user': []}
+            'featured': sorted(list(featured_worksets.values()), key=lambda d: d.name), 
+            'user': sorted(list(user_worksets.values()), key=lambda d: d.name)}
 
 
 @router.get("/{imported_id}/metadata", response_model_exclude_defaults=True)
