@@ -1,10 +1,9 @@
 from typing import Annotated
 
 from fastapi import Depends
-
+from authlib.oidc.core import UserInfo
 from htrc.torchlite.config import config
 from htrc.torchlite.models.workset import WorksetSummary
-#from htrc.torchlite.utils import load_yaml
 from htrc.torchlite.http_client import http
 import json
 
@@ -56,7 +55,13 @@ class _WorksetManager:
         data = json.loads(response.content)
         return [htid['id'] for htid in data['workset']['content']['volumes']['volume']]
     
-#    async def get_user_workset_volumes(self, wsid: str) -> str:
+    async def get_user_workset_volumes(self, wsid: str, user_access_token: UserInfo) -> str:
+        print("get_user_workset_volumes()")
+        headers = {'Accept': 'application/json', 'Authorization': user_access_token}
+        response = await http.get(f"{config.REGISTRY_API_URL}/workset/{wsid}", headers=headers)
+        data = json.loads(response.content)
+        print(data)
+        return [htid['id'] for htid in data['workset']['content']['volumes']['volume']]
 
     def is_valid_workset(self, wsid: str) -> bool:
         if isinstance(wsid,str):
