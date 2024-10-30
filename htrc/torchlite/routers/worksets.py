@@ -44,6 +44,7 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
     else:
         print("B")
         imported_volumes = await workset_manager.get_public_workset_volumes(imported_id)
+        print(imported_volumes)
         ef_wsid = await ef_api.create_workset(' '.join(imported_volumes))
         mongo_client.db["id-mappings"].insert_one({"importedId": UUID(imported_id), "worksetId": ef_wsid})
 
