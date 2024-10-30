@@ -29,13 +29,20 @@ async def list_worksets(workset_manager: WorksetManager, user_access_token: Anno
 
 @router.get("/{imported_id}/metadata", response_model_exclude_defaults=True)
 @cache()
-async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager) -> WorksetInfo:
+async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager, user_access_token: Annotated[str | None, Depends(get_user_access_token)]) -> WorksetInfo:
+    print("get_workset_metadata()")
+    print(imported_id)
+    print(workset_manager)
+    print(user_access_token)
     imported_id_mapping = await WorksetIdMapping.from_mongo(
         mongo_client.db["id-mappings"].find({"importedId": UUID(imported_id)}).to_list(1000))
+    print(imported_id_mapping)
     if len(imported_id_mapping):
+        print("A")
         imported_id_mapping = imported_id_mapping[0]
         ef_wsid = imported_id_mapping.workset_id
     else:
+        print("B")
         imported_volumes = await workset_manager.get_public_workset_volumes(imported_id)
         ef_wsid = await ef_api.create_workset(' '.join(imported_volumes))
         mongo_client.db["id-mappings"].insert_one({"importedId": UUID(imported_id), "worksetId": ef_wsid})
