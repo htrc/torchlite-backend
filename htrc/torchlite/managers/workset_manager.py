@@ -59,6 +59,7 @@ class _WorksetManager:
         print("get_user_workset_volumes()")
         headers = {'Accept': 'application/json', 'Authorization': user_access_token}
         response = await http.get(f"{config.REGISTRY_API_URL}/workset/{wsid}", headers=headers)
+        print(response)
         data = json.loads(response.content)
         print(data)
         return [htid['id'] for htid in data['workset']['content']['volumes']['volume']]
