@@ -55,6 +55,8 @@ class _WorksetManager:
         response = await http.get(f"{config.REGISTRY_API_URL}/publicworksets/{wsid}", headers=headers)
         data = json.loads(response.content)
         return [htid['id'] for htid in data['workset']['content']['volumes']['volume']]
+    
+#    async def get_user_workset_volumes(self, wsid: str) -> str:
 
     def is_valid_workset(self, wsid: str) -> bool:
         if isinstance(wsid,str):
@@ -62,7 +64,10 @@ class _WorksetManager:
         else:
             wsid_string = str(wsid)
 
-        return wsid_string in self.public_worksets
+        if wsid_string in self.public_worksets or wsid_string in self.user_worksets:
+            return True
+        else:
+            return False
 
 
 WorksetManager = Annotated[_WorksetManager, Depends()]
