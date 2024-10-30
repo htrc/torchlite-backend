@@ -102,7 +102,7 @@ async def update_dashboard(dashboard_id: UUID,
                            user_access_token: UserInfo | None = Depends(get_user_access_token)) -> DashboardSummary:
     print("update_dashboard()")
     print(user_access_token)
-    user = get_current_user(user_access_token)
+    user = await get_current_user(user_access_token)
     print(user)
     await workset_manager.get_public_worksets()
     if dashboard_patch.imported_id and not workset_manager.is_valid_workset(dashboard_patch.imported_id):
