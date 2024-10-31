@@ -40,12 +40,15 @@ class _WorksetManager:
         if self.user_worksets is None and user_access_token is not None:
             headers = {'Accept': 'application/json', 'Authorization': user_access_token}
             response = await http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
-            data = json.loads(response.content)
+            try:
+                data = json.loads(response.content)
 
-            self.user_worksets = {
-                workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
-                for workset in data['worksets']['workset']
-            }
+                self.user_worksets = {
+                    workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
+                    for workset in data['worksets']['workset']
+                }
+            except Exception as e:
+                print(f'ERROR getting user worksets: {e}')
 
         return self.user_worksets
     
