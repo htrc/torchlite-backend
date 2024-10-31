@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi_cache.decorator import cache
 from uuid import UUID
 from typing import Annotated
+from json import JSONDecodeError
 
 from ..converters import torchlite_volume_meta_from_ef
 from ..ef.api import ef_api
@@ -45,8 +46,7 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
         print("B")
         try:
             imported_volumes = await workset_manager.get_public_workset_volumes(imported_id)
-        except Exception as e:
-            print(f"ERROR: {e}")
+        except JSONDecodeError:
             imported_volumes = await workset_manager.get_user_workset_volumes(imported_id,user_access_token)
         print(imported_volumes)
         ef_wsid = await ef_api.create_workset(' '.join(imported_volumes))
