@@ -100,10 +100,7 @@ async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            workset_manager: WorksetManager,
                            user_access_token: UserInfo | None = Depends(get_user_access_token)) -> DashboardSummary:
-    print("update_dashboard()")
-    print(user_access_token)
     user = await get_current_user(user_access_token)
-    print(user)
     await workset_manager.get_public_worksets()
     if (user_access_token):
         await workset_manager.get_user_worksets(user_access_token)
@@ -115,9 +112,7 @@ async def update_dashboard(dashboard_id: UUID,
         )
 
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
-    print("dashboard_patch_update:")
     dashboard_patch_update = DashboardPatchUpdate(**dashboard_patch.model_dump(exclude_defaults=True))
-    print(dashboard_patch_update)
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one_and_update(
             filter={"_id": dashboard_id, "owner": user_id},
@@ -125,10 +120,7 @@ async def update_dashboard(dashboard_id: UUID,
             return_document=ReturnDocument.AFTER
         )
     )
-    print("dashboard")
-    print(dashboard)
     if dashboard:
-        print("YES dashboard")
         try:
             for w in dashboard.widgets:
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/widgets/{w.type}/data")
@@ -137,18 +129,12 @@ async def update_dashboard(dashboard_id: UUID,
             print(f"Error Clearing Cache: {e}")
         return dashboard
     else:
-        print("NO dashboard")
         dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
         if not dashboard:
-            print("404")
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         elif dashboard.owner != user_id:
-            print(dashboard)
-            print("403")
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         else:
-            print(dashboard)
-            print("500")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

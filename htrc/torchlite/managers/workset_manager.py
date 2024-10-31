@@ -56,14 +56,9 @@ class _WorksetManager:
         return [htid['id'] for htid in data['workset']['content']['volumes']['volume']]
     
     async def get_user_workset_volumes(self, wsid: str, user_access_token: UserInfo) -> str:
-        print("get_user_workset_volumes()")
         headers = {'Accept': 'application/json', 'Authorization': user_access_token}
-        print(headers)
-        print(f"{config.REGISTRY_API_URL}/workset/{wsid}")
         response = await http.get(f"{config.REGISTRY_API_URL}/worksets/{wsid}", headers=headers)
-        print(response)
         data = json.loads(response.content)
-        print(data)
         return [htid['id'] for htid in data['workset']['content']['volumes']['volume']]
 
     def is_valid_workset(self, wsid: str) -> bool:
