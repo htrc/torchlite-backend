@@ -30,7 +30,6 @@ async def list_worksets(workset_manager: WorksetManager, user_access_token: Anno
 @router.get("/{imported_id}/metadata", response_model_exclude_defaults=True)
 @cache()
 async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager, user_access_token: Annotated[str | None, Depends(get_user_access_token)]) -> WorksetInfo:
-    public_workset = True
     print("get_workset_metadata()")
     print(imported_id)
     print(workset_manager)
@@ -47,16 +46,15 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
         try:
             imported_volumes = await workset_manager.get_public_workset_volumes(imported_id)
         except:
-            public_workset = False
             imported_volumes = await workset_manager.get_user_workset_volumes(imported_id,user_access_token)
         print(imported_volumes)
         ef_wsid = await ef_api.create_workset(' '.join(imported_volumes))
         mongo_client.db["id-mappings"].insert_one({"importedId": UUID(imported_id), "worksetId": ef_wsid})
 
     volumes = await ef_api.get_workset_metadata(ef_wsid)
-    if public_workset:
+    try:
         workset = (await workset_manager.get_public_worksets())[imported_id]
-    else:
+    except:
         workset = (await workset_manager.get_user_worksets(user_access_token))[imported_id]
     if not workset:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workset not found")
