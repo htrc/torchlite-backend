@@ -3,6 +3,8 @@ from fastapi_cache.decorator import cache
 from uuid import UUID
 from typing import Annotated
 from json import JSONDecodeError
+from starlette.requests import Request
+from starlette.responses import Response
 
 from ..converters import torchlite_volume_meta_from_ef
 from ..ef.api import ef_api
@@ -16,9 +18,20 @@ router = APIRouter(
     tags=["worksets"],
 )
 
+def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None, args, **kwargs,):
+    print("request_key_builder()")
+    print(request)
+    for k in request.keys():
+        print(f'{k}: {request[k]}')
+    try:
+        return request.url.path
+    except AttributeError:
+        return f"/dashboards/{args[0]}"
 
 @router.get("/", response_model_exclude_defaults=True)
+@cache(key_builder=request_key_builder)
 async def list_worksets(workset_manager: WorksetManager, user_access_token: Annotated[str | None, Depends(get_user_access_token)]) -> dict[str, list[WorksetSummary]]:
+    print("list_worksets()")
     public_worksets = await workset_manager.get_public_worksets()
     featured_worksets = workset_manager.get_featured_worksets()
     user_worksets = await workset_manager.get_user_worksets(user_access_token)
