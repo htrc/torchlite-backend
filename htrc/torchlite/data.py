@@ -1,4 +1,4 @@
-import nltk
+import nltk 
 from .converters import torchlite_volume_meta_from_ef
 from .ef.models import Volume
 from .models.dashboard import FilterSettings
@@ -43,6 +43,7 @@ def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume
 def load_stopwords(language, directory="stopword_lists"):
     #COMMON CODE, SHOULD BE CALLED ONCE
     #skip it if already exists
+    nltk.download('stopwords')
     default_languages = ['english', 'german', 'spanish', 'french']
     if not os.path.exists(directory):
         os.makedirs(directory)
