@@ -154,4 +154,4 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
     print(f"Total volumes before cleaning: filtered_volumes {len(filtered_volumes)}")
     cleaned_volumes = apply_datacleaning(filtered_volumes, cleaning_settings=dashboard.datacleaning)
     print(f"Total volumes to clean: cleaned_volumes {len(cleaned_volumes)}")
-    return await widget.get_data(filtered_volumes)
+    return await widget.get_data(cleaned_volumes)
