@@ -30,7 +30,7 @@ class Dashboard(BaseModel, arbitrary_types_allowed=True):
     imported_id: UUID
 #    workset_id: str
     filters: FilterSettings | None
-    datacleaning: DataCleaningSettings | None
+    datacleaning: DataCleaningSettings | None = None
     widgets: list[ALL_WIDGETS]
 
 
