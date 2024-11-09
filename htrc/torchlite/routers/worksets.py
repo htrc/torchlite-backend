@@ -30,6 +30,7 @@ def request_key_builder(func, namespace: str = "", *, request: Request = None, r
     print("kwargs")
     for kwarg in kwargs:
         print(f'{kwarg}: {kwargs[kwarg]}')
+    print(kwargs['user_access_token'])
     try:
         return request.url.path
     except AttributeError:
