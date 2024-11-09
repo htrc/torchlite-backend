@@ -11,7 +11,7 @@ from ..ef.api import ef_api
 from ..managers.workset_manager import WorksetManager
 from ..models.workset import WorksetSummary, WorksetInfo, WorksetIdMapping
 from ..database import mongo_client
-from ..auth.auth import get_user_access_token
+from ..auth.auth import get_user_access_token, get_current_user
 
 router = APIRouter(
     prefix="/worksets",
@@ -20,17 +20,12 @@ router = APIRouter(
 
 def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None, args, **kwargs,):
     print("request_key_builder()")
-    print(request)
-    print("request")
-    for k in request.keys():
-        print(f'{k}: {request[k]}')
-    print("args")
-    for arg in args:
-        print(f'{arg}: {args[arg]}')
-    print("kwargs")
-    for kwarg in kwargs:
-        print(f'{kwarg}: {kwargs[kwarg]}')
     print(kwargs['kwargs']['user_access_token'])
+    if kwargs['kwargs']['user_access_token']:
+        user = get_current_user(kwargs['kwargs']['user_access_token'])
+        print(user)
+    else:
+        print(request.url.path)
     try:
         return request.url.path
     except AttributeError:
