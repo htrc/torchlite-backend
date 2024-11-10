@@ -15,6 +15,9 @@ from ..managers.workset_manager import WorksetManager
 from ..models.dashboard import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
 from ..models.workset import WorksetIdMapping
 from ..widgets.base import WidgetDataTypes
+import os
+import json
+from fastapi.responses import JSONResponse
 
 router = APIRouter(
     prefix="/dashboards",
@@ -157,3 +160,46 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
     cleaned_volumes = apply_datacleaning(filtered_volumes, cleaning_settings=dashboard.datacleaning)
     print(f"Total volumes to clean: cleaned_volumes {len(cleaned_volumes)}")
     return await widget.get_data(cleaned_volumes)
+
+
+#dashboard_id/stopwords
+@router.get("/{dashboard_id}/stopwords/${language}", description="Retrieve Stopwords data")
+async def get_stopwords_data(dashboard_id: UUID, language: str,
+                          user: UserInfo | None = Depends(get_current_user)):
+    
+    dashboard = await get_dashboard(dashboard_id, user)
+    if not dashboard:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Dashboard {dashboard_id} not found"
+        )
+    
+    # Normalize language input
+    language = language.lower().strip()
+    directory="stopword_lists"
+    stopword_file_path = os.path.join(directory, f"{language}_stopwords.json")
+
+    if not os.path.exists(stopword_file_path):
+        print(f"Stopwords file for language '{language}' not found.")
+    # Check if file exists
+    if not stopword_file_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Stopwords file for language '{language}' not found"
+        )
+    
+    try:
+        # Read and parse JSON file
+        with open(stopword_file_path, 'r', encoding='utf-8') as file:
+            stopwords_data = json.load(file)
+            
+        # Return JSON response
+        return JSONResponse(
+            content=stopwords_data,
+            media_type="application/json"
+        )
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error parsing stopwords JSON file for language '{language}'"
+        )
