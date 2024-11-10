@@ -163,7 +163,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 
 
 #dashboard_id/stopwords
-@router.get("/{dashboard_id}/stopwords/${language}", description="Retrieve Stopwords data")
+@router.get("/{dashboard_id}/stopwords/{language}", description="Retrieve Stopwords data")
 async def get_stopwords_data(dashboard_id: UUID, language: str,
                           user: UserInfo | None = Depends(get_current_user)):
     
@@ -175,14 +175,14 @@ async def get_stopwords_data(dashboard_id: UUID, language: str,
         )
     
     # Normalize language input
+    print(dashboard_id,language)
     language = language.lower().strip()
     directory="stopword_lists"
     stopword_file_path = os.path.join(directory, f"{language}_stopwords.json")
 
     if not os.path.exists(stopword_file_path):
         print(f"Stopwords file for language '{language}' not found.")
-    # Check if file exists
-    if not stopword_file_path.exists():
+    
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Stopwords file for language '{language}' not found"
@@ -193,6 +193,7 @@ async def get_stopwords_data(dashboard_id: UUID, language: str,
         with open(stopword_file_path, 'r', encoding='utf-8') as file:
             stopwords_data = json.load(file)
             
+       
         # Return JSON response
         return JSONResponse(
             content=stopwords_data,
