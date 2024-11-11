@@ -18,11 +18,11 @@ router = APIRouter(
     tags=["worksets"],
 )
 
-def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None, args, **kwargs,):
+async def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None, args, **kwargs,):
     print("request_key_builder()")
     print(kwargs['kwargs']['user_access_token'])
     if kwargs['kwargs']['user_access_token']:
-        user = get_current_user(kwargs['kwargs']['user_access_token'])
+        user = await get_current_user(kwargs['kwargs']['user_access_token'])
         print(user)
     else:
         print(request.url.path)
