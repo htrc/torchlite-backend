@@ -24,6 +24,8 @@ async def request_key_builder(func, namespace: str = "", *, request: Request = N
     if kwargs['kwargs']['user_access_token']:
         user = await get_current_user(kwargs['kwargs']['user_access_token'])
         print(user)
+        user_id = UUID(user.get("htrc-guid", user.sub))
+        print(user_id)
     else:
         print(request.url.path)
     try:
