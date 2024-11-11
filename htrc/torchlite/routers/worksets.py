@@ -26,6 +26,7 @@ async def request_key_builder(func, namespace: str = "", *, request: Request = N
         print(user)
         user_id = UUID(user.get("htrc-guid", user.sub))
         print(user_id)
+        print(f"{request.url.path}/{user_id}")
     else:
         print(request.url.path)
     try:
