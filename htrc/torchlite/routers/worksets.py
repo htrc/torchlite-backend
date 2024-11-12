@@ -19,20 +19,12 @@ router = APIRouter(
 )
 
 async def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None, args, **kwargs,):
-    print("request_key_builder()")
-    print(kwargs['kwargs']['user_access_token'])
     if kwargs['kwargs']['user_access_token']:
         user = await get_current_user(kwargs['kwargs']['user_access_token'])
-        print(user)
         user_id = UUID(user.get("htrc-guid", user.sub))
-        print(user_id)
-        print(f"{request.url.path}/{user_id}")
+        return f"{request.url.path}{user_id}"
     else:
-        print(request.url.path)
-    try:
         return request.url.path
-    except AttributeError:
-        return f"/dashboards/{args[0]}"
 
 @router.get("/", response_model_exclude_defaults=True)
 @cache(key_builder=request_key_builder)
