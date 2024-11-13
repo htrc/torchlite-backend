@@ -54,3 +54,9 @@ async def get_current_user(token: Token) -> UserInfo | None:
             user = UserInfo(claims)
 
     return user
+
+async def get_user_access_token(token: Token) -> Token | None:
+    if token:
+        return token
+    else:
+        return None
