@@ -81,7 +81,7 @@ def clean_volume_data(volume, stopwords):
 def apply_datacleaning(filtered_volumes, cleaning_settings: DataCleaningSettings):
     language = cleaning_settings.language   ## if other thAN NONE APPLY LOGIC FOR STIPWORDS
     
-    stopwords = load_stopwords(language)
+    stopwords = load_stopwords(language.lower())
     print(stopwords)
     cleaned_volumes = []
     
