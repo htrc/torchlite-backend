@@ -79,23 +79,27 @@ def clean_volume_data(volume, stopwords):
     return volume
 
 def apply_datacleaning(filtered_volumes, cleaning_settings: DataCleaningSettings):
-    language = cleaning_settings.language   ## if other thAN NONE APPLY LOGIC FOR STIPWORDS
     
-    stopwords = load_stopwords(language.lower())
-    print(stopwords)
+    language = cleaning_settings.language  ## if other thAN NONE APPLY LOGIC FOR STIPWORDS
+    print(language,"Testing")
+    
     cleaned_volumes = []
+    if (language):
+        stopwords = load_stopwords(language.lower())
+        print(stopwords)
     
-    count = 0
-    for volume in filtered_volumes:
+        count = 0
+        for volume in filtered_volumes:
         
-        #print(volume.features.body)
-        print(f"'me' present before cleaning: {'me' in volume.features.body}")
-        cleaned_volume = clean_volume_data(volume, stopwords) 
-        count += 1
-        #print(count)
-        print(f"'me' present after cleaning: {'me' in cleaned_volume.features.body}")
-        cleaned_volumes.append(cleaned_volume)
+            #print(volume.features.body)
+            print(f"'me' present before cleaning: {'me' in volume.features.body}")
+            cleaned_volume = clean_volume_data(volume, stopwords) 
+            count += 1
+            #print(count)
+            print(f"'me' present after cleaning: {'me' in cleaned_volume.features.body}")
+            cleaned_volumes.append(cleaned_volume)
 
-    return cleaned_volumes
+        return cleaned_volumes
+    return filtered_volumes
 
 #new language list can be loaded when selected
