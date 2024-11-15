@@ -31,7 +31,7 @@ class _WorksetManager:
             data = json.loads(response.content)
             self.public_worksets = {
                 workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
-                for workset in data['worksets']['workset']
+                for workset in data['worksets']['workset'] if workset['metadata']['public']
             }
 
         return self.public_worksets
