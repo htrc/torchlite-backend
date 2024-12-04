@@ -15,6 +15,8 @@ class Config:
     MONGODB_URL = os.environ.get("MONGODB_URL", "mongodb://localhost:27017/torchlite")
 
     KEYCLOAK_REALM = os.environ["KEYCLOAK_REALM"]
+    print("Test")
+    print(KEYCLOAK_REALM)
     TORCHLITE_CLIENT_ID = os.environ["TORCHLITE_CLIENT_ID"]
     TORCHLITE_CLIENT_SECRET = os.environ["TORCHLITE_CLIENT_SECRET"]
     TORCHLITE_DEFAULT_SCOPES = "openid email profile offline_access"
