@@ -15,8 +15,6 @@ class Config:
     MONGODB_URL = os.environ.get("MONGODB_URL", "mongodb://localhost:27017/torchlite")
 
     KEYCLOAK_REALM = os.environ["KEYCLOAK_REALM"]
-    print("Test")
-    print(KEYCLOAK_REALM)
     TORCHLITE_CLIENT_ID = os.environ["TORCHLITE_CLIENT_ID"]
     TORCHLITE_CLIENT_SECRET = os.environ["TORCHLITE_CLIENT_SECRET"]
     TORCHLITE_DEFAULT_SCOPES = "openid email profile offline_access"
@@ -25,8 +23,9 @@ class Config:
     TORCHLITE_UID = UUID("95164779-1fc9-4592-9c74-7a014407f46d")  # do not change
     EF_API_URL = os.environ.get("EF_API_URL", "https://data.htrc.illinois.edu/ef-api")
     REGISTRY_API_URL = os.environ.get("REGISTRY_API_URL", "https://analytics.dev.htrc.indiana.edu")
-    REGISTRY_TLS_CERT = os.environ.get("REGISTRY_TLS_CERT")
-    REGISTRY_TLS_KEY = os.environ.get("REGISTRY_TLS_KEY")
+#    REGISTRY_TLS_CERT_PATH = os.environ.get("REGISTRY_TLS_CERT_PATH")
+#    REGISTRY_TLS_KEY_PATH = os.environ.get("REGISTRY_TLS_KEY_PATH")
+    print(os.getcwd())
     FEATURED_WORKSET_USER = os.environ.get("FEATURED_WORKSET_USER")
     FEATURED_WORKSETS_URL = os.environ.get("FEATURED_WORKSETS_URL")
 
