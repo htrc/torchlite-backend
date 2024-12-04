@@ -2,7 +2,7 @@ import math
 from typing import Iterable, Any, TypeVar
 
 from ruamel.yaml import YAML
-from htrc.torchlite.http_client import http
+#from htrc.torchlite.http_client import http
 
 T = TypeVar('T')
 U = TypeVar('U')
@@ -77,6 +77,6 @@ def sanitize(data):
         return data
 
 
-async def load_yaml(url: str) -> dict:
-    response = await http.get(url)
-    return YAML().load(response.content)
+#async def load_yaml(url: str) -> dict:
+#    response = await http.get(url)
+#    return YAML().load(response.content)
