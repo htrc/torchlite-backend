@@ -27,6 +27,7 @@ class Config:
 #    REGISTRY_TLS_KEY_PATH = os.environ.get("REGISTRY_TLS_KEY_PATH")
     print(os.getcwd())
     print(os.listdir())
+    print(os.listdir(path='/etc/credentials'))
     FEATURED_WORKSET_USER = os.environ.get("FEATURED_WORKSET_USER")
     FEATURED_WORKSETS_URL = os.environ.get("FEATURED_WORKSETS_URL")
 
