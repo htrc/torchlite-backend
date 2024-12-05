@@ -26,6 +26,7 @@ class Config:
 #    REGISTRY_TLS_CERT_PATH = os.environ.get("REGISTRY_TLS_CERT_PATH")
 #    REGISTRY_TLS_KEY_PATH = os.environ.get("REGISTRY_TLS_KEY_PATH")
     print(os.getcwd())
+    print(os.listdir())
     FEATURED_WORKSET_USER = os.environ.get("FEATURED_WORKSET_USER")
     FEATURED_WORKSETS_URL = os.environ.get("FEATURED_WORKSETS_URL")
 
