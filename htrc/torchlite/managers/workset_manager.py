@@ -28,7 +28,6 @@ class _WorksetManager:
         if self.public_worksets is None:
             headers = {'Accept': 'application/json'}
             response = await registry_http.get(f"{config.REGISTRY_API_URL}/publicworksets", headers=headers)
-            print(response.content)
             data = json.loads(response.content)
             self.public_worksets = {
                 workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
