@@ -4,7 +4,7 @@ from fastapi import Depends
 from authlib.oidc.core import UserInfo
 from htrc.torchlite.config import config
 from htrc.torchlite.models.workset import WorksetSummary
-from htrc.torchlite.http_client import http
+from htrc.torchlite.http_client import registry_http
 import json
 
 
@@ -27,7 +27,7 @@ class _WorksetManager:
     async def get_public_worksets(self) -> dict[str, WorksetSummary]:
         if self.public_worksets is None:
             headers = {'Accept': 'application/json'}
-            response = await http.get(f"{config.REGISTRY_API_URL}/publicworksets", headers=headers)
+            response = await registry_http.get(f"{config.REGISTRY_API_URL}/publicworksets", headers=headers)
             data = json.loads(response.content)
             self.public_worksets = {
                 workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
@@ -39,7 +39,7 @@ class _WorksetManager:
     async def get_user_worksets(self, user_access_token: str | None) -> dict[str, WorksetSummary]:
         if self.user_worksets is None and user_access_token is not None:
             headers = {'Accept': 'application/json', 'Authorization': user_access_token}
-            response = await http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
+            response = await registry_http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
             try:
                 data = json.loads(response.content)
 
@@ -54,13 +54,13 @@ class _WorksetManager:
     
     async def get_public_workset_volumes(self, wsid: str) -> str:
         headers = {'Accept': 'application/json'}
-        response = await http.get(f"{config.REGISTRY_API_URL}/publicworksets/{wsid}", headers=headers)
+        response = await registry_http.get(f"{config.REGISTRY_API_URL}/publicworksets/{wsid}", headers=headers)
         data = json.loads(response.content)
         return [htid['id'] for htid in data['workset']['content']['volumes']['volume']]
     
     async def get_user_workset_volumes(self, wsid: str, user_access_token: UserInfo) -> str:
         headers = {'Accept': 'application/json', 'Authorization': user_access_token}
-        response = await http.get(f"{config.REGISTRY_API_URL}/worksets/{wsid}", headers=headers)
+        response = await registry_http.get(f"{config.REGISTRY_API_URL}/worksets/{wsid}", headers=headers)
         data = json.loads(response.content)
         return [htid['id'] for htid in data['workset']['content']['volumes']['volume']]
 
