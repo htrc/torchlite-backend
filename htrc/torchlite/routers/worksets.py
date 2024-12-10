@@ -32,7 +32,7 @@ async def list_worksets(workset_manager: WorksetManager, user_access_token: Anno
     public_worksets = await workset_manager.get_public_worksets()
     featured_worksets = workset_manager.get_featured_worksets()
     user_worksets = await workset_manager.get_user_worksets(user_access_token)
-    print(public_worksets)
+#    print(public_worksets)
     print(featured_worksets)
     print(user_worksets)
 
