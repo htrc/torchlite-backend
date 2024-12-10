@@ -70,11 +70,12 @@ class _WorksetManager:
         else:
             wsid_string = str(wsid)
 
-        print(self.public_worksets)
-        print(self.user_worksets)
-        if wsid_string in self.public_worksets or wsid_string in self.user_worksets:
-            return True
-        else:
+        try:
+            if wsid_string in self.public_worksets or wsid_string in self.user_worksets:
+                return True
+            else:
+                return False
+        except TypeError:
             return False
 
 
