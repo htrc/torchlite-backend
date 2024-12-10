@@ -17,10 +17,16 @@ class _WorksetManager:
 
     def get_featured_worksets(self) -> dict[str, WorksetSummary]:
         if self.featured_worksets is None:
+            print("FEATURED WORKSET USER")
+            print(config.FEATURED_WORKSET_USER)
             self.featured_worksets = {
                 workset: self.public_worksets[workset]
                 for workset in self.public_worksets if self.public_worksets[workset].author == config.FEATURED_WORKSET_USER
             }
+        print("featured worksets")
+        for ws in self.featured_worksets:
+            print(ws)
+            print(self.featured_worksets[ws].author)
 
         return self.featured_worksets
 
