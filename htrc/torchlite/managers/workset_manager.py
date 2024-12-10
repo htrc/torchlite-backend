@@ -23,10 +23,10 @@ class _WorksetManager:
                 workset: self.public_worksets[workset]
                 for workset in self.public_worksets if self.public_worksets[workset].author == config.FEATURED_WORKSET_USER
             }
-        print("featured worksets")
+        print("public worksets")
         for ws in self.public_worksets:
-            print(self.featured_worksets[ws])
-            print(self.featured_worksets[ws].author)
+            print(self.public_worksets[ws])
+            print(self.public_worksets[ws].author)
 
         return self.featured_worksets
 
