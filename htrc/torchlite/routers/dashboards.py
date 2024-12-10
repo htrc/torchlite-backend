@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from authlib.oidc.core import UserInfo
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from pymongo import ReturnDocument
 
 from ..auth.auth import get_current_user
@@ -17,6 +17,7 @@ from ..models.workset import WorksetIdMapping
 from ..widgets.base import WidgetDataTypes
 import os
 import json
+import csv
 from fastapi.responses import JSONResponse
 
 router = APIRouter(
@@ -157,7 +158,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
     print(f"Total volumes before cleaning: filtered_volumes {len(filtered_volumes)}")
     if (widget.data_type == WidgetDataTypes.metadata_only):
         return await widget.get_data(filtered_volumes)
-    cleaned_volumes = apply_datacleaning(filtered_volumes, cleaning_settings=dashboard.datacleaning)
+    cleaned_volumes = apply_datacleaning(dashboard_id, filtered_volumes, cleaning_settings=dashboard.datacleaning)
     print(f"Total volumes to clean: cleaned_volumes {len(cleaned_volumes)}")
     return await widget.get_data(cleaned_volumes)
 
@@ -203,4 +204,60 @@ async def get_stopwords_data(dashboard_id: UUID, language: str,
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error parsing stopwords JSON file for language '{language}'"
+        )
+    
+
+@router.post("/{dashboard_id}/stopwords", description="Upload stopwords file", response_model_exclude_defaults=True)
+async def upload_stopwords(dashboard_id: UUID,
+                           user: UserInfo | None = Depends(get_current_user),
+                           file: UploadFile = File(...)) -> DashboardSummary:
+    dashboard = await get_dashboard(dashboard_id, user)
+    print("Pooja")
+    if not dashboard:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Dashboard {dashboard_id} not found"
+        )
+    
+    os.makedirs("stopword_lists", exist_ok=True)
+    file_path = os.path.join("stopword_lists", f"{dashboard_id}_stopwords.json")
+    try:
+        # Determine file type based on the filename
+        filename = file.filename.lower()
+        content = await file.read()  # Read file content as bytes
+        stopwords_list = []
+
+        if filename.endswith(".txt"):
+            # Handle TXT file: split content into lines
+            stopwords_list = content.decode("utf-8").splitlines()
+            stopwords_list = [line.strip() for line in stopwords_list if line.strip()]
+        
+        elif filename.endswith(".csv"):
+            # Handle CSV file: parse rows and extract stopwords
+            decoded_content = content.decode("utf-8").splitlines()
+            csv_reader = csv.reader(decoded_content)
+            for row in csv_reader:
+                stopwords_list.extend([word.strip() for word in row if word.strip()])
+        
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Unsupported file format. Please upload a .txt or .csv file."
+            )
+
+        # Save the stopwords as a JSON array
+        with open(file_path, "w", encoding="utf-8") as json_file:
+            json.dump(stopwords_list, json_file, ensure_ascii=False, indent=4)
+
+        return {
+            "message": "Stopwords uploaded and processed successfully",
+            "file_path": file_path,
+            "filters": {},      
+            "widgets": [],       
+            "owner": dashboard_id  
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing stopwords file: {e}"
         )

@@ -40,7 +40,7 @@ def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume
 
     return filtered_volumes
 
-def load_stopwords(language, directory="stopword_lists"):
+def load_stopwords(dashboard_id, language, directory="stopword_lists"):
     #COMMON CODE, SHOULD BE CALLED ONCE
     #skip it if already exists
     nltk.download('stopwords')
@@ -54,15 +54,14 @@ def load_stopwords(language, directory="stopword_lists"):
             json.dump(stopword_list, file, ensure_ascii=False, indent=4)
     ######
 
-    stopword_file_path = os.path.join(directory, f"{language}_stopwords.json")
+    stopword_file_path = os.path.join(directory, f"{dashboard_id}_stopwords.json")
+    if os.path.exists(stopword_file_path):
+        with open(stopword_file_path, 'r', encoding='utf-8') as file:
+            return json.load(file)
 
-    if not os.path.exists(stopword_file_path):
-        print(f"Stopwords file for language '{language}' not found.")
-
-    with open(stopword_file_path, 'r', encoding='utf-8') as file:
-        stopword_list = json.load(file)
-    
-    return stopword_list
+    default_stopword_file = os.path.join(directory, f"{language}_stopwords.json")
+    with open(default_stopword_file, 'r', encoding='utf-8') as file:
+        return json.load(file)
 
 def clean_volume_data(volume, stopwords):
     cleaned_data = {}
@@ -78,14 +77,14 @@ def clean_volume_data(volume, stopwords):
     print("assigned")
     return volume
 
-def apply_datacleaning(filtered_volumes, cleaning_settings: DataCleaningSettings):
+def apply_datacleaning(dashboard_id, filtered_volumes, cleaning_settings: DataCleaningSettings):
     
     language = cleaning_settings.language  ## if other thAN NONE APPLY LOGIC FOR STIPWORDS
     print(language,"Testing")
     
     cleaned_volumes = []
     if (language):
-        stopwords = load_stopwords(language.lower())
+        stopwords = load_stopwords(dashboard_id, language.lower())
         print(stopwords)
     
         count = 0
