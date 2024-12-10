@@ -60,6 +60,10 @@ async def create_dashboard(dashboard_create: DashboardCreate,
                            owner: UUID | None = None,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
     print("create_dashboard")
+    print(dashboard_create)
+    print(workset_manager)
+    print(owner)
+    print(user)
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     owner = owner or user_id
 
@@ -84,6 +88,8 @@ async def create_dashboard(dashboard_create: DashboardCreate,
 async def get_dashboard(dashboard_id: UUID,
                         user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
     print("get_dashboard")
+    print(dashboard_id)
+    print(user)
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one({"_id": dashboard_id, "$or": [{"isShared": True}, {"owner": user_id}]})
