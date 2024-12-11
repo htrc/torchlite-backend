@@ -57,7 +57,7 @@ def load_stopwords(dashboard_id, language, directory="stopword_lists"):
     stopword_file_path = os.path.join(directory, f"{dashboard_id}_stopwords.json")
     print(stopword_file_path)
     print(os.path.exists(stopword_file_path))
-    if lang != "English" | lang != "German" | lang != "French" | lang != "Spanish":
+    if lang not in ["English", "German", "French", "Spanish"]:
         with open(stopword_file_path, 'r', encoding='utf-8') as file:
             return json.load(file)
 
