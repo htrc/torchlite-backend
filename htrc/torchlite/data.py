@@ -63,8 +63,9 @@ def load_stopwords(dashboard_id, language, directory="stopword_lists"):
                 return json.load(file)
 
     default_stopword_file = os.path.join(directory, f"{language}_stopwords.json")
-    with open(default_stopword_file, 'r', encoding='utf-8') as file:
-        return json.load(file)
+    if (os.path.exists(default_stopword_file)):
+        with open(default_stopword_file, 'r', encoding='utf-8') as file:
+            return json.load(file)
 
 def clean_volume_data(volume, stopwords):
     cleaned_data = {}
