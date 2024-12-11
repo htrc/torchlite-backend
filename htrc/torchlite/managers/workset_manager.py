@@ -17,16 +17,10 @@ class _WorksetManager:
 
     def get_featured_worksets(self) -> dict[str, WorksetSummary]:
         if self.featured_worksets is None:
-            print("FEATURED WORKSET USER")
-            print(config.FEATURED_WORKSET_USER)
             self.featured_worksets = {
                 workset: self.public_worksets[workset]
                 for workset in self.public_worksets if self.public_worksets[workset].author == config.FEATURED_WORKSET_USER
             }
-        print("public worksets")
-        for ws in self.public_worksets:
-            print(self.public_worksets[ws])
-            print(self.public_worksets[ws].author)
 
         return self.featured_worksets
 
@@ -76,12 +70,9 @@ class _WorksetManager:
         else:
             wsid_string = str(wsid)
 
-        try:
-            if wsid_string in self.public_worksets or wsid_string in self.user_worksets:
-                return True
-            else:
-                return False
-        except TypeError:
+        if wsid_string in self.public_worksets or wsid_string in self.user_worksets:
+            return True
+        else:
             return False
 
 
