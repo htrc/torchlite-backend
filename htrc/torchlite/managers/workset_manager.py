@@ -70,8 +70,8 @@ class _WorksetManager:
         else:
             wsid_string = str(wsid)
 
-        for ws in self.featured_worksets:
-            print(self.featured_worksets[ws])
+        for ws in self.public_worksets:
+            print(self.public_worksets[ws])
         print(wsid_string)
         if wsid_string in self.public_worksets or wsid_string in self.user_worksets:
             return True
