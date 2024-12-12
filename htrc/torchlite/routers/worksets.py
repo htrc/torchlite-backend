@@ -29,6 +29,8 @@ async def request_key_builder(func, namespace: str = "", *, request: Request = N
 @router.get("/", response_model_exclude_defaults=True)
 @cache(key_builder=request_key_builder)
 async def list_worksets(workset_manager: WorksetManager, user_access_token: Annotated[str | None, Depends(get_user_access_token)]) -> dict[str, list[WorksetSummary]]:
+    print("TOKEN")
+    print(user_access_token)
     public_worksets = await workset_manager.get_public_worksets()
     featured_worksets = workset_manager.get_featured_worksets()
     user_worksets = await workset_manager.get_user_worksets(user_access_token)
