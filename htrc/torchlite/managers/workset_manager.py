@@ -37,13 +37,11 @@ class _WorksetManager:
         return self.public_worksets
 
     async def get_user_worksets(self, user_access_token: str | None) -> dict[str, WorksetSummary]:
-        print('get_user_worksets')
         if self.user_worksets is None and user_access_token is not None:
             headers = {'Accept': 'application/json', 'Authorization': user_access_token}
             response = await registry_http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
             try:
                 data = json.loads(response.content)
-                print(data)
 
                 self.user_worksets = {
                     workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
