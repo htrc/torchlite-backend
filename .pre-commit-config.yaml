@@ -1,0 +1,31 @@
+repos:
+  # Black
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        language_version: python3.11
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    # Ruff version.
+    rev: 'v0.0.262'
+    hooks:
+      - id: ruff
+
+#  - repo: https://github.com/executablebooks/mdformat
+#    rev: 0.7.16
+#    hooks:
+#      - id: mdformat
+#        additional_dependencies:
+#          - mdformat-black
+#          - black==23.3.0 # Must be the latest version of Black
+#
+#  - repo: https://github.com/igorshubovych/markdownlint-cli
+#    rev: v0.33.0
+#    hooks:
+#      - id: markdownlint-fix
+#        args:
+#          - --disable
+#          - MD013 # line-length
+#          - MD033 # no-inline-html
+#          - --

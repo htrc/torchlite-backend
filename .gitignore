@@ -127,5 +127,17 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+# ruff
+.ruff_cache/
+
 # Pyre type checker
 .pyre/
+
+# IDEs
+/.idea/
+*.iml
+/.vscode/
+
+# coverage
+test-results/
+requirements.txt

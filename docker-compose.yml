@@ -1,0 +1,35 @@
+services:
+
+  mongo:
+    image: mongo:5.0
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+
+  torchlite-backend:
+    image: torchlite-backend:latest
+    container_name: torchlite-backend
+    restart: unless-stopped
+    environment:
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - TORCHLITE_CLIENT_ID=${TORCHLITE_CLIENT_ID}
+      - TORCHLITE_CLIENT_SECRET=${TORCHLITE_CLIENT_SECRET}
+      - FEATURED_WORKSETS_URL=${FEATURED_WORKSETS_URL}
+      - MONGODB_URL=${MONGODB_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - ENABLE_CACHE=${ENABLE_CACHE}
+      - CACHE_EXPIRE=${CACHE_EXPIRE}
+    ports:
+      - "8000:8000"
+    expose:
+      - "8000"
+
+volumes:
+  mongo-data:
