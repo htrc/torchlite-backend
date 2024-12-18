@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Brought changes from stage to main branch. [#135](https://github.com/htrc/torchlite-backend/issues/135)
+- Brought changes from stage to main branch, and from main to dev. [#135](https://github.com/htrc/torchlite-backend/issues/135)
 
 ## [0.1.0] – 2024-12-06
 
