@@ -147,3 +147,30 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
     return await widget.get_data(filtered_volumes)
+
+
+@router.get("/{dashboard_id}/{data_type}", description="Retrieve meta data")
+async def get_workset_data(dashboard_id: UUID, data_type: str,
+    filtered: bool = False, user: UserInfo | None = Depends(get_current_user)):
+    dashboard = await get_dashboard(dashboard_id, user)
+    
+    imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
+
+    ef_wsid = imported_id_mapping.workset_id
+
+    match data_type:
+        case "metadata":
+            volumes = await ef_api.get_workset_metadata(ef_wsid)
+        case "data":
+            volumes = await ef_api.get_workset_volumes(ef_wsid, include_pos=True)
+        case _:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid data_type '{data_type}'. Expected 'data' or 'metadata'."
+            )
+    if filtered:
+        volumes = apply_filters(volumes, filters=dashboard.filters)
+
+    return volumes
+
+    #return await widget.get_data(filtered_volumes)
