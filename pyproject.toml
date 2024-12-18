@@ -3,7 +3,12 @@ name = "torchlite"
 version = "0.0.0"
 description = "Torchlite API backend service"
 authors = [
-  "capitanu <capitanu@illinois.edu>",
+  "Boris Capitanu <capitanu@illinois.edu>",
+  "Deren Kudeki <dkudeki@illinois.edu>",
+  "Sandeep Puthanveetil Satheesan <sandeeps@illinois.edu>"
+]
+maintainers = [
+  "Deren Kudeki <dkudeki@illinois.edu>",
   "Sandeep Puthanveetil Satheesan <sandeeps@illinois.edu>"
 ]
 readme = "README.md"
