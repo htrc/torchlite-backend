@@ -30,21 +30,20 @@ router = APIRouter(
 async def list_dashboards(owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
 
-    print(owner)
     if owner == config.TORCHLITE_UID:
         return await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
         )
-    print("b")
+    
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    print("c")
+    
     user_id = UUID(user.get("htrc-guid", user.sub))
     owner = owner or user_id
-    print("d")
+    
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    print("e")
+    
     return await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)
     )
@@ -137,7 +136,6 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
         )
     imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
     
-    #print(widget.data_type)
     match widget.data_type:
         case WidgetDataTypes.metadata_only:
             volumes = await ef_api.get_workset_metadata(imported_id_mapping.workset_id)
@@ -193,8 +191,7 @@ async def get_stopwords_data(dashboard_id: UUID, language: str,
         # Read and parse JSON file
         with open(stopword_file_path, 'r', encoding='utf-8') as file:
             stopwords_data = json.load(file)
-            
-       
+                   
         # Return JSON response
         return JSONResponse(
             content=stopwords_data,

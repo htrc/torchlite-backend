@@ -41,8 +41,6 @@ def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume
     return filtered_volumes
 
 def load_stopwords(dashboard_id, language, directory="stopword_lists"):
-    #COMMON CODE, SHOULD BE CALLED ONCE
-    #skip it if already exists
     nltk.download('stopwords')
     default_languages = ['english', 'german', 'spanish', 'french']
     if not os.path.exists(directory):
@@ -52,7 +50,6 @@ def load_stopwords(dashboard_id, language, directory="stopword_lists"):
         stopword_file_path = os.path.join(directory, f"{lang}_stopwords.json")
         with open(stopword_file_path, 'w', encoding='utf-8') as file:
             json.dump(stopword_list, file, ensure_ascii=False, indent=4)
-    ######
 
     stopword_file_path = os.path.join(directory, f"{dashboard_id}_stopwords.json")
     print(stopword_file_path)
@@ -74,35 +71,25 @@ def clean_volume_data(volume, stopwords):
         lower_word = word.lower()
 
         if lower_word not in stopwords:
-            cleaned_data[lower_word] = count # checking word and just matches or not then pass through the data as cleaned
-        ##print the data before and after , just stopwords should be removed
-        #output to 2 file and run a diff
+            cleaned_data[lower_word] = count 
     volume.features.body = cleaned_data
-    print("assigned")
     return volume
 
 def apply_datacleaning(dashboard_id, filtered_volumes, cleaning_settings: DataCleaningSettings):
     
-    language = cleaning_settings.language  ## if other thAN NONE APPLY LOGIC FOR STIPWORDS
-    print(language,"Testing")
+    language = cleaning_settings.language 
     
     cleaned_volumes = []
     if (language):
         stopwords = load_stopwords(dashboard_id, language.lower())
-        print(stopwords)
     
         count = 0
         for volume in filtered_volumes:
-        
-            #print(volume.features.body)
             print(f"'me' present before cleaning: {'me' in volume.features.body}")
             cleaned_volume = clean_volume_data(volume, stopwords) 
             count += 1
-            #print(count)
             print(f"'me' present after cleaning: {'me' in cleaned_volume.features.body}")
             cleaned_volumes.append(cleaned_volume)
 
         return cleaned_volumes
     return filtered_volumes
-
-#new language list can be loaded when selected
