@@ -22,10 +22,21 @@ class Config:
 
     TORCHLITE_UID = UUID("95164779-1fc9-4592-9c74-7a014407f46d")  # do not change
     EF_API_URL = os.environ.get("EF_API_URL", "https://data.htrc.illinois.edu/ef-api")
-    REGISTRY_API_URL = os.environ.get("REGISTRY_API_URL")
+    REGISTRY_API_URL = os.environ.get("REGISTRY_API_URL", "https://analytics.dev.htrc.indiana.edu")
+    REGISTRY_TLS_CERT_PATH = os.environ.get("REGISTRY_TLS_CERT_PATH")
+    REGISTRY_TLS_KEY_PATH = os.environ.get("REGISTRY_TLS_KEY_PATH")
     FEATURED_WORKSET_USER = os.environ.get("FEATURED_WORKSET_USER")
-
     FEATURED_WORKSETS_URL = os.environ.get("FEATURED_WORKSETS_URL")
+
+    # Cache settings
+    ENABLE_CACHE = os.environ.get("ENABLE_CACHE", "false").lower() == "true"
+    CACHE_EXPIRE = int(os.environ.get("CACHE_EXPIRE", "300"))
+    REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+    REDIS_PORT = int(os.environ.get("REDIS_PORT", "6379"))
+    REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD", "")
+    REDIS_DB = int(os.environ.get("REDIS_DB", "1"))
+#    REDIS_PREFIX = os.environ.get("REDIS_PREFIX", "torchlite-cache")
+    CACHE_STATUS_HEADER = "x-torchlite-cache"
 
 
 config = Config

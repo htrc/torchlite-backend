@@ -68,5 +68,4 @@ class SimpleTagCloudWidget(WidgetBase):
 
         token_counts = sorted(token_counts, key=lambda x: x[1], reverse=True)[:100]
 
-        return(dict(token_counts))
-   
+        return dict(token_counts)
