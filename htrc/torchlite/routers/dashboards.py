@@ -85,9 +85,12 @@ async def get_dashboard(dashboard_id: UUID,
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one({"_id": dashboard_id, "$or": [{"isShared": True}, {"owner": user_id}]})
     )
+    print(dashboard)
     if dashboard:
+        print("A")
         return dashboard
     else:
+        print("B")
         dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
         if not dashboard:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
