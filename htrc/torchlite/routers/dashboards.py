@@ -85,12 +85,9 @@ async def get_dashboard(dashboard_id: UUID,
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one({"_id": dashboard_id, "$or": [{"isShared": True}, {"owner": user_id}]})
     )
-    print(dashboard)
     if dashboard:
-        print("A")
         return dashboard
     else:
-        print("B")
         dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
         if not dashboard:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -187,8 +184,14 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 async def get_workset_data(dashboard_id: UUID, data_type: str,
     filtered: bool = False, user: UserInfo | None = Depends(get_current_user)):
     dashboard = await get_dashboard(dashboard_id, user)
-    print('get_workset_data')
-    print(dashboard)
+
+    # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
+    # dashboard to the expected model type if it is just a dict, so that dashboard.widgets doesn't
+    # throw an error.
+    # This is happening only when an endpoint calls another method that is cached. Direct calls to
+    # endpoints that return pydantic models are not affected.
+    if isinstance(dashboard, dict):
+        dashboard = DashboardSummary.model_validate(dashboard)
     
     imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
 
