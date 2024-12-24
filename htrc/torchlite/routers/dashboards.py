@@ -187,6 +187,8 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 async def get_workset_data(dashboard_id: UUID, data_type: str,
     filtered: bool = False, user: UserInfo | None = Depends(get_current_user)):
     dashboard = await get_dashboard(dashboard_id, user)
+    print('get_workset_data')
+    print(dashboard)
     
     imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
 
