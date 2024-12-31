@@ -181,6 +181,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 
 
 @router.get("/{dashboard_id}/{data_type}", description="Retrieve meta data")
+@cache(key_builder=request_key_builder)
 async def get_workset_data(dashboard_id: UUID, data_type: str,
     filtered: bool = False, user: UserInfo | None = Depends(get_current_user)):
     dashboard = await get_dashboard(dashboard_id, user)
