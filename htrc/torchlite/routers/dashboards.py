@@ -25,7 +25,9 @@ router = APIRouter(
 )
 
 def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None, args, **kwargs,):
+    print(request)
     print(args)
+    print(kwargs)
     try:
         print(request.url.path)
         return request.url.path
