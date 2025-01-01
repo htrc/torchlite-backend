@@ -25,9 +25,12 @@ router = APIRouter(
 )
 
 def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None, args, **kwargs,):
+    print(args)
     try:
+        print(request.url.path)
         return request.url.path
     except AttributeError:
+        print(f"/dashboards/{args[0]}")
         return f"/dashboards/{args[0]}"
 
 @router.get("/", description="Retrieve the available dashboards for a user", response_model_exclude_defaults=True)
@@ -125,6 +128,9 @@ async def update_dashboard(dashboard_id: UUID,
             for w in dashboard.widgets:
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/widgets/{w.type}/data")
             await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}")
+            if dashboard_patch.imported_id:
+                await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/data")
+                await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/metadata")
         except Exception as e:
             print(f"Error Clearing Cache: {e}")
         return dashboard
@@ -180,7 +186,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
     return await widget.get_data(filtered_volumes)
 
 
-@router.get("/{dashboard_id}/{data_type}", description="Retrieve meta data")
+@router.get("/{dashboard_id}/{data_type}", description="Retrieve workset data or metadata")
 @cache(key_builder=request_key_builder)
 async def get_workset_data(dashboard_id: UUID, data_type: str,
     filtered: bool = False, user: UserInfo | None = Depends(get_current_user)):
