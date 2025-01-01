@@ -30,9 +30,11 @@ def request_key_builder(func, namespace: str = "", *, request: Request = None, r
     print(kwargs)
     try:
         print(request.url.path)
+        print("A")
         return request.url.path
     except AttributeError:
         print(f"/dashboards/{args[0]}")
+        print("B")
         return f"/dashboards/{args[0]}"
 
 @router.get("/", description="Retrieve the available dashboards for a user", response_model_exclude_defaults=True)
