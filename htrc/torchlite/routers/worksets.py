@@ -43,8 +43,12 @@ async def list_worksets(workset_manager: WorksetManager, user_access_token: Anno
 async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager, user_access_token: Annotated[str | None, Depends(get_user_access_token)]) -> WorksetInfo:
     imported_id_mapping = await WorksetIdMapping.from_mongo(
         mongo_client.db["id-mappings"].find({"importedId": UUID(imported_id)}).to_list(1000))
-    print(imported_id)
-    print(imported_id_mapping)
+    try:
+        print(imported_id)
+        print(imported_id_mapping)
+    except Exception as e:
+        print("Debugging error")
+        print(e)
 
     if len(imported_id_mapping):
         imported_id_mapping = imported_id_mapping[0]
@@ -54,7 +58,12 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
             imported_volumes = await workset_manager.get_public_workset_volumes(imported_id)
         except JSONDecodeError:
             imported_volumes = await workset_manager.get_user_workset_volumes(imported_id,user_access_token)
-        print(imported_volumes)
+        
+        try:
+            print(imported_volumes)
+        except Exception as e:
+            print("Debugging error 2")
+            print(e)
         ef_wsid = await ef_api.create_workset(' '.join(imported_volumes))
         mongo_client.db["id-mappings"].insert_one({"importedId": UUID(imported_id), "worksetId": ef_wsid})
 
