@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Endpoint for downloading workset data and metadata, optionally with filters applied. [#120](https://github.com/htrc/torchlite-backend/issues/120)
+
 ### Changed
 - Brought changes from stage to main branch, and from main to dev. [#135](https://github.com/htrc/torchlite-backend/issues/135)
+
+### Fixed
+- Redis close error on shutdown
 
 ## [0.1.0] – 2024-12-06
 

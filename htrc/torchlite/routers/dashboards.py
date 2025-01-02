@@ -26,7 +26,13 @@ router = APIRouter(
 
 def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None, args, **kwargs,):
     try:
-        return request.url.path
+        if 'data_type' in kwargs['kwargs'] and 'filtered' in kwargs['kwargs']:
+            if kwargs['kwargs']['data_type'] == 'data' and kwargs['kwargs']['filtered']:
+                return f"{request.url.path}/filtered"
+            else:
+                return request.url.path
+        else:
+            return request.url.path
     except AttributeError:
         return f"/dashboards/{args[0]}"
 
@@ -124,6 +130,12 @@ async def update_dashboard(dashboard_id: UUID,
         try:
             for w in dashboard.widgets:
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/widgets/{w.type}/data")
+
+            await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/data/filtered")
+            await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/metadata")
+            if dashboard_patch.imported_id:
+                await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/data")
+
             await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}")
         except Exception as e:
             print(f"Error Clearing Cache: {e}")
@@ -178,3 +190,37 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
     return await widget.get_data(filtered_volumes)
+
+
+@router.get("/{dashboard_id}/{data_type}", description="Retrieve workset data or metadata")
+@cache(key_builder=request_key_builder)
+async def get_workset_data(dashboard_id: UUID, data_type: str,
+    filtered: bool = False, user: UserInfo | None = Depends(get_current_user)):
+    dashboard = await get_dashboard(dashboard_id, user)
+
+    # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
+    # dashboard to the expected model type if it is just a dict, so that dashboard.widgets doesn't
+    # throw an error.
+    # This is happening only when an endpoint calls another method that is cached. Direct calls to
+    # endpoints that return pydantic models are not affected.
+    if isinstance(dashboard, dict):
+        dashboard = DashboardSummary.model_validate(dashboard)
+    
+    imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
+
+    ef_wsid = imported_id_mapping.workset_id
+
+    match data_type:
+        case "metadata":
+            volumes = await ef_api.get_workset_metadata(ef_wsid)
+        case "data":
+            volumes = await ef_api.get_workset_volumes(ef_wsid, include_pos=True)
+        case _:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid data_type '{data_type}'. Expected 'data' or 'metadata'."
+            )
+    if filtered:
+        volumes = apply_filters(volumes, filters=dashboard.filters)
+
+    return volumes
