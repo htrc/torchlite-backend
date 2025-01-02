@@ -29,9 +29,17 @@ def request_key_builder(func, namespace: str = "", *, request: Request = None, r
     print(args)
     print(kwargs)
     try:
-        print(request.url.path)
         print("A")
-        return request.url.path
+        if 'data_type' in kwargs['kwargs'] and 'filtered' in kwargs['kwargs']:
+            if kwargs['kwargs']['data_type'] == 'data' and kwargs['kwargs']['filtered']:
+                print(f"{request.url.path}/filtered")
+                return f"{request.url.path}/filtered"
+            else:
+                print(request.url.path)
+                return request.url.path
+        else:
+            print(request.url.path)
+            return request.url.path
     except AttributeError:
         print(f"/dashboards/{args[0]}")
         print("B")
@@ -130,11 +138,19 @@ async def update_dashboard(dashboard_id: UUID,
     if dashboard:
         try:
             for w in dashboard.widgets:
+                print(f"Deleting /dashboards/{dashboard_id}/widgets/{w.type}/data cache")
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/widgets/{w.type}/data")
-            await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}")
+            
+            print(f"Deleting /dashboards/{dashboard_id}/data/filtered cache")
+            await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/data/filtered")
             if dashboard_patch.imported_id:
+                print(f"Deleting /dashboards/{dashboard_id}/data cache")
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/data")
+                print(f"Deleting /dashboards/{dashboard_id}/metadata cache")
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/metadata")
+
+            print(f"Deleting /dashboards/{dashboard_id} cache")
+            await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}")
         except Exception as e:
             print(f"Error Clearing Cache: {e}")
         return dashboard
