@@ -143,11 +143,11 @@ async def update_dashboard(dashboard_id: UUID,
             
             print(f"Deleting /dashboards/{dashboard_id}/data/filtered cache")
             await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/data/filtered")
+            print(f"Deleting /dashboards/{dashboard_id}/metadata cache")
+            await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/metadata")
             if dashboard_patch.imported_id:
                 print(f"Deleting /dashboards/{dashboard_id}/data cache")
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/data")
-                print(f"Deleting /dashboards/{dashboard_id}/metadata cache")
-                await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/metadata")
 
             print(f"Deleting /dashboards/{dashboard_id} cache")
             await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}")
