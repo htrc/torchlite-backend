@@ -55,8 +55,10 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
         ef_wsid = imported_id_mapping.workset_id
     else:
         try:
+            print("A")
             imported_volumes = await workset_manager.get_public_workset_volumes(imported_id)
         except JSONDecodeError:
+            print("B")
             imported_volumes = await workset_manager.get_user_workset_volumes(imported_id,user_access_token)
         
         try:
