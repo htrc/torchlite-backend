@@ -25,24 +25,15 @@ router = APIRouter(
 )
 
 def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None, args, **kwargs,):
-    print(request)
-    print(args)
-    print(kwargs)
     try:
-        print("A")
         if 'data_type' in kwargs['kwargs'] and 'filtered' in kwargs['kwargs']:
             if kwargs['kwargs']['data_type'] == 'data' and kwargs['kwargs']['filtered']:
-                print(f"{request.url.path}/filtered")
                 return f"{request.url.path}/filtered"
             else:
-                print(request.url.path)
                 return request.url.path
         else:
-            print(request.url.path)
             return request.url.path
     except AttributeError:
-        print(f"/dashboards/{args[0]}")
-        print("B")
         return f"/dashboards/{args[0]}"
 
 @router.get("/", description="Retrieve the available dashboards for a user", response_model_exclude_defaults=True)
@@ -138,18 +129,13 @@ async def update_dashboard(dashboard_id: UUID,
     if dashboard:
         try:
             for w in dashboard.widgets:
-                print(f"Deleting /dashboards/{dashboard_id}/widgets/{w.type}/data cache")
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/widgets/{w.type}/data")
-            
-            print(f"Deleting /dashboards/{dashboard_id}/data/filtered cache")
+
             await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/data/filtered")
-            print(f"Deleting /dashboards/{dashboard_id}/metadata cache")
             await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/metadata")
             if dashboard_patch.imported_id:
-                print(f"Deleting /dashboards/{dashboard_id}/data cache")
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/data")
 
-            print(f"Deleting /dashboards/{dashboard_id} cache")
             await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}")
         except Exception as e:
             print(f"Error Clearing Cache: {e}")
@@ -238,5 +224,3 @@ async def get_workset_data(dashboard_id: UUID, data_type: str,
         volumes = apply_filters(volumes, filters=dashboard.filters)
 
     return volumes
-
-    #return await widget.get_data(filtered_volumes)
