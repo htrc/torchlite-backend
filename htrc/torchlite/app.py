@@ -50,7 +50,7 @@ async def torchlite_startup() -> redis.Redis:
 async def torchlite_shutdown(redis_connection: redis.Redis):
     log.info("Server shutting down")
     await http.aclose()
-    await redis_connection.aclose()
+    await redis_connection.close()
     mongo_client.close()
 
 
