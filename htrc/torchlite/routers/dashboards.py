@@ -214,7 +214,8 @@ async def get_workset_data(dashboard_id: UUID, data_type: str,
         case "metadata":
             volumes = await ef_api.get_workset_metadata(ef_wsid)
         case "data":
-            volumes = await ef_api.get_workset_volumes(ef_wsid, include_pos=True)
+#            volumes = await ef_api.get_workset_volumes(ef_wsid, include_pos=True)
+            volumes = await ef_api.get_aggregated_workset_volumes(ef_wsid)
         case _:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
