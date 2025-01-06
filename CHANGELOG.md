@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Brought changes from stage to main branch, and from main to dev. [#135](https://github.com/htrc/torchlite-backend/issues/135)
+- Full and Filtered to pull from aggregate data as a stopgap while full data is not loaded
 
 ### Fixed
 - Redis close error on shutdown
