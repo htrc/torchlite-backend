@@ -4,7 +4,10 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from fastapi import FastAPI
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
 from fastapi_healthchecks.api.router import HealthcheckRouter, Probe
+import redis.asyncio as redis
 
 from .config import config
 from .database import mongo_client
@@ -18,14 +21,22 @@ from .version import VERSION
 log = logging.getLogger(config.PROJECT_NAME)
 
 
-async def torchlite_startup():
+async def torchlite_startup() -> redis.Redis:
     print_splash()
     env = os.environ.get("ENV", "dev")
     log.info(f"Starting Torchlite API Server v{VERSION} ({env})")
 
+    # Setup backend caching
+    try:
+        redis_connection = redis.Redis(host=config.REDIS_HOST,port=config.REDIS_PORT,password=config.REDIS_PASSWORD,db=config.REDIS_DB)
+        log.info(f"Ping successful: {await redis_connection.ping()}")
+        FastAPICache.init(RedisBackend(redis_connection), enable=config.ENABLE_CACHE, expire=config.CACHE_EXPIRE, cache_status_header=config.CACHE_STATUS_HEADER)
+        log.info('Cache initialized successfully')
+    except Exception as e:
+        log.error(f'Error initializing cache {e}')
+
     # ensure DB is alive
     await mongo_client.ping()
-
 
     # config_file_name = os.getenv("TORCHLITE_CONFIG")
     # if not config_file_name:
@@ -33,18 +44,21 @@ async def torchlite_startup():
     #
     # log.info(f"Loading configuration from {config_file_name}...")
 
+    return redis_connection
 
-async def torchlite_shutdown():
+
+async def torchlite_shutdown(redis_connection: redis.Redis):
     log.info("Server shutting down")
     await http.aclose()
+    await redis_connection.close()
     mongo_client.close()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
-    await torchlite_startup()
+    redis_connection = await torchlite_startup()
     yield
-    await torchlite_shutdown()
+    await torchlite_shutdown(redis_connection)
 
 
 api = FastAPI(

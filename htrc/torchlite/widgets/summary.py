@@ -63,9 +63,9 @@ class SummaryWidget(WidgetBase):
 
             body = volume.features.body
             if body is not None:
-                update_dict(body,loacalPerVolDict[volume.htid])
+                update_dict(body, loacalPerVolDict[volume.htid])
                 updatedset(body, per_vol_set[volume.htid], volume.htid)
-            
+
             total += volume.features.token_count
             individualVol = volume.features.token_count
 
