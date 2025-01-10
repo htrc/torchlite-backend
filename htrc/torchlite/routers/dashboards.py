@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from authlib.oidc.core import UserInfo
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from fastapi_cache.decorator import cache
 from fastapi_cache import FastAPICache
 from pymongo import ReturnDocument
@@ -11,6 +11,7 @@ from starlette.responses import Response
 from ..auth.auth import get_current_user, get_user_access_token
 from ..config import config
 from ..data import apply_filters
+from ..data import apply_datacleaning
 from ..database import mongo_client
 from ..ef.api import ef_api
 from ..errors import TorchliteError
@@ -18,6 +19,10 @@ from ..managers.workset_manager import WorksetManager
 from ..models.dashboard import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
 from ..models.workset import WorksetIdMapping
 from ..widgets.base import WidgetDataTypes
+import os
+import json
+import csv
+from fastapi.responses import JSONResponse
 
 router = APIRouter(
     prefix="/dashboards",
@@ -40,20 +45,21 @@ def request_key_builder(func, namespace: str = "", *, request: Request = None, r
 @cache()
 async def list_dashboards(owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
+
     if owner == config.TORCHLITE_UID:
         return await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
         )
-
+    
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
+    
     user_id = UUID(user.get("htrc-guid", user.sub))
     owner = owner or user_id
-
+    
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-
+    
     return await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)
     )
@@ -149,11 +155,11 @@ async def update_dashboard(dashboard_id: UUID,
         else:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 @router.get("/{dashboard_id}/widgets/{widget_type}/data", description="Retrieve widget data")
 @cache(key_builder=request_key_builder)
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
+    
     dashboard = await get_dashboard(dashboard_id, user)
 
     # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
@@ -171,7 +177,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
     imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
-
+    
     match widget.data_type:
         case WidgetDataTypes.metadata_only:
             volumes = await ef_api.get_workset_metadata(imported_id_mapping.workset_id)
@@ -187,10 +193,113 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 
         case _:
             raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
-
+    #check widget type and perform cleaning
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
-    return await widget.get_data(filtered_volumes)
+    print(f"Total volumes before cleaning: filtered_volumes {len(filtered_volumes)}")
+    if (widget.data_type == WidgetDataTypes.metadata_only):
+        return await widget.get_data(filtered_volumes)
+    cleaned_volumes = apply_datacleaning(dashboard_id, filtered_volumes, cleaning_settings=dashboard.datacleaning)
+    print(f"Total volumes to clean: cleaned_volumes {len(cleaned_volumes)}")
+    return await widget.get_data(cleaned_volumes)
 
+
+#dashboard_id/stopwords
+@router.get("/{dashboard_id}/stopwords/{language}", description="Retrieve Stopwords data")
+async def get_stopwords_data(dashboard_id: UUID, language: str,
+                          user: UserInfo | None = Depends(get_current_user)):
+    
+    dashboard = await get_dashboard(dashboard_id, user)
+    if not dashboard:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Dashboard {dashboard_id} not found"
+        )
+    
+    # Normalize language input
+    print(dashboard_id,language)
+    language = language.lower().strip()
+    directory="stopword_lists"
+    stopword_file_path = os.path.join(directory, f"{language}_stopwords.json")
+
+    if not os.path.exists(stopword_file_path):
+        print(f"Stopwords file for language '{language}' not found.")
+    
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Stopwords file for language '{language}' not found"
+        )
+    
+    try:
+        # Read and parse JSON file
+        with open(stopword_file_path, 'r', encoding='utf-8') as file:
+            stopwords_data = json.load(file)
+                   
+        # Return JSON response
+        return JSONResponse(
+            content=stopwords_data,
+            media_type="application/json"
+        )
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error parsing stopwords JSON file for language '{language}'"
+        )
+    
+
+@router.post("/{dashboard_id}/stopwords", description="Upload stopwords file", response_model_exclude_defaults=True)
+async def upload_stopwords(dashboard_id: UUID,
+                           user: UserInfo | None = Depends(get_current_user),
+                           file: UploadFile = File(...)) -> DashboardSummary:
+    dashboard = await get_dashboard(dashboard_id, user)
+    print("Pooja")
+    if not dashboard:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Dashboard {dashboard_id} not found"
+        )
+    
+    os.makedirs("stopword_lists", exist_ok=True)
+    file_path = os.path.join("stopword_lists", f"{dashboard_id}_stopwords.json")
+    try:
+        # Determine file type based on the filename
+        filename = file.filename.lower()
+        content = await file.read()  # Read file content as bytes
+        stopwords_list = []
+
+        if filename.endswith(".txt"):
+            # Handle TXT file: split content into lines
+            stopwords_list = content.decode("utf-8").splitlines()
+            stopwords_list = [line.strip() for line in stopwords_list if line.strip()]
+        
+        elif filename.endswith(".csv"):
+            # Handle CSV file: parse rows and extract stopwords
+            decoded_content = content.decode("utf-8").splitlines()
+            csv_reader = csv.reader(decoded_content)
+            for row in csv_reader:
+                stopwords_list.extend([word.strip() for word in row if word.strip()])
+        
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Unsupported file format. Please upload a .txt or .csv file."
+            )
+
+        # Save the stopwords as a JSON array
+        with open(file_path, "w", encoding="utf-8") as json_file:
+            json.dump(stopwords_list, json_file, ensure_ascii=False, indent=4)
+
+        return {
+            "message": "Stopwords uploaded and processed successfully",
+            "file_path": file_path,
+            "filters": {},      
+            "widgets": [],       
+            "owner": dashboard_id  
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing stopwords file: {e}"
+        )
 
 @router.get("/{dashboard_id}/{data_type}", description="Retrieve workset data or metadata")
 @cache(key_builder=request_key_builder)
