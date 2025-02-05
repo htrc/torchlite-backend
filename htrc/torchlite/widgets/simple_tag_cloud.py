@@ -42,13 +42,14 @@ class SimpleTagCloudWidget(WidgetBase):
     def aggregate_word_counts(word_counts: dict) -> dict:
         aggregated_counts = {}
 
-        for word, count in word_counts.items():
-            lower_word = word.lower()
+        if word_counts:
+            for word, count in word_counts.items():
+                lower_word = word.lower()
 
-            if lower_word in aggregated_counts:
-                aggregated_counts[lower_word] += count
-            else:
-                aggregated_counts[lower_word] = count
+                if lower_word in aggregated_counts:
+                    aggregated_counts[lower_word] += count
+                else:
+                    aggregated_counts[lower_word] = count
 
         return aggregated_counts
 

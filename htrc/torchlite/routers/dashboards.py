@@ -18,6 +18,7 @@ from ..managers.workset_manager import WorksetManager
 from ..models.dashboard import DashboardSummary, DashboardPatch, DashboardCreate, DashboardPatchUpdate
 from ..models.workset import WorksetIdMapping
 from ..widgets.base import WidgetDataTypes
+from ..ef.exceptions import EfApiError
 
 router = APIRouter(
     prefix="/dashboards",
@@ -188,7 +189,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 
             case _:
                 raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
-    except Exception as e:
+    except EfApiError:
         raise HTTPException(
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,
             detail=f"Server timeout for {imported_id_mapping.workset_id} on request for data for the {widget_type} widget"
