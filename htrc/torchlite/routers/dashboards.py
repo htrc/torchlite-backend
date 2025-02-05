@@ -172,21 +172,27 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
         )
     imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
 
-    match widget.data_type:
-        case WidgetDataTypes.metadata_only:
-            volumes = await ef_api.get_workset_metadata(imported_id_mapping.workset_id)
+    try:
+        match widget.data_type:
+            case WidgetDataTypes.metadata_only:
+                volumes = await ef_api.get_workset_metadata(imported_id_mapping.workset_id)
 
-        case WidgetDataTypes.vols_with_pos:
-            volumes = await ef_api.get_workset_volumes(imported_id_mapping.workset_id, include_pos=True)
+            case WidgetDataTypes.vols_with_pos:
+                volumes = await ef_api.get_workset_volumes(imported_id_mapping.workset_id, include_pos=True)
 
-        case WidgetDataTypes.vols_no_pos:
-            volumes = await ef_api.get_workset_volumes(imported_id_mapping.workset_id, include_pos=False)
+            case WidgetDataTypes.vols_no_pos:
+                volumes = await ef_api.get_workset_volumes(imported_id_mapping.workset_id, include_pos=False)
 
-        case WidgetDataTypes.agg_vols_no_pos:
-            volumes = await ef_api.get_aggregated_workset_volumes(imported_id_mapping.workset_id)
+            case WidgetDataTypes.agg_vols_no_pos:
+                volumes = await ef_api.get_aggregated_workset_volumes(imported_id_mapping.workset_id)
 
-        case _:
-            raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
+            case _:
+                raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail=f"Server timeout for {imported_id_mapping.workset_id} on request for data for the {widget_type} widget"
+        )
 
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
     return await widget.get_data(filtered_volumes)
