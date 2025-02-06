@@ -60,11 +60,14 @@ class SimpleTagCloudWidget(WidgetBase):
             for volume in volumes
         ]
         print("get_data simple_tag_cloud B")
-        token_counts = functools.reduce(self.aggregate_counts, vol_token_counts)
-        token_counts = [
-            (k, v) for k, v in token_counts.items()
-            if len(k) > 2 and k not in self.stopwords and not re.search(self._regex, k)
-        ]
+        try:
+            token_counts = functools.reduce(self.aggregate_counts, vol_token_counts)
+            token_counts = [
+                (k, v) for k, v in token_counts.items()
+                if len(k) > 2 and k not in self.stopwords and not re.search(self._regex, k)
+            ]
+        except Exception as e:
+            print(e)
         # FIXME: all these conditions should probably be input parameters to the widget that can be controlled from
         #        the frontend rather than hardcoded here
         print("get_data simple_tag_cloud C")
