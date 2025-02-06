@@ -54,11 +54,12 @@ class SimpleTagCloudWidget(WidgetBase):
         return aggregated_counts
 
     async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
+        print("get_data simple_tag_cloud A")
         vol_token_counts = [
             self.aggregate_word_counts(volume.features.body)
             for volume in volumes
         ]
-
+        print("get_data simple_tag_cloud B")
         token_counts = functools.reduce(self.aggregate_counts, vol_token_counts)
         token_counts = [
             (k, v) for k, v in token_counts.items()
@@ -66,7 +67,7 @@ class SimpleTagCloudWidget(WidgetBase):
         ]
         # FIXME: all these conditions should probably be input parameters to the widget that can be controlled from
         #        the frontend rather than hardcoded here
-
+        print("get_data simple_tag_cloud C")
         token_counts = sorted(token_counts, key=lambda x: x[1], reverse=True)[:100]
-
+        print("get_data simple_tag_cloud D")
         return dict(token_counts)
