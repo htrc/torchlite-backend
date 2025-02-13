@@ -20,6 +20,11 @@ from ..models.workset import WorksetIdMapping
 from ..widgets.base import WidgetDataTypes
 from ..ef.exceptions import EfApiError
 
+import logging
+from ..config import config
+
+log = logging.getLogger(config.PROJECT_NAME)
+
 router = APIRouter(
     prefix="/dashboards",
     tags=["dashboards"],
@@ -139,7 +144,7 @@ async def update_dashboard(dashboard_id: UUID,
 
             await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}")
         except Exception as e:
-            print(f"Error Clearing Cache: {e}")
+            log.error(f"Error Clearing Cache: {e}")
         return dashboard
     else:
         dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
@@ -156,7 +161,7 @@ async def update_dashboard(dashboard_id: UUID,
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
     dashboard = await get_dashboard(dashboard_id, user)
-    print("get_widget_data A")
+    log.debug("get_widget_data A")
     # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
     # dashboard to the expected model type if it is just a dict, so that dashboard.widgets doesn't
     # throw an error.
@@ -164,7 +169,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
     # endpoints that return pydantic models are not affected.
     if isinstance(dashboard, dict):
         dashboard = DashboardSummary.model_validate(dashboard)
-    print("get_widget_data B")    
+    log.debug("get_widget_data B")    
     widget = next((w for w in dashboard.widgets if w.type == widget_type), None)
     if not widget:
         raise HTTPException(
@@ -172,7 +177,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
     imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
-    print("get_widget_data C")
+    log.debug("get_widget_data C")
     try:
         match widget.data_type:
             case WidgetDataTypes.metadata_only:
@@ -194,9 +199,9 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,
             detail=f"Server timeout for {imported_id_mapping.workset_id} on request for data for the {widget_type} widget"
         )
-    print("get_widget_data D")
+    log.debug("get_widget_data D")
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
-    print("get_widget_data E")
+    log.debug("get_widget_data E")
     return await widget.get_data(filtered_volumes)
 
 

@@ -7,6 +7,10 @@ from htrc.torchlite.models.workset import WorksetSummary
 from htrc.torchlite.http_client import registry_http
 import json
 
+import logging
+from ..config import config
+
+log = logging.getLogger(config.PROJECT_NAME)
 
 class _WorksetManager:
 
@@ -48,7 +52,7 @@ class _WorksetManager:
                     for workset in data['worksets']['workset']
                 }
             except Exception as e:
-                print(f'ERROR getting user worksets: {e}')
+                log.error(f'ERROR getting user worksets: {e}')
 
         return self.user_worksets
     

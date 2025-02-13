@@ -9,6 +9,11 @@ from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
 from ..ef.models import VolumeAggFeaturesNoPos
 
+import logging
+from ..config import config
+
+log = logging.getLogger(config.PROJECT_NAME)
+
 class SimpleTagCloudWidget(WidgetBase):
     type: Literal['SimpleTagCloud'] = 'SimpleTagCloud'
     data_type: WidgetDataTypes = WidgetDataTypes.agg_vols_no_pos
@@ -54,26 +59,26 @@ class SimpleTagCloudWidget(WidgetBase):
         return aggregated_counts
 
     async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
-        print("get_data simple_tag_cloud A")
+        log.debug("get_data simple_tag_cloud A")
         vol_token_counts = [
             self.aggregate_word_counts(volume.features.body)
             for volume in volumes
         ]
-        print("get_data simple_tag_cloud B")
+        log.debug("get_data simple_tag_cloud B")
         try:
-            print("get_data simple_tag_cloud E")
+            log.debug("get_data simple_tag_cloud E")
             token_counts = functools.reduce(self.aggregate_counts, vol_token_counts)
-            print("get_data simple_tag_cloud F")
+            log.debug("get_data simple_tag_cloud F")
             token_counts = [
                 (k, v) for k, v in token_counts.items()
                 if len(k) > 2 and k not in self.stopwords and not re.search(self._regex, k)
             ]
-            print("get_data simple_tag_cloud G")
+            log.debug("get_data simple_tag_cloud G")
         except Exception as e:
-            print(e)
+            log.error(e)
         # FIXME: all these conditions should probably be input parameters to the widget that can be controlled from
         #        the frontend rather than hardcoded here
-        print("get_data simple_tag_cloud C")
+        log.debug("get_data simple_tag_cloud C")
         token_counts = sorted(token_counts, key=lambda x: x[1], reverse=True)[:100]
-        print("get_data simple_tag_cloud D")
+        log.debug("get_data simple_tag_cloud D")
         return dict(token_counts)

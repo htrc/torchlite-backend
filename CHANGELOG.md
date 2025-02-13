@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- All logging to use logger instead of print statements
+
+### Fixed
+- How unauthorized worksets and invalid worksets are handled
+- Handling of columes without text in text-based widgets
+
 ## [0.2.0] – 2025-01-06
 
 ### Added
