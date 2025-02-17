@@ -11,8 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All logging to use logger instead of print statements
 
 ### Fixed
-- How unauthorized worksets and invalid worksets are handled
-- Handling of columes without text in text-based widgets
+- Handling of unauthorized and invalid worksets
+- Handling of volumes without text in text-based widgets
+- Handling of widgets when loading featured worksets for the first time
+- Handling of building redis connection at startup
 
 ## [0.2.0] – 2025-01-06
 
