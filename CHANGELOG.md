@@ -11,9 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All logging to use logger instead of print statements
 
 ### Fixed
-- Handling of unauthorized and invalid worksets
-- Handling of volumes without text in text-based widgets
-- Handling of widgets when loading featured worksets for the first time
+- Handling of unauthorized and invalid worksets [#146](https://github.com/htrc/torchlite-backend/issues/146)
+- Handling of volumes without text in text-based widgets [#146](https://github.com/htrc/torchlite-backend/issues/146)
+- Handling of widgets when loading featured worksets for the first time [#146](https://github.com/htrc/torchlite-backend/issues/146)
 - Handling of building redis connection at startup
 
 ## [0.2.0] – 2025-01-06
