@@ -93,17 +93,25 @@ async def create_dashboard(dashboard_create: DashboardCreate,
 @cache(key_builder=request_key_builder)
 async def get_dashboard(dashboard_id: UUID,
                         user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
+    log.debug('get_dashboard')
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
+    log.debug(user_id)
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one({"_id": dashboard_id, "$or": [{"isShared": True}, {"owner": user_id}]})
     )
     if dashboard:
+        log.debug('dashboard')
+        log.debug(dashboard)
         return dashboard
     else:
+        log.debug('no dashboard')
         dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
         if not dashboard:
+            log.debug('no dashboard')
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         else:
+            log.debug('not not dasbhoard?')
+            log.debug(dashboard)
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
 
