@@ -176,7 +176,14 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
-    imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
+    
+    try:
+        imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
+    except IndexError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Analytics Gateway workset {dashboard.imported_id} has no representation within TORCHLITE. Worksets cannot recieve data until the workset is fully imported."
+        )
     log.debug("get_widget_data C")
     try:
         match widget.data_type:
