@@ -71,6 +71,7 @@ async def create_dashboard(dashboard_create: DashboardCreate,
                            owner: UUID | None = None,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
     log.debug('create_dashboard')
+    log.debug(dashboard_create)
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     owner = owner or user_id
 
