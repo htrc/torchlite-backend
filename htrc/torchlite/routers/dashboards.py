@@ -21,7 +21,6 @@ from ..widgets.base import WidgetDataTypes
 from ..ef.exceptions import EfApiError
 
 import logging
-from ..config import config
 
 log = logging.getLogger(config.PROJECT_NAME)
 

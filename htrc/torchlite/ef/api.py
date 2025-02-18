@@ -12,7 +12,6 @@ from ..http_client import http
 from ..utils import sanitize
 
 import logging
-from ..config import config
 
 log = logging.getLogger(config.PROJECT_NAME)
 

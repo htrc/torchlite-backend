@@ -8,7 +8,6 @@ from htrc.torchlite.http_client import registry_http
 import json
 
 import logging
-from ..config import config
 
 log = logging.getLogger(config.PROJECT_NAME)
 
