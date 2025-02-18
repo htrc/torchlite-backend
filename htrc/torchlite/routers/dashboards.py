@@ -45,6 +45,7 @@ def request_key_builder(func, namespace: str = "", *, request: Request = None, r
 @cache()
 async def list_dashboards(owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
+    log.debug('list_dashboards')
     if owner == config.TORCHLITE_UID:
         return await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
@@ -69,6 +70,7 @@ async def create_dashboard(dashboard_create: DashboardCreate,
                            workset_manager: WorksetManager,
                            owner: UUID | None = None,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
+    log.debug('create_dashboard')
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     owner = owner or user_id
 
@@ -119,6 +121,7 @@ async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            workset_manager: WorksetManager,
                            user_access_token: UserInfo | None = Depends(get_user_access_token)) -> DashboardSummary:
+    log.debug('update_dashboard')
     user = await get_current_user(user_access_token)
     await workset_manager.get_public_worksets()
     if (user_access_token):
@@ -167,6 +170,7 @@ async def update_dashboard(dashboard_id: UUID,
 @cache(key_builder=request_key_builder)
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
+    log.debug('get_widget_data')
     dashboard = await get_dashboard(dashboard_id, user)
     log.debug("get_widget_data A")
     # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
@@ -223,6 +227,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 @cache(key_builder=request_key_builder)
 async def get_workset_data(dashboard_id: UUID, data_type: str,
     filtered: bool = False, user: UserInfo | None = Depends(get_current_user)):
+    log.debug('get_workset_data')
     dashboard = await get_dashboard(dashboard_id, user)
 
     # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
