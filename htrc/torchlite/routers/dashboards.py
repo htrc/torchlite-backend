@@ -98,6 +98,7 @@ async def get_dashboard(dashboard_id: UUID,
     log.debug('get_dashboard')
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     log.debug(user_id)
+    log.debug(dashboard_id)
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one({"_id": dashboard_id, "$or": [{"isShared": True}, {"owner": user_id}]})
     )
