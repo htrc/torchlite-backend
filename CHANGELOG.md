@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - All logging to use logger instead of print statements
 
+### Added
+- Comparison between frontend featured workset list and backend to keep backend representation up-to-date to allow featured worksets to be swapped out by the AG user, and those changes will seemlessly propogate to TORCHLITE [#148](https://github.com/htrc/torchlite-backend/issues/148)
+
 ### Fixed
 - Handling of unauthorized and invalid worksets [#146](https://github.com/htrc/torchlite-backend/issues/146)
 - Handling of volumes without text in text-based widgets [#146](https://github.com/htrc/torchlite-backend/issues/146)
