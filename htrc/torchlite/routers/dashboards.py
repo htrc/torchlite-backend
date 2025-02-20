@@ -43,13 +43,17 @@ def request_key_builder(func, namespace: str = "", *, request: Request = None, r
 
 @router.get("/", description="Retrieve the available dashboards for a user", response_model_exclude_defaults=True)
 @cache()
-async def list_dashboards(owner: UUID | None = None,
+async def list_dashboards(workset_manager: WorksetManager,
+                          owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
     log.debug('list_dashboards')
     if owner == config.TORCHLITE_UID:
-        return await DashboardSummary.from_mongo(
+        await workset_manager.get_public_worksets()
+        workset_manager.get_featured_worksets()
+        shared_torchlite_worksets = await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
         )
+        return await workset_manager.align_featured_worksets(shared_torchlite_worksets)
 
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
