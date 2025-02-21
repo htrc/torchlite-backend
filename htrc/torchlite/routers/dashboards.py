@@ -201,7 +201,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Analytics Gateway workset {dashboard.imported_id} has no representation within TORCHLITE. Worksets cannot recieve data until the workset is fully imported."
         )
-    log.debug("get_widget_data C")
+    log.debug(f"{widget.type} get_widget_data C")
     try:
         match widget.data_type:
             case WidgetDataTypes.metadata_only:
@@ -223,9 +223,9 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,
             detail=f"Server timeout for {imported_id_mapping.workset_id} on request for data for the {widget_type} widget"
         )
-    log.debug("get_widget_data D")
+    log.debug(f"{widget.type} get_widget_data D")
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
-    log.debug("get_widget_data E")
+    log.debug(f"{widget.type} get_widget_data E")
     return await widget.get_data(filtered_volumes)
 
 
