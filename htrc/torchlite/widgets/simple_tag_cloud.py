@@ -37,11 +37,16 @@ class SimpleTagCloudWidget(WidgetBase):
     _regex: Pattern = re.compile(punctuation_and_numbers_regex)
 
     @staticmethod
-    def aggregate_counts(p1: dict, p2: dict) -> dict:
-        p1_counter = Counter(p1)
-        p2_counter = Counter(p2)
+    def sum_dicts(vol_token_counts: list[dict]) -> dict:
+        total = {}
+        for vol in vol_token_counts:
+            for token, count in vol.items():
+                if token in total:
+                    total[token] += count
+                else:
+                    total[token] = count
 
-        return p1_counter + p2_counter
+        return total
 
     @staticmethod
     def aggregate_word_counts(word_counts: dict) -> dict:
@@ -59,26 +64,22 @@ class SimpleTagCloudWidget(WidgetBase):
         return aggregated_counts
 
     async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
-        log.debug("get_data simple_tag_cloud A")
         vol_token_counts = [
             self.aggregate_word_counts(volume.features.body)
             for volume in volumes
         ]
-        log.debug("get_data simple_tag_cloud B")
+
         try:
-            log.debug("get_data simple_tag_cloud E")
-            token_counts = functools.reduce(self.aggregate_counts, vol_token_counts)
-            log.debug("get_data simple_tag_cloud F")
+            token_counts = self.sum_dicts(vol_token_counts)
             token_counts = [
                 (k, v) for k, v in token_counts.items()
                 if len(k) > 2 and k not in self.stopwords and not re.search(self._regex, k)
             ]
-            log.debug("get_data simple_tag_cloud G")
         except Exception as e:
             log.error(e)
         # FIXME: all these conditions should probably be input parameters to the widget that can be controlled from
         #        the frontend rather than hardcoded here
-        log.debug("get_data simple_tag_cloud C")
+
         token_counts = sorted(token_counts, key=lambda x: x[1], reverse=True)[:100]
-        log.debug("get_data simple_tag_cloud D")
+
         return dict(token_counts)

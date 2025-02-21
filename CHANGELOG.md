@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - All logging to use logger instead of print statements
+- How the word cloud widget tabulates word counts, significantly reducing processing time once the EF API has responded. Page load time should now be almost completely dependent on EF API response time. 
 
 ### Added
 - Comparison between frontend featured workset list and backend to keep backend representation up-to-date to allow featured worksets to be swapped out by the AG user, and those changes will seemlessly propogate to TORCHLITE [#148](https://github.com/htrc/torchlite-backend/issues/148)
@@ -16,8 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Handling of unauthorized and invalid worksets [#146](https://github.com/htrc/torchlite-backend/issues/146)
 - Handling of volumes without text in text-based widgets [#146](https://github.com/htrc/torchlite-backend/issues/146)
-- Handling of widgets when loading featured worksets for the first time [#146](https://github.com/htrc/torchlite-backend/issues/146)
-- Handling of building redis connection at startup
+- Handling of widgets when trying to load worksets that have not yet been built in the database [#146](https://github.com/htrc/torchlite-backend/issues/146)
+- Handling of building redis connection at startup [#150](https://github.com/htrc/torchlite-backend/issues/150)
 
 ## [0.2.0] – 2025-01-06
 
