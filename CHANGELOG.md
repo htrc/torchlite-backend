@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - All logging to use logger instead of print statements
-- How the word cloud widget tabulates word counts, significantly reducing processing time once the EF API has responded. Page load time should now be almost completely dependent on EF API response time. 
+- How the word cloud widget tabulates word counts, significantly reducing processing time once the EF API has responded.
 
 ### Added
 - Comparison between frontend featured workset list and backend to keep backend representation up-to-date to allow featured worksets to be swapped out by the AG user, and those changes will seemlessly propogate to TORCHLITE [#148](https://github.com/htrc/torchlite-backend/issues/148)

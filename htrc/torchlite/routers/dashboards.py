@@ -46,7 +46,6 @@ def request_key_builder(func, namespace: str = "", *, request: Request = None, r
 async def list_dashboards(workset_manager: WorksetManager,
                           owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
-    log.debug('list_dashboards')
     if owner == config.TORCHLITE_UID:
         await workset_manager.get_public_worksets()
         workset_manager.get_featured_worksets()
@@ -74,8 +73,6 @@ async def create_dashboard(dashboard_create: DashboardCreate,
                            workset_manager: WorksetManager,
                            owner: UUID | None = None,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
-    log.debug('create_dashboard')
-    log.debug(dashboard_create)
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     owner = owner or user_id
 
@@ -99,26 +96,18 @@ async def create_dashboard(dashboard_create: DashboardCreate,
 @cache(key_builder=request_key_builder)
 async def get_dashboard(dashboard_id: UUID,
                         user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
-    log.debug('get_dashboard')
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
-    log.debug(user_id)
-    log.debug(dashboard_id)
+
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one({"_id": dashboard_id, "$or": [{"isShared": True}, {"owner": user_id}]})
     )
     if dashboard:
-        log.debug('dashboard')
-        log.debug(dashboard)
         return dashboard
     else:
-        log.debug('no dashboard')
         dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
         if not dashboard:
-            log.debug('no dashboard')
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         else:
-            log.debug('not not dasbhoard?')
-            log.debug(dashboard)
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
 
@@ -127,7 +116,6 @@ async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            workset_manager: WorksetManager,
                            user_access_token: UserInfo | None = Depends(get_user_access_token)) -> DashboardSummary:
-    log.debug('update_dashboard')
     user = await get_current_user(user_access_token)
     await workset_manager.get_public_worksets()
     if (user_access_token):
@@ -176,9 +164,8 @@ async def update_dashboard(dashboard_id: UUID,
 @cache(key_builder=request_key_builder)
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
-    log.debug('get_widget_data')
     dashboard = await get_dashboard(dashboard_id, user)
-    log.debug("get_widget_data A")
+
     # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
     # dashboard to the expected model type if it is just a dict, so that dashboard.widgets doesn't
     # throw an error.
@@ -186,7 +173,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
     # endpoints that return pydantic models are not affected.
     if isinstance(dashboard, dict):
         dashboard = DashboardSummary.model_validate(dashboard)
-    log.debug("get_widget_data B")    
+
     widget = next((w for w in dashboard.widgets if w.type == widget_type), None)
     if not widget:
         raise HTTPException(
@@ -201,7 +188,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Analytics Gateway workset {dashboard.imported_id} has no representation within TORCHLITE. Worksets cannot recieve data until the workset is fully imported."
         )
-    log.debug(f"{widget.type} get_widget_data C")
+
     try:
         match widget.data_type:
             case WidgetDataTypes.metadata_only:
@@ -223,9 +210,9 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,
             detail=f"Server timeout for {imported_id_mapping.workset_id} on request for data for the {widget_type} widget"
         )
-    log.debug(f"{widget.type} get_widget_data D")
+
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
-    log.debug(f"{widget.type} get_widget_data E")
+
     return await widget.get_data(filtered_volumes)
 
 
@@ -233,7 +220,6 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
 @cache(key_builder=request_key_builder)
 async def get_workset_data(dashboard_id: UUID, data_type: str,
     filtered: bool = False, user: UserInfo | None = Depends(get_current_user)):
-    log.debug('get_workset_data')
     dashboard = await get_dashboard(dashboard_id, user)
 
     # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting

@@ -62,25 +62,20 @@ class SimpleTagCloudWidget(WidgetBase):
         return aggregated_counts
 
     async def get_data(self, volumes: list[ef_models.Volume[VolumeAggFeaturesNoPos]]) -> dict:
-        log.debug("get_data simple_tag_cloud A")
         vol_token_counts = [
             self.aggregate_word_counts(volume.features.body)
             for volume in volumes
         ]
-        log.debug("get_data simple_tag_cloud B")
         try:
             token_counts = self.sum_dicts(vol_token_counts)
-            log.debug("get_data simple_tag_cloud C")
             token_counts = [
                 (k, v) for k, v in token_counts.items()
                 if len(k) > 2 and k not in self.stopwords and not re.search(self._regex, k)
             ]
-            log.debug("get_data simple_tag_cloud D")
         except Exception as e:
             log.error(e)
         # FIXME: all these conditions should probably be input parameters to the widget that can be controlled from
         #        the frontend rather than hardcoded here
-        log.debug("get_data simple_tag_cloud E")
         token_counts = sorted(token_counts, key=lambda x: x[1], reverse=True)[:100]
-        log.debug("get_data simple_tag_cloud F")
+
         return dict(token_counts)

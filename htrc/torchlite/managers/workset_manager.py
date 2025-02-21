@@ -76,18 +76,16 @@ class _WorksetManager:
         return [htid['id'] for htid in data['workset']['content']['volumes']['volume']]
 
     def is_valid_workset(self, wsid: str) -> bool:
-        log.debug('is_valid_workset')
         if isinstance(wsid,str):
             wsid_string = wsid
         else:
             wsid_string = str(wsid)
-        log.debug(wsid_string)
+
         if wsid_string in self.public_worksets:
             return True
         elif self.user_worksets and wsid_string in self.user_worksets:
             return True
         else:
-            log.debug(self.public_worksets)
             return False
         
     # Handle changes in featured worksets. Ensure all featured worksets each has their own shared

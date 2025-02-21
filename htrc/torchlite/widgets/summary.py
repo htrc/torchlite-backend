@@ -46,7 +46,7 @@ class SummaryWidget(WidgetBase):
             sortedDocuments = sorted(list(target.keys()), key=lambda a: target[a]['value'], reverse=(True if extreme == 'max' else False))
             limitedDocuments = sortedDocuments[:5]
             return ';  '.join([f"{target[doc]['title']} ({target[doc]['value']})" for doc in limitedDocuments])
-        log.debug("get_data summary A")
+
         total = 0
         totalunique = 0
         loacalPerVolDict = {}
@@ -90,25 +90,25 @@ class SummaryWidget(WidgetBase):
         
             #read_score = calculate_readability(individualVol)
             #readability_score[volume.metadata.title] = read_score;
-        log.debug("get_data summary B")
+
         output_data = { 'worksetSize': len(volumes), 'totalWords': total, 'uniqueWords': totalunique, 'lengthGraph': document_lengths, 'densityGraph': vocab_density }
-        log.debug("get_data summary C")
+
         # Find the longest document
         longestDocumentsString = find_extreme_value(document_lengths,'max')
         output_data['longestDoc'] = longestDocumentsString
-        log.debug("get_data summary D")
+
         # Find the shortest document
         shortestDocumentsString = find_extreme_value(document_lengths,'min')
         output_data['shortestDoc'] = shortestDocumentsString
-        log.debug("get_data summary E")
+
         # Find the document with the highest vocabulary density
         highestDense = find_extreme_value(vocab_density,'max')
         output_data['highestDensityDoc'] = highestDense
-        log.debug("get_data summary F")
+
         # Find the document with the lowest vocabulary density
         lowestDense = find_extreme_value(vocab_density,'min')
         output_data['lowestDensityDoc'] = lowestDense
-        log.debug("get_data summary G")
+
         """ // Find the document with the highest readability score
         const highestReadabilityDocument = Object.keys(readability_score).reduce((a, b) => readability_score[a] > readabilityScore[b] ? a : b);
         const highestReadability = readability_score[highestReadabilityDocument];
