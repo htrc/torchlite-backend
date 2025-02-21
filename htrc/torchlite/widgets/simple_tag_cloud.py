@@ -1,8 +1,6 @@
-import functools
 import regex as re
 
 from re import Pattern
-from collections import Counter
 from typing import Literal, Set
 
 from .base import WidgetBase, WidgetDataTypes
