@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] – 2025-02-27
+
 ### Changed
 - All logging to use logger instead of print statements
 - How the word cloud widget tabulates word counts, significantly reducing processing time once the EF API has responded.
