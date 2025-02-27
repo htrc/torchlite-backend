@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] – 2025-02-27
+
+### Changed
+- All logging to use logger instead of print statements
+- How the word cloud widget tabulates word counts, significantly reducing processing time once the EF API has responded.
+
+### Added
+- Comparison between frontend featured workset list and backend to keep backend representation up-to-date to allow featured worksets to be swapped out by the AG user, and those changes will seemlessly propogate to TORCHLITE [#148](https://github.com/htrc/torchlite-backend/issues/148)
+
+### Fixed
+- Handling of unauthorized and invalid worksets [#146](https://github.com/htrc/torchlite-backend/issues/146)
+- Handling of volumes without text in text-based widgets [#146](https://github.com/htrc/torchlite-backend/issues/146)
+- Handling of widgets when trying to load worksets that have not yet been built in the database [#146](https://github.com/htrc/torchlite-backend/issues/146)
+- Handling of building redis connection at startup [#150](https://github.com/htrc/torchlite-backend/issues/150)
+
 ## [0.2.0] – 2025-01-06
 
 ### Added
@@ -25,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - This CHANGELOG file.
 - HTTPX client for mTLS connections to the registry to retrieve worksets. [#125](https://github.com/htrc/torchlite-backend/issues/125)
 
-[unreleased]: https://github.com/htrc/torchlite-backend/compare/0.1.0...HEAD
-[0.1.0]: https://github.com/htrc/torchlite-backend/compare/0.2.0...0.1.0
-[0.2.0]: https://github.com/htrc/torchlite-backend/releases/tag/0.2.0
+[unreleased]: https://github.com/htrc/torchlite-backend/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/htrc/torchlite-backend/compare/0.2.0...0.3.0
+[0.2.0]: https://github.com/htrc/torchlite-backend/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/htrc/torchlite-backend/releases/tag/0.1.0

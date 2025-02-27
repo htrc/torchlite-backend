@@ -11,6 +11,10 @@ from ..config import config
 from ..http_client import http
 from ..utils import sanitize
 
+import logging
+
+log = logging.getLogger(config.PROJECT_NAME)
+
 T = TypeVar('T')
 
 
@@ -107,6 +111,7 @@ class EfApi:
         if data["code"] == status.HTTP_200_OK:
             return data.get("data").get('id')
         else:
+            log.error(volumes)
             raise EfApiError(f"EF API Exception for {response.url} - {data}")
 
 ef_api = EfApi(ef_api_url=config.EF_API_URL, http_client=http)

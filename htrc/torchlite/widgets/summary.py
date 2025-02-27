@@ -4,6 +4,10 @@ from .base import WidgetBase, WidgetDataTypes
 from ..ef import models as ef_models
 from ..ef.models import VolumeAggFeaturesNoPos
 
+import logging
+from ..config import config
+
+log = logging.getLogger(config.PROJECT_NAME)
 
 class SummaryWidget(WidgetBase):
     type: Literal['Summary'] = 'Summary'
@@ -71,7 +75,7 @@ class SummaryWidget(WidgetBase):
 
             volumeId = volume.htid
 
-            individualUni = (len(per_vol_set[volumeId][volumeId]) if volumeId in per_vol_set else 0)
+            individualUni = ((len(per_vol_set[volumeId][volumeId]) if volumeId in per_vol_set[volumeId] else 0) if volumeId in per_vol_set else 0)
 
             totalunique += individualUni
 
@@ -82,7 +86,7 @@ class SummaryWidget(WidgetBase):
 
             document_words[volume.metadata.id] = { 'title': volume.metadata.title, 'value': individualVol}
     
-            vocab_density[volume.metadata.id] = { 'title': volume.metadata.title, 'value': (individualVol / individualUni) / 100 }
+            vocab_density[volume.metadata.id] = { 'title': volume.metadata.title, 'value': ((individualVol / individualUni) if individualUni > 0 else 0) / 100 }
         
             #read_score = calculate_readability(individualVol)
             #readability_score[volume.metadata.title] = read_score;
