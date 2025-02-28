@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -26,14 +27,19 @@ async def torchlite_startup() -> redis.Redis:
     env = os.environ.get("ENV", "dev")
     log.info(f"Starting Torchlite API Server v{VERSION} ({env})")
 
+    redis_connected = False
+    while not redis_connected:
     # Setup backend caching
-    try:
-        redis_connection = redis.Redis(host=config.REDIS_HOST,port=config.REDIS_PORT,password=config.REDIS_PASSWORD,db=config.REDIS_DB)
-        log.info(f"Ping successful: {await redis_connection.ping()}")
-        FastAPICache.init(RedisBackend(redis_connection), enable=config.ENABLE_CACHE, expire=config.CACHE_EXPIRE, cache_status_header=config.CACHE_STATUS_HEADER)
-        log.info('Cache initialized successfully')
-    except Exception as e:
-        log.error(f'Error initializing cache {e}')
+        try:
+            redis_connection = redis.Redis(host=config.REDIS_HOST,port=config.REDIS_PORT,password=config.REDIS_PASSWORD,db=config.REDIS_DB)
+            log.info(f"Ping successful: {await redis_connection.ping()}")
+            FastAPICache.init(RedisBackend(redis_connection), enable=config.ENABLE_CACHE, expire=config.CACHE_EXPIRE, cache_status_header=config.CACHE_STATUS_HEADER)
+            redis_connected = True
+            log.info('Cache initialized successfully')
+        except Exception as e:
+            log.error(f'Error initializing cache {e}')
+            time.sleep(5)
+            log.info('Retrying cache initialization')
 
     # ensure DB is alive
     await mongo_client.ping()
