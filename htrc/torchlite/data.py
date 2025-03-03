@@ -7,7 +7,6 @@ from .utils import make_set
 from nltk.corpus import stopwords
 import os
 import json
-import regex as re
 
 def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume]:
     filtered_volumes = []
