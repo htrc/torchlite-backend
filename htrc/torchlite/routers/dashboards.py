@@ -23,6 +23,11 @@ import os
 import json
 import csv
 from fastapi.responses import JSONResponse
+from ..ef.exceptions import EfApiError
+
+import logging
+
+log = logging.getLogger(config.PROJECT_NAME)
 
 router = APIRouter(
     prefix="/dashboards",
@@ -43,14 +48,18 @@ def request_key_builder(func, namespace: str = "", *, request: Request = None, r
 
 @router.get("/", description="Retrieve the available dashboards for a user", response_model_exclude_defaults=True)
 @cache()
-async def list_dashboards(owner: UUID | None = None,
+async def list_dashboards(workset_manager: WorksetManager,
+                          owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
 
     if owner == config.TORCHLITE_UID:
-        return await DashboardSummary.from_mongo(
+        await workset_manager.get_public_worksets()
+        workset_manager.get_featured_worksets()
+        shared_torchlite_worksets = await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
         )
-    
+        return await workset_manager.align_featured_worksets(shared_torchlite_worksets)
+
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     
@@ -94,6 +103,7 @@ async def create_dashboard(dashboard_create: DashboardCreate,
 async def get_dashboard(dashboard_id: UUID,
                         user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
+
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one({"_id": dashboard_id, "$or": [{"isShared": True}, {"owner": user_id}]})
     )
@@ -144,7 +154,7 @@ async def update_dashboard(dashboard_id: UUID,
 
             await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}")
         except Exception as e:
-            print(f"Error Clearing Cache: {e}")
+            log.error(f"Error Clearing Cache: {e}")
         return dashboard
     else:
         dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
@@ -169,37 +179,50 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
     # endpoints that return pydantic models are not affected.
     if isinstance(dashboard, dict):
         dashboard = DashboardSummary.model_validate(dashboard)
-        
+
     widget = next((w for w in dashboard.widgets if w.type == widget_type), None)
     if not widget:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Widget type {widget_type} not part of dashboard {dashboard_id}"
         )
-    imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
     
-    match widget.data_type:
-        case WidgetDataTypes.metadata_only:
-            volumes = await ef_api.get_workset_metadata(imported_id_mapping.workset_id)
+    try:
+        imported_id_mapping = (await WorksetIdMapping.from_mongo(mongo_client.db["id-mappings"].find({"importedId": dashboard.imported_id}).to_list(1000)))[0]
+    except IndexError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Analytics Gateway workset {dashboard.imported_id} has no representation within TORCHLITE. Worksets cannot recieve data until the workset is fully imported."
+        )
 
-        case WidgetDataTypes.vols_with_pos:
-            volumes = await ef_api.get_workset_volumes(imported_id_mapping.workset_id, include_pos=True)
+    try:
+        match widget.data_type:
+            case WidgetDataTypes.metadata_only:
+                volumes = await ef_api.get_workset_metadata(imported_id_mapping.workset_id)
 
-        case WidgetDataTypes.vols_no_pos:
-            volumes = await ef_api.get_workset_volumes(imported_id_mapping.workset_id, include_pos=False)
+            case WidgetDataTypes.vols_with_pos:
+                volumes = await ef_api.get_workset_volumes(imported_id_mapping.workset_id, include_pos=True)
 
-        case WidgetDataTypes.agg_vols_no_pos:
-            volumes = await ef_api.get_aggregated_workset_volumes(imported_id_mapping.workset_id)
+            case WidgetDataTypes.vols_no_pos:
+                volumes = await ef_api.get_workset_volumes(imported_id_mapping.workset_id, include_pos=False)
 
-        case _:
-            raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
+            case WidgetDataTypes.agg_vols_no_pos:
+                volumes = await ef_api.get_aggregated_workset_volumes(imported_id_mapping.workset_id)
+
+            case _:
+                raise TorchliteError(f"Unsupported widget data type {widget.data_type}")
+    except EfApiError:
+        raise HTTPException(
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail=f"Server timeout for {imported_id_mapping.workset_id} on request for data for the {widget_type} widget"
+        )
     #check widget type and perform cleaning
     filtered_volumes = apply_filters(volumes, filters=dashboard.filters)
-    print(f"Total volumes before cleaning: filtered_volumes {len(filtered_volumes)}")
+    log.debug(f"Total volumes before cleaning: filtered_volumes {len(filtered_volumes)}")
     if (widget.data_type == WidgetDataTypes.metadata_only):
         return await widget.get_data(filtered_volumes)
     cleaned_volumes = apply_datacleaning(dashboard_id, filtered_volumes, cleaning_settings=dashboard.datacleaning)
-    print(f"Total volumes to clean: cleaned_volumes {len(cleaned_volumes)}")
+    log.debug(f"Total volumes to clean: cleaned_volumes {len(cleaned_volumes)}")
     return await widget.get_data(cleaned_volumes)
 
 
