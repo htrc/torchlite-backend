@@ -137,4 +137,4 @@ FeaturesT = TypeVar('FeaturesT')
 class Volume(BaseModel, Generic[FeaturesT]):
     htid: str
     metadata: VolumeMetadata
-    features: FeaturesT | None = None
+    features: VolumeFeatures | VolumeAggFeaturesNoPos | None = None
