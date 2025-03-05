@@ -12,6 +12,10 @@ from ..managers.workset_manager import WorksetManager
 from ..models.workset import WorksetSummary, WorksetInfo, WorksetIdMapping
 from ..database import mongo_client
 from ..auth.auth import get_user_access_token, get_current_user
+from ..config import config
+import logging
+
+log = logging.getLogger(config.PROJECT_NAME)
 
 router = APIRouter(
     prefix="/worksets",
@@ -59,9 +63,12 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
     try:
         workset = (await workset_manager.get_public_worksets())[imported_id]
     except KeyError:
-        workset = (await workset_manager.get_user_worksets(user_access_token))[imported_id]
-    if not workset:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workset not found")
+        try:
+            workset = (await workset_manager.get_user_worksets(user_access_token))[imported_id]
+        except (KeyError, TypeError):
+            log.error(f"Workset not found for {imported_id}")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workset not found")
+
     volumes_meta = [torchlite_volume_meta_from_ef(vol) for vol in volumes]
     workset_info = WorksetInfo.model_construct(**workset.model_dump(), volumes=volumes_meta)
     return workset_info
