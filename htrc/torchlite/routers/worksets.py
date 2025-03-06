@@ -8,6 +8,7 @@ from starlette.responses import Response
 
 from ..converters import torchlite_volume_meta_from_ef
 from ..ef.api import ef_api
+from ..ef.exceptions import EfApiError
 from ..managers.workset_manager import WorksetManager
 from ..models.workset import WorksetSummary, WorksetInfo, WorksetIdMapping
 from ..database import mongo_client
@@ -60,9 +61,13 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
             except JSONDecodeError:
                 log.error(f"Could not retrieve volumes from Analytics Gateway for workset {imported_id}")
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workset not found")
-            
-        ef_wsid = await ef_api.create_workset(' '.join(imported_volumes))
-        mongo_client.db["id-mappings"].insert_one({"importedId": UUID(imported_id), "worksetId": ef_wsid})
+
+        try:    
+            ef_wsid = await ef_api.create_workset(' '.join(imported_volumes))
+            mongo_client.db["id-mappings"].insert_one({"importedId": UUID(imported_id), "worksetId": ef_wsid})
+        except EfApiError:
+            log.error(f"Could not build workset from given volumes")
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Workset not found")
 
     volumes = await ef_api.get_workset_metadata(ef_wsid)
     try:
