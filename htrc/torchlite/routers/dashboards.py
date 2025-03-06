@@ -157,6 +157,7 @@ async def update_dashboard(dashboard_id: UUID,
         elif dashboard.owner != user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         else:
+            log.error(f"Dashboard patch error: {dashboard}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
