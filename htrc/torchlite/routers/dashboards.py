@@ -116,19 +116,29 @@ async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            workset_manager: WorksetManager,
                            user_access_token: UserInfo | None = Depends(get_user_access_token)) -> DashboardSummary:
+    log.debug('update_dashboard')
     user = await get_current_user(user_access_token)
+    log.debug('a')
     await workset_manager.get_public_worksets()
+    log.debug('b')
     if (user_access_token):
+        log.debug('c')
         await workset_manager.get_user_worksets(user_access_token)
+        log.debug('d')
 
+    log.debug('e')
     if dashboard_patch.imported_id and not workset_manager.is_valid_workset(dashboard_patch.imported_id):
+        log.debug('f')
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown workset id {dashboard_patch.imported_id}"
         )
 
+    log.debug('g')
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
+    log.debug('h')
     dashboard_patch_update = DashboardPatchUpdate(**dashboard_patch.model_dump(exclude_defaults=True))
+    log.debug('i')
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one_and_update(
             filter={"_id": dashboard_id, "owner": user_id},
@@ -136,8 +146,11 @@ async def update_dashboard(dashboard_id: UUID,
             return_document=ReturnDocument.AFTER
         )
     )
+    log.debug('j')
     if dashboard:
+        log.debug('k')
         try:
+            log.debug('l')
             for w in dashboard.widgets:
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/widgets/{w.type}/data")
 
@@ -151,10 +164,14 @@ async def update_dashboard(dashboard_id: UUID,
             log.error(f"Error Clearing Cache: {e}")
         return dashboard
     else:
+        log.debug('m')
         dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
+        log.debug('n')
         if not dashboard:
+            log.debug('o')
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         elif dashboard.owner != user_id:
+            log.debug('p')
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         else:
             log.error(f"Dashboard patch error: {dashboard}")
