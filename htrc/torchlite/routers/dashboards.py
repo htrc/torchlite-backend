@@ -117,6 +117,7 @@ async def update_dashboard(dashboard_id: UUID,
                            workset_manager: WorksetManager,
                            user_access_token: UserInfo | None = Depends(get_user_access_token)) -> DashboardSummary:
     log.debug('update_dashboard')
+    log.debug(dashboard_patch)
     user = await get_current_user(user_access_token)
     log.debug('a')
     await workset_manager.get_public_worksets()
@@ -171,6 +172,8 @@ async def update_dashboard(dashboard_id: UUID,
             log.debug('o')
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         elif dashboard.owner != user_id:
+            log.debug(dashboard.owner)
+            log.debug(user_id)
             log.debug('p')
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         else:
