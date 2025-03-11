@@ -66,7 +66,7 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
             ef_wsid = await ef_api.create_workset(' '.join(imported_volumes))
             mongo_client.db["id-mappings"].insert_one({"importedId": UUID(imported_id), "worksetId": ef_wsid})
         except EfApiError:
-            log.error(f"Could not build workset from given volumes")
+            log.error("Could not build workset from given volumes")
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Could not build workset from given volumes")
 
     volumes = await ef_api.get_workset_metadata(ef_wsid)
