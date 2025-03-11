@@ -117,6 +117,7 @@ async def update_dashboard(dashboard_id: UUID,
                            workset_manager: WorksetManager,
                            user_access_token: UserInfo | None = Depends(get_user_access_token)) -> DashboardSummary:
     log.debug('update_dashboard')
+    log.debug(dashboard_id)
     log.debug(dashboard_patch)
     user = await get_current_user(user_access_token)
     log.debug('a')
