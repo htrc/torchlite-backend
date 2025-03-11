@@ -76,7 +76,7 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
         try:
             workset = (await workset_manager.get_user_worksets(user_access_token))[imported_id]
         except (KeyError, TypeError):
-            log.error(f"Workset not found for {imported_id}")
+            log.error(f"Workset not found for  {imported_id}")
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workset not found")
 
     volumes_meta = [torchlite_volume_meta_from_ef(vol) for vol in volumes]
