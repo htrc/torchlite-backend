@@ -46,12 +46,16 @@ def request_key_builder(func, namespace: str = "", *, request: Request = None, r
 async def list_dashboards(workset_manager: WorksetManager,
                           owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
+    log.debug('list_dashboards')
+    log.debug(f'user: {user}')
+    log.debug(f'owner: {owner}')
     if owner == config.TORCHLITE_UID:
         await workset_manager.get_public_worksets()
         workset_manager.get_featured_worksets()
         shared_torchlite_worksets = await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
         )
+        log.debug('returning featured worksets')
         return await workset_manager.align_featured_worksets(shared_torchlite_worksets)
 
     if not user:
@@ -62,7 +66,7 @@ async def list_dashboards(workset_manager: WorksetManager,
 
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-
+    log.debug('returning owner worksets')
     return await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)
     )
