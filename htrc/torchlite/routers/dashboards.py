@@ -56,6 +56,7 @@ async def list_dashboards(workset_manager: WorksetManager,
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
         )
         log.debug('returning featured worksets')
+        log.debug(workset_manager.public_worksets)
         return await workset_manager.align_featured_worksets(shared_torchlite_worksets)
 
     if not user:
