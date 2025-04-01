@@ -37,13 +37,16 @@ class _WorksetManager:
 
     async def get_public_worksets(self) -> dict[str, WorksetSummary]:
         if self.public_worksets is None:
-            headers = {'Accept': 'application/json'}
-            response = await registry_http.get(f"{config.REGISTRY_API_URL}/publicworksets", headers=headers)
-            data = json.loads(response.content)
-            self.public_worksets = {
-                workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
-                for workset in data['worksets']['workset'] if workset['metadata']['public']
-            }
+            try:
+                headers = {'Accept': 'application/json'}
+                response = await registry_http.get(f"{config.REGISTRY_API_URL}/publicworksets", headers=headers)
+                data = json.loads(response.content)
+                self.public_worksets = {
+                    workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
+                    for workset in data['worksets']['workset'] if workset['metadata']['public']
+                }
+            except Exception as e:
+                log.error(f'ERROR getting public worksets: {e}')
 
         return self.public_worksets
 
