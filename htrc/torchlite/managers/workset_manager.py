@@ -27,7 +27,7 @@ class _WorksetManager:
         self.user_worksets = None
 
     def get_featured_worksets(self) -> dict[str, WorksetSummary]:
-        if self.featured_worksets is None:
+        if self.featured_worksets is None and self.public_worksets is not None:
             self.featured_worksets = {
                 workset: self.public_worksets[workset]
                 for workset in self.public_worksets if self.public_worksets[workset].author == config.FEATURED_WORKSET_USER
