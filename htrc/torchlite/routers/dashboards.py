@@ -80,8 +80,10 @@ async def create_dashboard(dashboard_create: DashboardCreate,
                            workset_manager: WorksetManager,
                            owner: UUID | None = None,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
+    log.debug('create_dashboard')
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     owner = owner or user_id
+    log.debug(owner)
 
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
@@ -148,6 +150,9 @@ async def update_dashboard(dashboard_id: UUID,
     log.debug('h')
     dashboard_patch_update = DashboardPatchUpdate(**dashboard_patch.model_dump(exclude_defaults=True))
     log.debug('i')
+    log.debug(dashboard_patch_update)
+    log.debug(dashboard_id)
+    log.debug(user_id)
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one_and_update(
             filter={"_id": dashboard_id, "owner": user_id},
