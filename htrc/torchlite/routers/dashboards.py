@@ -173,6 +173,7 @@ async def update_dashboard(dashboard_id: UUID,
     log.debug('j')
     if dashboard:
         log.debug('k')
+        log.debug(dashboard)
         try:
             log.debug('l')
             for w in dashboard.widgets:
