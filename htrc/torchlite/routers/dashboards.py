@@ -154,9 +154,18 @@ async def update_dashboard(dashboard_id: UUID,
     log.debug(dashboard_patch_update)
     log.debug(dashboard_id)
     log.debug(user_id)
+    if user_id:
+        #The dashboard_id value is whatever the stored unauthenticated session dashboard was.
+        #Keeping that for now for the sake of consistency with GET and because I'm afraid it may
+        #be involved in how the page reloads when logging out, but we may want to get rid of 
+        #dashboard_id from patch calls when authenticated in the future
+        filter={"owner": user_id}
+    else:
+        filter={"_id": dashboard_id, "owner": user_id}
+
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one_and_update(
-            filter={"_id": dashboard_id, "owner": user_id},
+            filter=filter,
             update={"$set": dashboard_patch_update.to_mongo(exclude_unset=False)},
             return_document=ReturnDocument.AFTER
         )
