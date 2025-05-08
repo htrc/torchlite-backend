@@ -111,7 +111,7 @@ async def get_private_dashboard(user: UserInfo | None = Depends(get_current_user
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Missing user data"
-        ) 
+        )
 
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one({"owner": user_id})
@@ -140,9 +140,7 @@ async def get_dashboard(dashboard_id: UUID,
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-
-
-#@router.patch("/private", description="Update a private dashboard")
+        
 
 
 @router.patch("/{dashboard_id}", description="Update a dashboard", response_model_exclude_defaults=True)
@@ -234,6 +232,8 @@ async def update_dashboard(dashboard_id: UUID,
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
     dashboard = await get_dashboard(dashboard_id, user)
+    log.debug('get_widget_data')
+    log.debug(dashboard)
 
     # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
     # dashboard to the expected model type if it is just a dict, so that dashboard.widgets doesn't
