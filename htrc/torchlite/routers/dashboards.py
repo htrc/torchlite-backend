@@ -130,6 +130,10 @@ async def get_private_dashboard(user: UserInfo | None = Depends(get_current_user
     if dashboard:
         log.debug("PRIVATE DASHBOARD")
         log.debug(dashboard)
+        return dashboard
+    else:
+        log.error('Dashboard get error')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @router.patch("/{dashboard_id}", description="Update a dashboard", response_model_exclude_defaults=True)
 async def update_dashboard(dashboard_id: UUID,
