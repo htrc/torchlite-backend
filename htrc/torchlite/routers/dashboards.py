@@ -105,14 +105,18 @@ async def create_dashboard(dashboard_create: DashboardCreate,
 @router.get("/private", description="Retrieve a private dashboard", response_model_exclude_defaults=True)
 async def get_private_dashboard(user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
     log.debug("get_private_dashboard")
-    user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
+    if user:
+        user_id = UUID(user.get("htrc-guid", user.sub))
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing user data"
+        ) 
 
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one({"owner": user_id})
     )
     if dashboard:
-        log.debug("PRIVATE DASHBOARD")
-        log.debug(dashboard)
         return dashboard
     else:
         log.error('Dashboard get error')
@@ -136,7 +140,10 @@ async def get_dashboard(dashboard_id: UUID,
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-        
+
+
+#@router.patch("/private", description="Update a private dashboard")
+
 
 @router.patch("/{dashboard_id}", description="Update a dashboard", response_model_exclude_defaults=True)
 async def update_dashboard(dashboard_id: UUID,
