@@ -119,7 +119,17 @@ async def get_dashboard(dashboard_id: UUID,
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        
+@router.get("/private", description="Retrieve a private dashboard", response_model_exclude_defaults=True)
+async def get_private_dashboard(user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
+    user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
 
+    dashboard = await DashboardSummary.from_mongo(
+        mongo_client.db["dashboards"].find_one({"owner": user_id})
+    )
+    if dashboard:
+        log.debug("PRIVATE DASHBOARD")
+        log.debug(dashboard)
 
 @router.patch("/{dashboard_id}", description="Update a dashboard", response_model_exclude_defaults=True)
 async def update_dashboard(dashboard_id: UUID,
