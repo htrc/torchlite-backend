@@ -122,18 +122,20 @@ async def get_dashboard(dashboard_id: UUID,
         
 @router.get("/private", description="Retrieve a private dashboard", response_model_exclude_defaults=True)
 async def get_private_dashboard(user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
-    user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
-
-    dashboard = await DashboardSummary.from_mongo(
-        mongo_client.db["dashboards"].find_one({"owner": user_id})
-    )
-    if dashboard:
-        log.debug("PRIVATE DASHBOARD")
-        log.debug(dashboard)
-        return dashboard
-    else:
-        log.error('Dashboard get error')
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    log.debug("get_private_dashboard")
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+#    user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
+#
+#    dashboard = await DashboardSummary.from_mongo(
+#        mongo_client.db["dashboards"].find_one({"owner": user_id})
+#    )
+#    if dashboard:
+#        log.debug("PRIVATE DASHBOARD")
+#        log.debug(dashboard)
+#        return dashboard
+#    else:
+#        log.error('Dashboard get error')
+#        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @router.patch("/{dashboard_id}", description="Update a dashboard", response_model_exclude_defaults=True)
 async def update_dashboard(dashboard_id: UUID,
