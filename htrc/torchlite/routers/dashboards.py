@@ -46,16 +46,13 @@ def request_key_builder(func, namespace: str = "", *, request: Request = None, r
 async def list_dashboards(workset_manager: WorksetManager,
                           owner: UUID | None = None,
                           user: UserInfo | None = Depends(get_current_user)) -> list[DashboardSummary]:
-    log.debug('list_dashboards')
-    log.debug(f'user: {user}')
-    log.debug(f'owner: {owner}')
     if owner == config.TORCHLITE_UID:
         await workset_manager.get_public_worksets()
         workset_manager.get_featured_worksets()
         shared_torchlite_worksets = await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
         )
-        log.debug('returning featured worksets')
+
         if not workset_manager.public_worksets:
             raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
         
@@ -69,8 +66,7 @@ async def list_dashboards(workset_manager: WorksetManager,
 
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    log.debug('returning owner worksets')
-    log.debug(await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)))
+
     return await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)
     )
@@ -81,10 +77,8 @@ async def create_dashboard(dashboard_create: DashboardCreate,
                            workset_manager: WorksetManager,
                            owner: UUID | None = None,
                            user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
-    log.debug('create_dashboard')
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     owner = owner or user_id
-    log.debug(owner)
 
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
@@ -104,7 +98,6 @@ async def create_dashboard(dashboard_create: DashboardCreate,
 
 @router.get("/private", description="Retrieve a private dashboard", response_model_exclude_defaults=True)
 async def get_private_dashboard(user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
-    log.debug("get_private_dashboard")
     if user:
         user_id = UUID(user.get("htrc-guid", user.sub))
     else:
@@ -142,40 +135,25 @@ async def get_dashboard(dashboard_id: UUID,
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         
 
-
 @router.patch("/{dashboard_id}", description="Update a dashboard", response_model_exclude_defaults=True)
 async def update_dashboard(dashboard_id: UUID,
                            dashboard_patch: DashboardPatch,
                            workset_manager: WorksetManager,
                            user_access_token: UserInfo | None = Depends(get_user_access_token)) -> DashboardSummary:
-    log.debug('update_dashboard')
-    log.debug(dashboard_id)
-    log.debug(dashboard_patch)
     user = await get_current_user(user_access_token)
-    log.debug('a')
     await workset_manager.get_public_worksets()
-    log.debug('b')
     if (user_access_token):
-        log.debug('c')
         await workset_manager.get_user_worksets(user_access_token)
-        log.debug('d')
 
-    log.debug('e')
     if dashboard_patch.imported_id and not workset_manager.is_valid_workset(dashboard_patch.imported_id):
-        log.debug('f')
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown workset id {dashboard_patch.imported_id}"
         )
 
-    log.debug('g')
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
-    log.debug('h')
     dashboard_patch_update = DashboardPatchUpdate(**dashboard_patch.model_dump(exclude_defaults=True))
-    log.debug('i')
-    log.debug(dashboard_patch_update)
-    log.debug(dashboard_id)
-    log.debug(user_id)
+
     if user_id:
         #The dashboard_id value is whatever the stored unauthenticated session dashboard was.
         #Keeping that for now for the sake of consistency with GET and because I'm afraid it may
@@ -192,12 +170,9 @@ async def update_dashboard(dashboard_id: UUID,
             return_document=ReturnDocument.AFTER
         )
     )
-    log.debug('j')
+
     if dashboard:
-        log.debug('k')
-        log.debug(dashboard)
         try:
-            log.debug('l')
             for w in dashboard.widgets:
                 await FastAPICache.clear(namespace=None,key=f"/dashboards/{dashboard_id}/widgets/{w.type}/data")
 
@@ -211,16 +186,10 @@ async def update_dashboard(dashboard_id: UUID,
             log.error(f"Error Clearing Cache: {e}")
         return dashboard
     else:
-        log.debug('m')
         dashboard = await DashboardSummary.from_mongo(mongo_client.db["dashboards"].find_one({"_id": dashboard_id}))
-        log.debug('n')
         if not dashboard:
-            log.debug('o')
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         elif dashboard.owner != user_id:
-            log.debug(dashboard.owner)
-            log.debug(user_id)
-            log.debug('p')
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         else:
             log.error(f"Dashboard patch error: {dashboard}")
@@ -232,8 +201,6 @@ async def update_dashboard(dashboard_id: UUID,
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
     dashboard = await get_dashboard(dashboard_id, user)
-    log.debug('get_widget_data')
-    log.debug(dashboard)
 
     # fastapi_cache doesn't seem to preserve pydantic models and instead returns dicts, so converting
     # dashboard to the expected model type if it is just a dict, so that dashboard.widgets doesn't
