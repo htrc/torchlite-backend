@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- PATCH calls will search by user_id if one exists to handle authenticated users, while searching by dashboard_id when unauthenticated so calls for authenticated users can ignore the now-meaningless dashboard id value
+
+### Added
+- Separate GET dashboard call for authenticated users, so we're not causing any confusion by passing a meaningless dashboard id
+- Raises 404 error when we can't find workset in AG list of public or private worksets
+- Raises 422 error when trying to build a workset where no HTIDs are in TORCHLITE
+
+### Fixed
+- Handling of worksets when none are loading from Analytics Gateway
+
 ## [0.3.0] – 2025-02-27
 
 ### Changed
