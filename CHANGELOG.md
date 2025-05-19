@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] – 2025-05-19
+
 ### Changed
 - PATCH calls will search by user_id if one exists to handle authenticated users, while searching by dashboard_id when unauthenticated so calls for authenticated users can ignore the now-meaningless dashboard id value
 
@@ -51,7 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - This CHANGELOG file.
 - HTTPX client for mTLS connections to the registry to retrieve worksets. [#125](https://github.com/htrc/torchlite-backend/issues/125)
 
-[unreleased]: https://github.com/htrc/torchlite-backend/compare/0.3.0...HEAD
+[unreleased]: https://github.com/htrc/torchlite-backend/compare/0.3.1...HEAD
+[0.3.1]: https://github.com/htrc/torchlite-backend/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/htrc/torchlite-backend/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/htrc/torchlite-backend/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/htrc/torchlite-backend/releases/tag/0.1.0
