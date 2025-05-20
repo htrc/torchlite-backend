@@ -8,10 +8,15 @@ from starlette.responses import Response
 
 from ..converters import torchlite_volume_meta_from_ef
 from ..ef.api import ef_api
+from ..ef.exceptions import EfApiError
 from ..managers.workset_manager import WorksetManager
 from ..models.workset import WorksetSummary, WorksetInfo, WorksetIdMapping
 from ..database import mongo_client
 from ..auth.auth import get_user_access_token, get_current_user
+from ..config import config
+import logging
+
+log = logging.getLogger(config.PROJECT_NAME)
 
 router = APIRouter(
     prefix="/worksets",
@@ -33,8 +38,8 @@ async def list_worksets(workset_manager: WorksetManager, user_access_token: Anno
     featured_worksets = workset_manager.get_featured_worksets()
     user_worksets = await workset_manager.get_user_worksets(user_access_token)
 
-    return {'public': sorted(list(public_worksets.values()), key=lambda d: d.name),
-            'featured': sorted(list(featured_worksets.values()), key=lambda d: d.name), 
+    return {'public': sorted(list(public_worksets.values()), key=lambda d: d.name) if public_worksets else [],
+            'featured': sorted(list(featured_worksets.values()), key=lambda d: d.name) if featured_worksets else [], 
             'user': sorted(list(user_worksets.values()), key=lambda d: d.name) if user_worksets else []}
 
 
@@ -51,17 +56,29 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
         try:
             imported_volumes = await workset_manager.get_public_workset_volumes(imported_id)
         except JSONDecodeError:
-            imported_volumes = await workset_manager.get_user_workset_volumes(imported_id,user_access_token)
-        ef_wsid = await ef_api.create_workset(' '.join(imported_volumes))
-        mongo_client.db["id-mappings"].insert_one({"importedId": UUID(imported_id), "worksetId": ef_wsid})
+            try:
+                imported_volumes = await workset_manager.get_user_workset_volumes(imported_id,user_access_token)
+            except JSONDecodeError:
+                log.error(f"Could not retrieve volumes from Analytics Gateway for workset {imported_id}")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workset not found")
+
+        try:    
+            ef_wsid = await ef_api.create_workset(' '.join(imported_volumes))
+            mongo_client.db["id-mappings"].insert_one({"importedId": UUID(imported_id), "worksetId": ef_wsid})
+        except EfApiError:
+            log.error("Could not build workset from given volumes")
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Could not build workset from given volumes")
 
     volumes = await ef_api.get_workset_metadata(ef_wsid)
     try:
         workset = (await workset_manager.get_public_worksets())[imported_id]
     except KeyError:
-        workset = (await workset_manager.get_user_worksets(user_access_token))[imported_id]
-    if not workset:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workset not found")
+        try:
+            workset = (await workset_manager.get_user_worksets(user_access_token))[imported_id]
+        except (KeyError, TypeError):
+            log.error(f"Workset not found for  {imported_id}")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workset not found")
+
     volumes_meta = [torchlite_volume_meta_from_ef(vol) for vol in volumes]
     workset_info = WorksetInfo.model_construct(**workset.model_dump(), volumes=volumes_meta)
     return workset_info

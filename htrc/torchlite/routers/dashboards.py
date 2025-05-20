@@ -52,6 +52,10 @@ async def list_dashboards(workset_manager: WorksetManager,
         shared_torchlite_worksets = await DashboardSummary.from_mongo(
             mongo_client.db["dashboards"].find({"owner": config.TORCHLITE_UID, "isShared": True}).to_list(1000)
         )
+
+        if not workset_manager.public_worksets:
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
         return await workset_manager.align_featured_worksets(shared_torchlite_worksets)
 
     if not user:
@@ -92,6 +96,26 @@ async def create_dashboard(dashboard_create: DashboardCreate,
     return dashboard
 
 
+@router.get("/private", description="Retrieve a private dashboard", response_model_exclude_defaults=True)
+async def get_private_dashboard(user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
+    if user:
+        user_id = UUID(user.get("htrc-guid", user.sub))
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing user data"
+        )
+
+    dashboard = await DashboardSummary.from_mongo(
+        mongo_client.db["dashboards"].find_one({"owner": user_id})
+    )
+    if dashboard:
+        return dashboard
+    else:
+        log.error('Dashboard get error')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @router.get("/{dashboard_id}", description="Retrieve a dashboard", response_model_exclude_defaults=True)
 @cache(key_builder=request_key_builder)
 async def get_dashboard(dashboard_id: UUID,
@@ -109,7 +133,7 @@ async def get_dashboard(dashboard_id: UUID,
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-
+        
 
 @router.patch("/{dashboard_id}", description="Update a dashboard", response_model_exclude_defaults=True)
 async def update_dashboard(dashboard_id: UUID,
@@ -129,13 +153,24 @@ async def update_dashboard(dashboard_id: UUID,
 
     user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
     dashboard_patch_update = DashboardPatchUpdate(**dashboard_patch.model_dump(exclude_defaults=True))
+
+    if user_id:
+        #The dashboard_id value is whatever the stored unauthenticated session dashboard was.
+        #Keeping that for now for the sake of consistency with GET and because I'm afraid it may
+        #be involved in how the page reloads when logging out, but we may want to get rid of 
+        #dashboard_id from patch calls when authenticated in the future
+        filter={"owner": user_id}
+    else:
+        filter={"_id": dashboard_id, "owner": user_id}
+
     dashboard = await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find_one_and_update(
-            filter={"_id": dashboard_id, "owner": user_id},
+            filter=filter,
             update={"$set": dashboard_patch_update.to_mongo(exclude_unset=False)},
             return_document=ReturnDocument.AFTER
         )
     )
+
     if dashboard:
         try:
             for w in dashboard.widgets:
@@ -157,6 +192,7 @@ async def update_dashboard(dashboard_id: UUID,
         elif dashboard.owner != user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         else:
+            log.error(f"Dashboard patch error: {dashboard}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
