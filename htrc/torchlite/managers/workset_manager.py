@@ -27,7 +27,7 @@ class _WorksetManager:
         self.user_worksets = None
 
     def get_featured_worksets(self) -> dict[str, WorksetSummary]:
-        if self.featured_worksets is None:
+        if self.featured_worksets is None and self.public_worksets is not None:
             self.featured_worksets = {
                 workset: self.public_worksets[workset]
                 for workset in self.public_worksets if self.public_worksets[workset].author == config.FEATURED_WORKSET_USER
@@ -37,21 +37,24 @@ class _WorksetManager:
 
     async def get_public_worksets(self) -> dict[str, WorksetSummary]:
         if self.public_worksets is None:
-            headers = {'Accept': 'application/json'}
-            response = await registry_http.get(f"{config.REGISTRY_API_URL}/publicworksets", headers=headers)
-            data = json.loads(response.content)
-            self.public_worksets = {
-                workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
-                for workset in data['worksets']['workset'] if workset['metadata']['public']
-            }
+            try:
+                headers = {'Accept': 'application/json'}
+                response = await registry_http.get(f"{config.REGISTRY_API_URL}/publicworksets", headers=headers)
+                data = json.loads(response.content)
+                self.public_worksets = {
+                    workset['metadata']['id']: WorksetSummary.model_construct(numVolumes=workset['metadata']['volumeCount'],isPublic=workset['metadata']['public'],**workset['metadata'])
+                    for workset in data['worksets']['workset'] if workset['metadata']['public']
+                }
+            except Exception as e:
+                log.error(f'ERROR getting public worksets: {e}')
 
         return self.public_worksets
 
     async def get_user_worksets(self, user_access_token: str | None) -> dict[str, WorksetSummary]:
         if self.user_worksets is None and user_access_token is not None:
             headers = {'Accept': 'application/json', 'Authorization': user_access_token}
-            response = await registry_http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
             try:
+                response = await registry_http.get(f"{config.REGISTRY_API_URL}/worksets", headers=headers)
                 data = json.loads(response.content)
 
                 self.user_worksets = {
