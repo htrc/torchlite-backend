@@ -83,13 +83,10 @@ def clean_volume_data(volume: Volume, stopwords: list[str]):
     volume.features.body = cleaned_data
     return volume
 
-def apply_datacleaning(dashboard_id: UUID, filtered_volumes: list[Volume], cleaning_settings: DataCleaningSettings):
-    
-    language = cleaning_settings.language 
-    
+def apply_datacleaning(dashboard_id: UUID, filtered_volumes: list[Volume], cleaning_settings: DataCleaningSettings):    
     cleaned_volumes = []
-    if (language):
-        stopwords = load_stopwords(dashboard_id, language.lower())
+    if (cleaning_settings.language):
+        stopwords = load_stopwords(dashboard_id, cleaning_settings.language.lower())
     
         count = 0
         for volume in filtered_volumes:
