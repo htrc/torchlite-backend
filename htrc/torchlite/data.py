@@ -1,8 +1,18 @@
+from uuid import UUID
+
+import nltk 
 from .converters import torchlite_volume_meta_from_ef
 from .ef.models import Volume
 from .models.dashboard import FilterSettings
+from .models.dashboard import DataCleaningSettings
 from .utils import make_set
+from .config import config
+from nltk.corpus import stopwords
+import os
+import json
+import logging
 
+log = logging.getLogger(config.PROJECT_NAME)
 
 def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume]:
     filtered_volumes = []
@@ -33,4 +43,58 @@ def apply_filters(volumes: list[Volume], filters: FilterSettings) -> list[Volume
 
         filtered_volumes.append(volume)
 
+    return filtered_volumes
+
+def load_stopwords(dashboard_id: UUID, language: str, directory="stopword_lists"):
+    nltk.download('stopwords')
+    default_languages = ['english', 'german', 'spanish', 'french']
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    for lang in default_languages:
+        stopword_list = stopwords.words(lang)
+        stopword_file_path = os.path.join(directory, f"{lang}_stopwords.json")
+        with open(stopword_file_path, 'w', encoding='utf-8') as file:
+            json.dump(stopword_list, file, ensure_ascii=False, indent=4)
+
+    stopword_file_path = os.path.join(directory, f"{dashboard_id}_stopwords.json")
+    log.debug(stopword_file_path)
+    log.debug(os.path.exists(stopword_file_path))
+    if lang not in ["English", "German", "French", "Spanish"]:
+        if (os.path.exists(stopword_file_path)):
+            with open(stopword_file_path, 'r', encoding='utf-8') as file:
+                return json.load(file)
+
+    default_stopword_file = os.path.join(directory, f"{language}_stopwords.json")
+    if (os.path.exists(default_stopword_file)):
+        with open(default_stopword_file, 'r', encoding='utf-8') as file:
+            return json.load(file)
+
+def clean_volume_data(volume: Volume, stopwords: list[str]):
+    cleaned_data = {}
+
+    for word, count in volume.features.body.items():
+        lower_word = word.lower()
+
+        if lower_word not in stopwords:
+            if lower_word not in cleaned_data:
+                cleaned_data[lower_word] = count
+            else:
+                cleaned_data[lower_word] += count
+    volume.features.body = cleaned_data
+    return volume
+
+def apply_datacleaning(dashboard_id: UUID, filtered_volumes: list[Volume], cleaning_settings: DataCleaningSettings):    
+    cleaned_volumes = []
+    if (cleaning_settings.language):
+        stopwords = load_stopwords(dashboard_id, cleaning_settings.language.lower())
+    
+        count = 0
+        for volume in filtered_volumes:
+            log.debug(f"'me' present before cleaning: {'me' in volume.features.body}")
+            cleaned_volume = clean_volume_data(volume, stopwords) 
+            count += 1
+            log.debug(f"'me' present after cleaning: {'me' in cleaned_volume.features.body}")
+            cleaned_volumes.append(cleaned_volume)
+
+        return cleaned_volumes
     return filtered_volumes

@@ -22,11 +22,14 @@ class FilterSettings(BaseModel):
     languages: list[str] = []
     source_institutions: list[str] = []
 
+class DataCleaningSettings(BaseModel):
+    language: str | None = None
 
 class Dashboard(BaseModel, arbitrary_types_allowed=True):
     id: PyUuid = Field(default_factory=uuid.uuid4)
     imported_id: UUID
     filters: FilterSettings | None
+    datacleaning: DataCleaningSettings | None = None
     widgets: list[ALL_WIDGETS]
 
 
@@ -45,12 +48,14 @@ class DashboardCreate(MongoModel):
     description: str | None = None
     imported_id: UUID
     filters: FilterSettings | None = None
+    datacleaning: DataCleaningSettings | None = None
     widgets: conlist(ALL_WIDGETS, min_length=1)
 
 
 class DashboardPatch(MongoModel):
     imported_id: UUID | None = None
     filters: FilterSettings | None = None
+    datacleaning: DataCleaningSettings | None = None
     widgets: list[ALL_WIDGETS] | None = None
     is_shared: bool | None = None
 
