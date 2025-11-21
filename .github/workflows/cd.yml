@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Poetry with dynamic versioning support
@@ -66,7 +66,7 @@ jobs:
     needs: cd
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Show GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
