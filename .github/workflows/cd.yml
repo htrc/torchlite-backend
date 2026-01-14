@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install Poetry with dynamic versioning support
@@ -52,7 +52,7 @@ jobs:
       - name: Build wheels
         run: poetry build --format=wheel
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: torchlite-wheels
           path: dist
@@ -66,7 +66,7 @@ jobs:
     needs: cd
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Show GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -86,7 +86,7 @@ jobs:
           labels: |
             org.opencontainers.image.vendor=HathiTrust Research Center
       - name: Retrieve saved wheels
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: torchlite-wheels
           path: dist
@@ -109,7 +109,7 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Repository Dispatch
         if: github.event.inputs.environment == ''
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@v4
         env:
           HEAD_COMMIT_MESSAGE: ${{ toJSON(github.event.head_commit.message) }}
         with:
@@ -127,7 +127,7 @@ jobs:
             }
       - name: Manual Repository Dispatch
         if: github.event.inputs.environment != ''
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@v4
         env:
           HEAD_COMMIT_MESSAGE: ${{ toJSON(github.event.head_commit.message) }}
         with:
