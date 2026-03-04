@@ -91,7 +91,8 @@ class MappingContributorDataWidget(WidgetBase):
         data = await http.get(
             cls.WIKIDATA_URL,
             params={'query': query},
-            headers={'Accept': 'application/sparql-results+json'}
+            headers={'Accept': 'application/sparql-results+json',
+                     'User-Agent': 'TORCHLITE / 0.3.2 HathiTrust Research Center'}
         )
         data = data.json()
 
