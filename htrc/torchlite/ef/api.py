@@ -93,6 +93,8 @@ class EfApi:
         return [models.Volume[VolumeAggFeaturesNoPos](**sanitize(vol)) for vol in data]
 
     async def create_workset(self, volumes: list[str]) -> str:
+        log.debug(f"{self.ef_api_url}/worksets")
+        log.debug(volumes)
         try:
             headers = {
                 "Content-Type": "text/plain",
