@@ -130,7 +130,7 @@ class VolumeAggFeaturesNoPos(BaseModel):
     header: dict[str, int] | None = None
     body: dict[str, int] | None = None
     footer: dict[str, int] | None = None
-    calculated_language: list[str] | None = None
+    calculated_language: dict[str, int] | list[str] | None = None
 
 FeaturesT = TypeVar('FeaturesT')
 
