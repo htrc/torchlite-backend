@@ -37,7 +37,7 @@ fastapi-cache2 = {version = "^0.2.2", extras = ["redis"]}
 h11 = "^0.16.0"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^7.2.2"
+pytest = "^9.0.3"
 pytest-asyncio = "^0.18.3"
 pytest-cov = "^3.0.0"
 pytest-html = "^3.1.1"
