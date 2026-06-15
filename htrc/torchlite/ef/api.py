@@ -44,7 +44,6 @@ class EfApi:
             raise EfApiError(f"EF API Exception for {response.url} - {data}")
 
     async def get_workset(self, wsid: str, **kwargs) -> models.Workset:
-        log.debug(f"{self.ef_api_url}/worksets/{wsid}")
         data = await self._get(f"{self.ef_api_url}/worksets/{wsid}", **kwargs)
         return models.Workset(**data)
 
@@ -53,8 +52,6 @@ class EfApi:
         if fields:
             params["fields"] = ",".join(fields)
 
-        log.debug(f"{self.ef_api_url}/worksets/{wsid}/metadata")
-        log.debug(params)
         data = await self._get(
             f"{self.ef_api_url}/worksets/{wsid}/metadata",
             params=params,
@@ -71,8 +68,6 @@ class EfApi:
         if fields:
             params["fields"] = ",".join(fields)
 
-        log.debug(f"{self.ef_api_url}/worksets/{wsid}/volumes")
-        log.debug(params)
         data = await self._get(
             f"{self.ef_api_url}/worksets/{wsid}/volumes",
             params=params,
@@ -89,8 +84,6 @@ class EfApi:
         if fields:
             params["fields"] = ",".join(fields)
 
-        log.debug(f"{self.ef_api_url}/worksets/{wsid}/volumes/aggregated")
-        log.debug(params)
         data = await self._get(
             f"{self.ef_api_url}/worksets/{wsid}/volumes/aggregated",
             params=params,
@@ -100,8 +93,6 @@ class EfApi:
         return [models.Volume[VolumeAggFeaturesNoPos](**sanitize(vol)) for vol in data]
 
     async def create_workset(self, volumes: list[str]) -> str:
-        log.debug(f"{self.ef_api_url}/worksets")
-        log.debug(volumes)
         try:
             headers = {
                 "Content-Type": "text/plain",
