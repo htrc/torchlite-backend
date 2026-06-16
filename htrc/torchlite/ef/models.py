@@ -60,7 +60,7 @@ class VolumeMetadata(BaseModel):
         "cc-by-nc-3.0", "cc-by-nc-sa-3.0", "cc-by-sa-3.0", "orphcand", "cc-zero", "und-world", "icus", "cc-by-4.0",
         "cc-by-nd-4.0", "cc-by-nc-nd-4.0", "cc-by-nc-4.0", "cc-by-nc-sa-4.0", "cc-by-sa-4.0", "pd-pvt", "supp"
     ]
-    access_profile: Literal["open", "google", "page", "page+lowres"]
+    access_profile: Literal["open", "google", "page", "page+lowres"] | None = None
     source_institution: SourceInstitution
     main_entity_of_page: list[str] | None = None
     lcc: str | list[str] | None = None
@@ -130,7 +130,7 @@ class VolumeAggFeaturesNoPos(BaseModel):
     header: dict[str, int] | None = None
     body: dict[str, int] | None = None
     footer: dict[str, int] | None = None
-    calculated_language: list[str] | None = None
+    calculated_language: dict[str, int] | list[str] | None = None
 
 FeaturesT = TypeVar('FeaturesT')
 
