@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] – 2026-06-16
+
+### Added
+- Validation for EF 2.5 while still allowing EF 2.0 data to be returned. Specifically in the metadata accessProfile is optional, and in the aggregated features data the page-level calculated language can now be a dict holding counts for each language instead of just a set that lists each distinct language.
+
 ## [0.3.2] – 2026-03-03
 
 ### Fixed
@@ -58,7 +63,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - This CHANGELOG file.
 - HTTPX client for mTLS connections to the registry to retrieve worksets. [#125](https://github.com/htrc/torchlite-backend/issues/125)
 
-[unreleased]: https://github.com/htrc/torchlite-backend/compare/0.3.2...HEAD
+[unreleased]: https://github.com/htrc/torchlite-backend/compare/0.3.3...HEAD
+[0.3.3]: https://github.com/htrc/torchlite-backend/compare/0.3.2...0.3.3
 [0.3.2]: https://github.com/htrc/torchlite-backend/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/htrc/torchlite-backend/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/htrc/torchlite-backend/compare/0.2.0...0.3.0
