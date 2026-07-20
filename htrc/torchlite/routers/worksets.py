@@ -46,13 +46,16 @@ async def list_worksets(workset_manager: WorksetManager, user_access_token: Anno
 @router.get("/{imported_id}/metadata", response_model_exclude_defaults=True)
 @cache()
 async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager, user_access_token: Annotated[str | None, Depends(get_user_access_token)]) -> WorksetInfo:
+    log.debug(f'Imported ID: {imported_id}')
     imported_id_mapping = await WorksetIdMapping.from_mongo(
         mongo_client.db["id-mappings"].find({"importedId": UUID(imported_id)}).to_list(1000))
 
     if len(imported_id_mapping):
+        log.debug(f'Imported ID mapping: {imported_id_mapping}')
         imported_id_mapping = imported_id_mapping[0]
         ef_wsid = imported_id_mapping.workset_id
     else:
+        log.debug('No Imported ID mapping')
         try:
             imported_volumes = await workset_manager.get_public_workset_volumes(imported_id)
         except JSONDecodeError:
@@ -69,7 +72,9 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
             log.error("Could not build workset from given volumes")
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Could not build workset from given volumes")
 
+    log.debug(f'WSID: {ef_wsid}')
     volumes = await ef_api.get_workset_metadata(ef_wsid)
+    log.debug(f'Volumes: {volumes}')
     try:
         workset = (await workset_manager.get_public_worksets())[imported_id]
     except KeyError:
@@ -78,6 +83,7 @@ async def get_workset_metadata(imported_id: str, workset_manager: WorksetManager
         except (KeyError, TypeError):
             log.error(f"Workset not found for  {imported_id}")
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workset not found")
+    log.debug(f'Workset: {workset}')
 
     volumes_meta = [torchlite_volume_meta_from_ef(vol) for vol in volumes]
     workset_info = WorksetInfo.model_construct(**workset.model_dump(), volumes=volumes_meta)
