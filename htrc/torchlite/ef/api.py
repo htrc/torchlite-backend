@@ -34,7 +34,10 @@ class EfApi:
             response = await self.http.get(*args, **kwargs)
             response.raise_for_status()
         except httpx.HTTPError as e:
-            raise EfApiError(f"HTTP Exception for {e.request.url} - {e}")
+            detail = str(e) or repr(e)
+            if e.__cause__ is not None:
+                detail = f'{detail} (caused by {e.__cause__!r})'
+            raise EfApiError(f"HTTP Exception for {e.request.url} - {detail}")
 
         data = response.json()
 
@@ -105,7 +108,10 @@ class EfApi:
             )
             response.raise_for_status()
         except httpx.HTTPError as e:
-            raise EfApiError(f"HTTP Exception for {e.request.url} - {e}")
+            detail = str(e) or repr(e)
+            if e.__cause__ is not None:
+                detail = f'{detail} (caused by {e.__cause__!r})'
+            raise EfApiError(f"HTTP Exception for {e.request.url} - {detail}")
         
         data = response.json()
         if data["code"] == status.HTTP_200_OK:
