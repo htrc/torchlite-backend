@@ -56,6 +56,7 @@ async def list_dashboards(workset_manager: WorksetManager,
         if not workset_manager.public_worksets:
             raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
         
+        log.debug("A")
         return await workset_manager.align_featured_worksets(shared_torchlite_worksets)
 
     if not user:
@@ -67,6 +68,7 @@ async def list_dashboards(workset_manager: WorksetManager,
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
+    log.debug("B");
     return await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)
     )
