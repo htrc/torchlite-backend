@@ -68,7 +68,7 @@ async def list_dashboards(workset_manager: WorksetManager,
     if user_id != owner:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    log.debug("B");
+    log.debug("B")
     return await DashboardSummary.from_mongo(
         mongo_client.db["dashboards"].find({"owner": owner}).to_list(1000)
     )
