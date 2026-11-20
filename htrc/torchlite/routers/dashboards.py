@@ -115,8 +115,16 @@ async def get_private_dashboard(user: UserInfo | None = Depends(get_current_user
         log.error('Dashboard get error')
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+async def require_dashboard_access(dashboard_id: UUID,
+                        user: UserInfo | None = Depends(get_current_user)) -> None:
+    user_id = UUID(user.get("htrc-guid", user.sub)) if user else None
+    doc = await mongo_client.db["dashboards"].find_one({"_id": dashboard_id}, {"owner": 1, "isShared": 1})
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if not doc.get("isShared") and doc.get("owner") != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-@router.get("/{dashboard_id}", description="Retrieve a dashboard", response_model_exclude_defaults=True)
+@router.get("/{dashboard_id}", dependencies=[Depends(require_dashboard_access)], description="Retrieve a dashboard", response_model_exclude_defaults=True)
 @cache(key_builder=request_key_builder)
 async def get_dashboard(dashboard_id: UUID,
                         user: UserInfo | None = Depends(get_current_user)) -> DashboardSummary:
@@ -196,7 +204,7 @@ async def update_dashboard(dashboard_id: UUID,
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/{dashboard_id}/widgets/{widget_type}/data", description="Retrieve widget data")
+@router.get("/{dashboard_id}/widgets/{widget_type}/data", dependencies=[Depends(require_dashboard_access)], description="Retrieve widget data")
 @cache(key_builder=request_key_builder)
 async def get_widget_data(dashboard_id: UUID, widget_type: str,
                           user: UserInfo | None = Depends(get_current_user)):
@@ -252,7 +260,7 @@ async def get_widget_data(dashboard_id: UUID, widget_type: str,
     return await widget.get_data(filtered_volumes)
 
 
-@router.get("/{dashboard_id}/{data_type}", description="Retrieve workset data or metadata")
+@router.get("/{dashboard_id}/{data_type}", dependencies=[Depends(require_dashboard_access)], description="Retrieve workset data or metadata")
 @cache(key_builder=request_key_builder)
 async def get_workset_data(dashboard_id: UUID, data_type: str,
     filtered: bool = False, user: UserInfo | None = Depends(get_current_user)):

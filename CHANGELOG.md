@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.4] – 2026-11-20
+
+### Security
+
+- When a dashboard was loaded into the cache any user who had access to that dashboard_id could access three endpoints that were using a custom cache function which bypassed the default and thus did not confirm that the querying user was the owner of the dashboard. Fixed by adding a function that checks authentication as a dependency for the three vulnerable endpoints.
+
 ## [0.3.3] – 2026-06-16
 
 ### Added
@@ -63,7 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - This CHANGELOG file.
 - HTTPX client for mTLS connections to the registry to retrieve worksets. [#125](https://github.com/htrc/torchlite-backend/issues/125)
 
-[unreleased]: https://github.com/htrc/torchlite-backend/compare/0.3.3...HEAD
+[unreleased]: https://github.com/htrc/torchlite-backend/compare/0.3.4...HEAD
+[0.3.4]: https://github.com/htrc/torchlite-backend/compare/0.3.3...0.3.4
 [0.3.3]: https://github.com/htrc/torchlite-backend/compare/0.3.2...0.3.3
 [0.3.2]: https://github.com/htrc/torchlite-backend/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/htrc/torchlite-backend/compare/0.3.0...0.3.1
